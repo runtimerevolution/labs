@@ -94,7 +94,128 @@ Embeddings allow us to bridge the gap between raw data and machine learning mode
    - nomic-embed-text
    - all-minilm
 
-(1) [OpenAI.] https://platform.openai.com/docs/models/embeddings.
+(1) [OpenAI.] (https://platform.openai.com/docs/models/embeddings)
 (2) [Cohere AI.](https://dashboard.cohere.com/playground/classify)
 (3) [Anthropic.](https://docs.anthropic.com/en/docs/embeddings)
 (4) [Ollama.](https://ollama.com/blog/embedding-models)
+
+
+**Choosing the right embedding model**
+
+1. **Role of Embeddings in AI Applications**:
+   - Question Answering (QA):
+      Embeddings encode questions and answers into high-dimensional vectors.
+      Enables efficient information retrieval for precise answers.
+   - Conversational Search:
+      Embeddings represent nuances in dynamic conversations.
+      Facilitates context-aware information retrieval.
+   - InContext Learning (ICL):
+      Retrieving context-relevant demonstrations enhances learning efficiency.
+      Addresses biases in manual example selection.
+   - Tool Fetching:
+      Embeddings improve tool recommendations for a user-friendly experience.
+
+2. **Impact of Embeddings on RAG Performance**:
+   - Encoder Selection:
+      Choose the right encoder for success.
+      Low-quality embeddings lead to poor retrieval.
+   - Selection Criteria:
+      Consider vector dimension, retrieval performance, and model size.
+      Custom evaluation on your dataset is essential.
+   - Private vs. Public Models:
+      Private embedding APIs offer convenience but have scaling limitations.
+      Verify rate limits and explore model improvements.
+   - Cost Considerations:
+      - Querying Cost: Ensure high availability based on model size and latency needs.
+      - Indexing Cost: Separate storage for flexibility.
+      - Storage Cost: Scales with dimension (e.g., OpenAI’s 1526 dimensions).
+      - Search Latency: Opt for low-dimensional embeddings.
+      - Language Support: Choose multilingual encoders.
+      - Privacy Concerns: Evaluate data privacy requirements.
+      - Granularity of Text: Segment large text for relevance and noise reduction.
+
+3. **Types of embeddings**:
+   - Dense Embeddings:
+      - Dense embeddings are continuous, real-valued vectors that capture overall semantic meaning.
+      - Suitable for tasks like dense retrieval and semantic search.
+      - Examples include embeddings from models like OpenAI's Ada or sentence transformers.
+
+   - Sparse Embeddings:
+      - Sparse embeddings emphasize relevant information by having most values as zero.
+      - Beneficial for specialized domains with rare terms (e.g., medical field).
+      - Overcome limitations of Bag-of-Words (BOW) models.
+
+   - Multi-Vector Embeddings (ColBERT):
+      - Late interaction models where query and document representations interact after encoding.
+      - Efficient for large document collections due to pre-computed document representations.
+
+   - Long Context Embeddings:
+      - Address challenges in embedding long documents.
+      - Models like BGE-M3 allow encoding sequences up to 8,192 tokens.
+
+   - Variable Dimension Embeddings (Matryoshka Representation Learning):
+      - Nested lower-dimensional embeddings (like Matryoshka Dolls).
+      - Efficiently pack information at logarithmic granularities.
+      - Models like OpenAI's text-embedding-3-small and Nomic's Embed v1.5 use this approach.
+
+   - Code Embeddings:
+      - Transform how developers interact with codebases.
+      - Semantic understanding for code snippets and functionalities.
+      - Models like OpenAI's text-embedding-3-small and jina-embeddings-v2-base-code facilitate code search and assistance.
+
+4. **How to Measure Embedding Performance**:
+   - Retrieval Metrics and MTEB Benchmark:
+      - Retrieval metrics are used to evaluate the performance of embeddings.
+      - The **Massive Text Embedding Benchmark (MTEB)** is widely recognized for this purpose.
+      - MTEB evaluates embeddings using datasets containing a corpus, queries, and mappings to relevant documents.
+      - The goal is to identify pertinent documents based on similarity scores calculated using cosine similarity.
+      - Metrics like **nDCG@10** are commonly used to assess performance.
+
+   - Limitations of MTEB:
+      - While MTEB provides insights into top embedding models, it doesn't determine the best choice for specific domains or tasks.
+      - It's essential to evaluate embeddings on your own dataset to find the optimal model.
+
+   - Chunk Attribution:
+      - In scenarios where raw text is available, assessing retrieval-at-generation (RAG) performance on user queries is crucial.
+      - **Chunk attribution** helps identify which retrieved chunks or documents were used by the model to generate an answer.
+      - An attribution score of 0 indicates that necessary documents weren't retrieved.
+      - The average score represents the ratio of utilized chunks at a run level.
+
+5. **Choosing the Right Embedding Model for RAG Systems**:
+
+The process of selecting an optimal embedding model for a Retrieval-Augmented Generation (RAG) system can be enhanced by using chunk attribution to identify which model best fits a specific use case. Galileo’s GenAI Studio offers a practical demonstration using 10-K annual financial reports from Nvidia over the past four years.
+
+- Data Preparation
+   - Retrieval and Parsing: The 10-K reports are parsed using the PyPDF library, producing approximately 700 large text chunks.
+   - Question Generation: GPT-turbo with a zero-shot instruction prompt generates a question for each chunk. A subset of 100 chunks is randomly selected to ensure questions cover all reports.
+
+- Evaluation Metrics
+   - RAG Metrics:
+      - Chunk Attribution: Boolean metric indicating whether a chunk contributed to the response.
+      - Chunk Utilization: Measures the extent of chunk text used in responses.
+      - Completeness: Assesses how much of the provided context was used in generating a response.
+      - Context Adherence: Evaluates if the LLM’s output aligns with the given context.
+
+- Safety Metrics:
+   - Private Identifiable Information (PII): Flags instances of PII such as credit card numbers and email addresses.
+   - Toxicity: Binary classification to detect hateful or toxic information.
+   - Tone: Classifies response tone into nine emotional categories.
+
+- System Metrics:
+   - Latency: Measures the response time of LLM calls.
+
+- Workflow for Model Evaluation
+
+A function is created to run various sweep parameters, testing different embedding models to identify the optimal one. Steps include:
+   - Loading the embedding model.
+   - Managing the vector index.
+   - Vectorizing chunks and adding them to the index.
+   - Loading the chain and defining tags.
+   - Preparing Galileo callback with metrics and tags.
+   - Running the chain with questions to generate answers.
+
+- Failure Analysis
+
+Instances with an attribution score of 0 (indicating retrieval failure) can be easily identified. For example, failures occurred when chunks mentioned income tax but did not reference the specific year in question.
+
+(1) [Mastering RAG: How to Select an Embedding Model] (https://www.rungalileo.io/blog/mastering-rag-how-to-select-an-embedding-model)
