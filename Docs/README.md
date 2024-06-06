@@ -219,3 +219,42 @@ A function is created to run various sweep parameters, testing different embeddi
 Instances with an attribution score of 0 (indicating retrieval failure) can be easily identified. For example, failures occurred when chunks mentioned income tax but did not reference the specific year in question.
 
 (1) [Mastering RAG: How to Select an Embedding Model] (https://www.rungalileo.io/blog/mastering-rag-how-to-select-an-embedding-model)
+
+
+
+
+***Indexes***
+
+1. **What is a Vector Index?**
+    - A **vector index** is a specialized data structure used in computer science and information retrieval.
+    - It efficiently stores and retrieves high-dimensional vector data, enabling fast similarity searches and nearest neighbor queries.
+    - Vector indexes play a crucial role in applications like generative AI, where semantic context matters.
+    - **Reference**: [DataStax Guide](https://www.datastax.com/guides/what-is-a-vector-index)
+
+2. **Purpose of Vector Indexing**:
+    - **Search and Retrieval**: Vector indexes allow us to find specific data within large sets of vector representations easily.
+    - **Context for Generative AI**: Embeddings (mathematical representations of data) capture object meanings. Vector indexes provide context to generative AI models.
+    - **Example**: Imagine an embedding space with dimensions for clothing type and color.
+    - **Reference**: [DataStax Guide](https://www.datastax.com/guides/what-is-a-vector-index)
+
+3. **Components of a Vector Index**:
+    - **Pre-processing (Optional)**: Vectors may be reduced or optimized before indexing.
+    - **Primary Indexing Step (Required)**: Core algorithm for indexing.
+    - **Secondary Step (Optional)**: Quantization or hashing to further improve search speeds.
+    - **Reference**: [Understanding Vector Index Basics](https://zilliz.com/learn/vector-index)
+
+4. **Vector Databases and Indexing**:
+    - **Datastax Astra DB**: Built on Apache Cassandra, it provides a vector index for fast object retrieval and efficient storage of vector embeddings.
+    - **Other Vector Databases**: Explore options like Pinecone and Zilliz for vector indexing.
+    - **Reference**: [Pinecone](https://www.pinecone.io/learn/vector-database/), [Zilliz blog](https://zilliz.com/learn/choosing-right-vector-index-for-your-project)
+
+
+(1) What is a Vector Index? An Introduction to Vector Indexing | DataStax. https://www.datastax.com/guides/what-is-a-vector-index.
+(2) Everything You Need to Know about Vector Index Basics. https://zilliz.com/learn/vector-index.
+(3) Understanding Vector Indexing: A Comprehensive Guide. https://myscale.com/blog/everything-about-vector-indexing/.
+(4) Choosing the Right Vector Index for Your Project - Zilliz blog. https://zilliz.com/learn/choosing-right-vector-index-for-your-project.
+(5) What is a Vector Database & How Does it Work? Use Cases - Pinecone. https://www.pinecone.io/learn/vector-database/.
+(6) What is a vector index?. https://www.gomomento.com/blog/what-is-a-vector-index.
+(7) Vector Indexing: A Roadmap for Vector Databases - Medium. https://medium.com/kx-systems/vector-indexing-a-roadmap-for-vector-databases-65866f07daf5.
+(8) Understanding Vector Indexing: A Comprehensive Guide. https://medium.com/@myscale/understanding-vector-indexing-a-comprehensive-guide-d1abe36ccd3c.
+(9) How to find index of a given element in a Vector in C++. https://www.geeksforgeeks.org/how-to-find-index-of-a-given-element-in-a-vector-in-cpp/.
