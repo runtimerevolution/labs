@@ -70,14 +70,50 @@ To build an application using LLMs, we might take into account the following ste
        - Sparse Transformer by OpenAI https://openai.com/index/sparse-transformer/
        - Linformer by Facebook AI https://serp.ai/linformer/#:~:text=Linformer%20is%20a%20linear%20Transformer%20model%20designed%20to%20make%20transformer,model%20while%20reducing%20computational%20costs.
 
-When picking a specific model, it's essential to evaluate its performance on relevant tasks, consider the computational resources required for training and inference, and assess any pre-trained versions available for transfer learning. Additionally, consider factors such as model interpretability, robustness to adversarial attacks, and alignment with our project's requirements and constraints.
+    When picking a specific model, it's essential to evaluate its performance on relevant tasks, consider the computational resources required for training and inference, and assess any pre-trained versions available for transfer learning. Additionally, consider factors such as model interpretability, robustness to adversarial attacks, and alignment with our project's requirements and constraints.
 
-3. Training:
+3.  Training:
 
-Train the selected LLM on our preprocessed dataset. This typically involves using large-scale parallel processing hardware (GPUs or TPUs) due to the computational demands of training deep learning models.
-Fine-tune the model on task-specific data if necessary, using techniques like transfer learning to adapt the pre-trained model to our specific use case.
+    Trainnig the selected LLM on our preprocessed dataset typically involves using large-scale parallel processing hardware (GPUs or TPUs) due to the computational demands of training deep learning models. When training a Large Language Model (LLM), there are several approaches and techniques that can be employed, each with its own impacts and usages. Here are some examples:
 
-4. Deployment:
+    1.  Pre-training from Scratch - In this approach, the model is trained from scratch on a large corpus of text data without any pre-existing knowledge. The entire model architecture is initialized randomly, and the parameters are updated through backpropagation during training.
+        Impacts/Usages:
+
+        - Requires a vast amount of labeled text data for effective training.
+        - Computationally expensive, as it involves training the entire model from scratch.
+        - Suitable for cases where pre-trained models are not available or when the task requires domain-specific knowledge not present in existing pre-trained models.
+
+    2.  Transfer Learning - Transfer learning involves pre-training a model on a large dataset for a related task and then fine-tuning it on a smaller dataset for the target task. The pre-trained model learns general language representations during pre-training, which are then adapted to the specific characteristics of the target task during fine-tuning.
+        Impacts/Usages:
+
+        - Reduces the amount of labeled data required for training, as the model leverages knowledge learned from the pre-training task.
+        - Improves generalization and performance on the target task by initializing the model with pre-trained weights.
+        - Allows for faster convergence during training, as the model starts with learned representations that are already useful for the target task.
+
+    3.  Multi-Task Learning - Multi-task learning involves training a single model on multiple related tasks simultaneously. The model learns to jointly optimize performance across all tasks by sharing parameters and representations between them.
+        Impacts/Usages:
+
+        - Improves generalization and robustness by leveraging shared knowledge across multiple tasks.
+        - Helps mitigate overfitting by regularizing the model through task-specific and shared representations.
+        - Can lead to more efficient use of computational resources by training a single model for multiple tasks instead of separate models for each task.
+
+    4.  Curriculum Learning - Curriculum learning involves training the model on a curriculum of tasks or data samples, starting with simpler tasks or samples and gradually increasing the difficulty over time. This approach guides the model's learning process and helps it to converge more effectively.
+        Impacts/Usages:
+
+        - Improves convergence and performance by providing a structured learning schedule that gradually exposes the model to more complex tasks or data samples.
+        - Helps prevent the model from getting stuck in local optima by starting with easier optimization problems.
+        - Can lead to more efficient use of computational resources by focusing training efforts on the most informative data samples or tasks early in the training process.
+
+    5.  Self-Supervised Learning - Self-supervised learning involves training the model to predict certain properties or features of the input data without explicit supervision. For example, the model may be trained to predict masked words in a sentence or to generate text conditioned on a corrupted version of the input.
+        Impacts/Usages:
+
+        - Enables training on large amounts of unlabeled data, as the model generates its own supervision signals during training.
+        - Helps the model learn rich and generalizable representations of the input data, which can be transferred to downstream tasks.
+        - Can serve as a pre-training stage for transfer learning, providing a strong initialization for fine-tuning on supervised tasks.
+
+    Each of these training approaches has its own strengths and weaknesses, and the choice of approach depends on factors such as the availability of labeled data, computational resources, task requirements, and desired performance metrics. Experimentation and iteration are often necessary to determine the most effective training strategy for a given LLM project.
+
+4.  Deployment:
 
 Deploy the trained model in a production environment, either on-premises or in the cloud.
 Design a scalable and efficient infrastructure to handle inference requests, considering factors such as latency requirements, throughput, and resource utilization.
@@ -89,6 +125,6 @@ Integrate the LLM into the application or workflow, providing appropriate APIs o
 Ensure compatibility with existing systems and data formats, and handle input/output preprocessing as needed.
 Evaluation and Iteration:
 
-Continuously evaluate the performance of the deployed model on relevant metrics, both quantitatively and qualitatively.
+We should continuously evaluate the performance of the deployed model on relevant metrics, both quantitatively and qualitatively.
 Collect feedback from users and stakeholders to identify areas for improvement and prioritize future development efforts.
 Iterate on the architecture, data, and model as necessary to address emerging challenges and optimize performance over time
