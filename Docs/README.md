@@ -1,5 +1,42 @@
+***RAG diagram - 31-05-2024***
+```mermaid
+stateDiagram-v2
+    [*] --> Embedding
+    Embedding --> Index
+    Index --> Vector_Storage
+    Document_Loading --> Splitting
+    Splitting --> Vector_Storage
+    Vector_Storage --> Retrieval
+    Retrieval --> QA_Model
+    QA_Model --> Docs_Output_plus_Prompt
+    Docs_Output_plus_Prompt --> LLM
+    Context[System] --> LLM
+    Chain --> LLM
+    Memory --> LLM
+    LLM --> Memory
+    LLM --> Chain
+    LLM --> Output_Parser
+    Output_Parser --> Output
+    Output --> [*]
+```
+---
+***RAG approaches***
 
+**Naive approach**
+![image info](images/rag_naive.png)
 
+**Agent approach**
+![image info](images/rag_agent_retrieval.png)
+
+**Guardrails approach**
+![image info](images/rag_guardrails.png)
+
+**Knowledge graph approach**
+![image info](images/rag_knowledge_graph.png)
+
+Reference: https://www.youtube.com/watch?v=twM_9CM_3RY
+
+---
 ***Embeddings***
 
 1. **What are Embeddings?**
@@ -34,7 +71,7 @@ Embeddings allow us to bridge the gap between raw data and machine learning mode
 (4) The Full Guide to Embeddings in Machine Learning | Encord. https://encord.com/blog/embeddings-machine-learning/.
 
 
-
+---
 **Commonly used embeddings for natural language and coding:**
 
 1. **Word2Vec**:
@@ -65,7 +102,7 @@ Embeddings allow us to bridge the gap between raw data and machine learning mode
 (5) Neural Network Embeddings Explained - Towards Data Science. https://towardsdatascience.com/neural-network-embeddings-explained-4d028e6f0526.
 (6) https://openai.com/_next/static/chunks/1420.023ea14fc18e2250.js%29.
 
-
+---
 **Practical embeddings associated with each of the platforms provided in Langchain:**
 
 1. **OpenAI**:
@@ -99,7 +136,7 @@ Embeddings allow us to bridge the gap between raw data and machine learning mode
 (3) [Anthropic.](https://docs.anthropic.com/en/docs/embeddings)
 (4) [Ollama.](https://ollama.com/blog/embedding-models)
 
-
+---
 **Choosing the right embedding model**
 
 1. **Role of Embeddings in AI Applications**:
@@ -222,7 +259,7 @@ Instances with an attribution score of 0 (indicating retrieval failure) can be e
 
 
 
-
+---
 ***Indexes***
 
 1. **What is a Vector Index?**
@@ -260,7 +297,7 @@ Instances with an attribution score of 0 (indicating retrieval failure) can be e
 (9) How to find index of a given element in a Vector in C++. https://www.geeksforgeeks.org/how-to-find-index-of-a-given-element-in-a-vector-in-cpp/.
 
 
-
+---
 ***Databases***
 
 Retrieval Augmented Generation (RAG) combines pretrained Large Language Models (LLMs) with your own data to generate responses. It involves retrieving relevant documents and then using a sequence-to-sequence model to generate outputs. Let's explore the types of databases used in RAG and their advantages and disadvantages:
@@ -282,10 +319,10 @@ Retrieval Augmented Generation (RAG) combines pretrained Large Language Models (
 2. **SQL Databases**:
     - **Description**: SQL databases store structured data in tables with rows and columns. In RAG, SQL databases can be used to store metadata or structured information related to documents.
     - **Advantages**:
-        - Schema flexibility: SQL databases allow defining relationships and enforcing constraints.
         - Rich querying capabilities: SQL queries can join tables, aggregate data, and filter results.
         - Integration with existing systems: Many applications already use SQL databases.
     - **Disadvantages**:
+        - Schema rigidity: SQL databases require defining relationships and enforcing constraints.
         - Complexity: Setting up and maintaining SQL databases can be intricate.
         - Not optimized for text retrieval: SQL databases are designed for structured data, not natural language text.
     - **Integration Example**:
@@ -311,7 +348,6 @@ Retrieval Augmented Generation (RAG) combines pretrained Large Language Models (
         - Semantic context: Graphs allow expressing semantic connections between documents.
     - **Disadvantages**:
         - Scalability challenges: Graph databases may struggle with large-scale graphs.
-        - Learning curve: Developers need to understand graph modeling and query languages.
     - **Use Case**:
         - Model document similarity based on semantic relationships using graph databases .
 
@@ -359,3 +395,71 @@ References:
 (6) 4 From Simple to Advanced RAG. https://mallahyari.github.io/rag-ebook/04_advanced_rag.html.
 (7) Advanced RAG on Hugging Face documentation using LangChain - Hugging .... https://huggingface.co/learn/cookbook/advanced_rag.
 
+---
+**Graph databases in a Retrieval Augmented Generation (RAG)**
+
+1. **Advantages of Graph Databases in RAG**:
+   - **Context-Rich Data Storage**: Graph databases store information in nodes and edges, capturing relationships and links between data points. This additional context is valuable for RAG.
+   - **Navigating Hierarchies**: Graph databases excel at representing hierarchical structures, making them suitable for scenarios where deep hierarchies need to be navigated.
+   - **Hidden Connections**: Graph databases reveal hidden connections between items, which can enhance the quality of generated responses.
+   - **Discovering Relationships**: Graph databases facilitate the discovery of relationships between items, aiding in generating relevant content.
+
+2. **Use Cases for RAG with Graph Databases**:
+   - **Recommendation Chatbot**:
+     - Graph databases can power recommendation systems by modeling user-item interactions and capturing preferences.
+     - The chatbot can provide personalized recommendations based on user queries.
+     - Example: Suggesting relevant products to users based on their preferences¹.
+   - **AI-Augmented CRM (Customer Relationship Management)**:
+     - Graph databases allow modeling complex customer relationships.
+     - The chatbot can assist sales or support teams by providing context-aware responses about customer interactions.
+     - Example: Understanding the history of interactions with a specific customer¹.
+   - **Behavior Analysis with Natural Language**:
+     - Graph databases enable analyzing correlations between data points.
+     - The chatbot can analyze customer behavior patterns using natural language queries.
+     - Example: Identifying trends or anomalies in customer behavior based on textual descriptions¹.
+
+3. **References**:
+   - ¹ [OpenAI Cookbook: RAG with a Graph Database](https://cookbook.openai.com/examples/rag_with_graph_db)
+
+
+(1) RAG with a Graph database | OpenAI Cookbook. https://cookbook.openai.com/examples/rag_with_graph_db.
+(2) Improving RAG performance: Introducing GraphRAG - Lettria. https://www.lettria.com/blogpost/improving-rag-performance-introducing-graphrag.
+(3) Graph Data Models for RAG Applications - Graph Database & Analytics. https://neo4j.com/developer-blog/graph-data-models-rag-applications/.
+(4) Implementing Graph RAG with NebulaGraph. https://www.nebula-graph.io/posts/implement_graph_rag_with_nebulagraph.
+
+
+---
+**Vector databases in a Retrieval Augmented Generation (RAG)**
+
+1. **Knowledge Expansion**:
+   - **Scenario**: When you want to augment a large language model (LLM) with external data to improve contextuality and accuracy.
+   - **Why?**: Vector databases allow efficient access to vast information, expanding the LLM's knowledge base.
+   - **References**: ¹⁴
+
+2. **Customer Support Chatbots**:
+   - **Scenario**: Building chatbots that respond to customer queries.
+   - **Why?**: Vector search retrieves relevant passages from a knowledge base, enhancing chatbot responses.
+   - **References**: ⁵
+
+3. **Research Literature Review**:
+   - **Scenario**: Analyzing research papers to summarize developments in a field.
+   - **Why?**: RAG can extract key themes from a literature database using vector search.
+   - **References**: ⁵
+
+4. **Text Summarization and Classification**:
+   - **Scenario**: When summarizing or classifying text data.
+   - **Why?**: Vector databases aid in retrieving relevant content for summarization or classification tasks.
+   - **References**: ⁶
+
+5. **Sentiment Analysis**:
+   - **Scenario**: Analyzing sentiment in user-generated content.
+   - **Why?**: Vector databases help retrieve relevant examples for sentiment analysis.
+   - **References**: ⁶
+
+(1) Overview of RAG Approaches with Vector Databases. https://www.youtube.com/watch?v=twM_9CM_3RY.
+(2) Optimizing RAG: A Guide to Choosing the Right Vector Database. https://medium.com/@mutahar789/optimizing-rag-a-guide-to-choosing-the-right-vector-database-480f71a33139.
+(3) RAG and Vector Search: Better Together for AI. https://www.capellasolutions.com/blog/rag-and-vector-search-better-together-for-ai.
+(4) Building a RAG Application using LLM and Vector Database. https://medium.com/@niren.p.pai/building-a-rag-application-using-llm-and-vector-database-555db9a8fbe5.
+(5) The Secret Sauce of RAG: Vector Search and Embeddings. https://www.thecloudgirl.dev/blog/the-secret-sauce-of-rag-vector-search-and-embeddings.
+(6) Vector Search RAG Tutorial – Combine Your Data with LLMs with Advanced Search. https://www.youtube.com/watch?v=JEBDfGqrAUA.
+(7) Evaluating RAG Performance with Vector Databases | BLEU, ROUGE, and RAGAS. https://www.youtube.com/watch?v=yO7-VhtWWno.
