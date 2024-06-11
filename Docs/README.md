@@ -1,4 +1,4 @@
-***RAG diagram - 31-05-2024***
+## RAG diagram - 31-05-2024
 ```mermaid
 stateDiagram-v2
     [*] --> Embedding
@@ -20,7 +20,7 @@ stateDiagram-v2
     Output --> [*]
 ```
 ---
-***RAG approaches***
+## RAG approaches
 
 **Naive approach**
 ![image info](images/rag_naive.png)
@@ -37,7 +37,7 @@ stateDiagram-v2
 Reference: https://www.youtube.com/watch?v=twM_9CM_3RY
 
 ---
-***Embeddings***
+## Embeddings
 
 1. **What are Embeddings?**
    - An **embedding** is a numerical representation of a real-world object, such as words, images, or videos. These representations capture the semantic meaning of the object, making them useful for various applications.
@@ -260,7 +260,7 @@ Instances with an attribution score of 0 (indicating retrieval failure) can be e
 
 
 ---
-***Indexes***
+## Indexes
 
 1. **What is a Vector Index?**
     - A **vector index** is a specialized data structure used in computer science and information retrieval.
@@ -296,9 +296,95 @@ Instances with an attribution score of 0 (indicating retrieval failure) can be e
 (8) Understanding Vector Indexing: A Comprehensive Guide. https://medium.com/@myscale/understanding-vector-indexing-a-comprehensive-guide-d1abe36ccd3c.
 (9) How to find index of a given element in a Vector in C++. https://www.geeksforgeeks.org/how-to-find-index-of-a-given-element-in-a-vector-in-cpp/.
 
+---
+
+**Types of indexes**
+
+
+**ANNOY (Approximate Nearest Neighbors Oh Yeah)**
+- **Description**: ANNOY is a C++ library with Python bindings for approximate nearest neighbor search. It efficiently searches for points in high-dimensional space that are close to a given query point. ANNOY also creates large read-only file-based data structures that can be mmapped into memory, allowing multiple processes to share the same data.
+- **Features**:
+    - Supports various distance metrics: Euclidean distance, Manhattan distance, cosine distance, Hamming distance, or dot (inner) product distance.
+    - Small memory usage: ANNOY minimizes memory footprint, resulting in compact indexes.
+    - Static file-based indexes: ANNOY allows sharing indexes across processes and decouples index creation from loading.
+    - Native Python support: Tested with Python 2.7, 3.6, and 3.7.
+    - Build index on disk: Enables indexing large datasets that won't fit into memory.
+- **Use Case**: ANNOY is used at Spotify for music recommendations, where millions of tracks are represented as high-dimensional vectors.
+
+- **References**:
+    - [PyPI: ANNOY](https://pypi.org/project/annoy/)
+    - [What is ANNOY (Approximate Nearest Neighbors Oh Yeah)](https://www.activeloop.ai/resources/glossary/annoy-approximate-nearest-neighbors-oh-yeah/)
+    - [GitHub Repository](https://github.com/spotify/annoy)
+
+
+**FAISS (Facebook AI Similarity Search)**
+- **Description**: FAISS is an open-source library developed by Facebook AI Research (FAIR) for efficient similarity search and clustering of large-scale datasets. It focuses on high-dimensional vectors (e.g., embeddings from neural networks) and provides both exact and approximate search methods.
+- **Features**:
+    - **Vector indexing**: FAISS supports indexing vectors in high-dimensional spaces (e.g., image features, text embeddings).
+    - **GPU acceleration**: FAISS leverages GPUs for fast search and indexing.
+    - **Multiple index types**:
+        - *Flat index*: Simple linear scan.
+        - *IVF (Inverted File)*: Hierarchical quantization-based index.
+        - *HNSW (Hierarchical Navigable Small World)*: Approximate graph-based index.
+        - *PQ (Product Quantization)*: Vector quantization-based index.
+    - **Scalability**: FAISS scales well to billions of vectors.
+    - **Python and C++ APIs**: Provides both Python and C++ interfaces.
+- **Use Case**: FAISS is widely used for content-based image retrieval, recommendation systems, and natural language processing tasks.
+
+- **References**:
+    - [GitHub Repository](https://github.com/facebookresearch/faiss)
+    - [FAISS: A Library for Efficient Similarity Search](https://engineering.fb.com/2017/03/29/data-infrastructure/faiss-a-library-for-efficient-similarity-search/)
+    - [FAISS Documentation](https://github.com/facebookresearch/faiss/wiki)
+
+
+
+**HNSW (Hierarchical Navigable Small World)**
+- **Description**: HNSW is an approximate nearest neighbor search algorithm that constructs a graph in which each node represents a data point. It organizes the data points into a hierarchical structure, allowing efficient and scalable similarity search.
+- **Features**:
+    - **Graph-based approach**: HNSW constructs a graph where each node is connected to other nodes based on their similarity.
+    - **Hierarchical levels**: The graph is organized into multiple levels, with each level containing fewer nodes. This hierarchical structure enables efficient search.
+    - **Navigable small world property**: HNSW balances exploration (finding distant neighbors) and exploitation (finding nearby neighbors).
+    - **Memory-efficient**: HNSW uses a compact index structure.
+    - **Fast search time**: HNSW achieves sublinear search time.
+- **Use Case**: HNSW is commonly used for similarity search in large-scale datasets, such as image retrieval, recommendation systems, and natural language processing.
+
+- **References**:
+    - [GitHub Repository](https://github.com/nmslib/hnswlib)
+    - [HNSW: Fast Approximate Nearest Neighbors with Hierarchical Navigable Small World Graph](https://arxiv.org/abs/1603.09320)
+
+
+
+**SCANN (Scalable Nearest Neighbors)**
+- **Description**: SCANN is a library for approximate nearest neighbor search. It provides an efficient and scalable solution for similarity search in high-dimensional spaces. SCANN is built on top of the FAISS library and extends its capabilities.
+- **Features**:
+    - **Graph-based index**: SCANN constructs a graph where each node represents a data point. It uses hierarchical clustering to organize the data points.
+    - **Hierarchical structure**: Similar to HNSW, SCANN organizes data points into levels, allowing efficient search.
+    - **Memory-efficient**: SCANN optimizes memory usage while maintaining search quality.
+    - **Fast search time**: SCANN achieves sublinear search time.
+    - **Python and C++ APIs**: Provides both Python and C++ interfaces.
+- **Use Case**: SCANN is suitable for large-scale similarity search tasks, such as recommendation systems, content-based image retrieval, and natural language processing.
+
+- **References**:
+    - [GitHub Repository](https://github.com/google-research/google-research/tree/master/scann)
+    - [SCANN: Efficient Vector Similarity Search and ANN Algorithms](https://ai.googleblog.com/2020/07/scann-efficient-vector-similarity-search.html)
+
+
+
+(1) annoy · PyPI. https://pypi.org/project/annoy/.
+(2) What is Annoy (Approximate Nearest Neighbors Oh Yeah). https://www.activeloop.ai/resources/glossary/annoy-approximate-nearest-neighbors-oh-yeah/.
+(3) AnnoyIndex function - RDocumentation. https://www.rdocumentation.org/packages/RcppAnnoy/versions/0.0.22/topics/AnnoyIndex.
+(4) GitHub - spotify/annoy: Approximate Nearest Neighbors in C++/Python .... https://github.com/spotify/annoy.
+(5) Welcome to Faiss Documentation — Faiss documentation. https://faiss.ai/.
+(6) Home · facebookresearch/faiss Wiki · GitHub. https://github.com/facebookresearch/faiss/wiki.
+(7) GitHub - facebookresearch/faiss: A library for efficient similarity .... https://github.com/facebookresearch/faiss.
+(8) Hierarchical Navigable Small Worlds (HNSW) | Pinecone. https://www.pinecone.io/learn/series/faiss/hnsw/.
+(9) HNSW indexes | Supabase Docs. https://supabase.com/docs/guides/ai/vector-indexes/hnsw-indexes.
+(10) Understanding vector search and HNSW index with pgvector. https://neon.tech/blog/understanding-vector-search-and-hnsw-index-with-pgvector.
+(11) Understanding the SCaNN index in AlloyDB | Google Cloud Blog. https://cloud.google.com/blog/products/databases/understanding-the-scann-index-in-alloydb.
+
 
 ---
-***Databases***
+## Databases
 
 Retrieval Augmented Generation (RAG) combines pretrained Large Language Models (LLMs) with your own data to generate responses. It involves retrieving relevant documents and then using a sequence-to-sequence model to generate outputs. Let's explore the types of databases used in RAG and their advantages and disadvantages:
 
@@ -463,3 +549,83 @@ References:
 (5) The Secret Sauce of RAG: Vector Search and Embeddings. https://www.thecloudgirl.dev/blog/the-secret-sauce-of-rag-vector-search-and-embeddings.
 (6) Vector Search RAG Tutorial – Combine Your Data with LLMs with Advanced Search. https://www.youtube.com/watch?v=JEBDfGqrAUA.
 (7) Evaluating RAG Performance with Vector Databases | BLEU, ROUGE, and RAGAS. https://www.youtube.com/watch?v=yO7-VhtWWno.
+
+---
+
+**Choosing the right vector database**
+
+https://medium.com/@mutahar789/optimizing-rag-a-guide-to-choosing-the-right-vector-database-480f71a33139
+
+---
+
+***Vector Database vs. Knowledge Graph: Making the Right Choice When Implementing RAG***
+
+In the evolving landscape of large language models (LLMs) and retrieval-augmented generation (RAG), the choice of database technology—vector databases or knowledge graphs—plays a critical role in shaping the performance and scalability of these systems. This detailed explanation combines insights from three articles to provide a clear understanding of when to use vector databases and when to opt for knowledge graphs.
+
+**Vector Databases: Unleashing the Power of Embeddings**
+
+**Characteristics and Strengths:**
+- **Unstructured Data Handling:** Vector databases are designed to manage large volumes of unstructured data, such as text, images, and audio, by storing them as high-dimensional vector embeddings. These embeddings capture the semantic relationships between data points.
+- **Efficient Similarity Search:** They excel in scenarios where similarity search is a primary concern. Optimized indexing structures enable swift identification of vectors with similar semantic meanings, facilitating faster and more accurate responses.
+- **Scalability:** Vector databases are highly scalable, making them suitable for handling the massive datasets often associated with LLMs. Horizontal scaling allows seamless expansion to meet growing data requirements.
+- **Versatility:** Capable of handling diverse data types, vector databases provide a unified approach to data representation and retrieval, making them versatile in various applications.
+- **Cost and Speed:** Generally, vector databases offer lower costs and faster retrieval times compared to knowledge graphs, making them efficient for large-scale operations.
+
+**Use Cases:**
+- **Customer Service Applications:** Ideal for RAG systems designed to assist customer service representatives by dynamically fetching relevant answers from a structured knowledge base. This reduces wait times and ensures consistent information delivery.
+- **Procedural Queries:** Suitable for scenarios requiring quick retrieval of information from standard operating procedures or other structured knowledge bases, enhancing user satisfaction and operational efficiency.
+
+
+**Knowledge Graphs: Navigating the Web of Relationships**
+
+**Characteristics and Strengths:**
+- **Structured Data and Relationships:** Knowledge graphs represent data as networks of nodes (entities) and edges (relationships), making them excellent for managing and exploiting complex relationships between structured data entities.
+- **Relationship Exploration:** They excel at traversing and understanding intricate relationships within data, which enhances contextual understanding by navigating semantic connections between words and phrases.
+- **Flexible Schema:** Adaptable to evolving data structures and relationships, knowledge graphs are suitable for dynamic language modeling tasks.
+- **Query Expressiveness:** Offer expressive query languages (e.g., Cypher for Neo4j) that allow sophisticated queries to uncover nuanced relationships within the data, contributing to improved language model performance.
+- **Explainability and Traceability:** Provide transparent reasoning paths, making it easier to understand how conclusions are reached, which is crucial for applications requiring high explainability.
+- **Data Integrity and Consistency:** Maintain high data integrity and consistency, ensuring reliable data representation.
+
+**Use Cases:**
+- **Complex Insurance Claims:** Ideal for roles demanding deep understanding of relationships and interdependencies among various entities, such as policies, claims, and customers. Knowledge graphs provide a structured representation of these relationships, aiding in complex decision-making processes.
+- **Domain-Specific Applications:** Particularly useful in fields requiring deep, domain-specific knowledge representation, such as medicine, law, or engineering, where structured, interconnected data is essential for accurate and reliable outputs.
+
+**Key Considerations for Choosing Between Vector Databases and Knowledge Graphs**
+
+**Nature of Data:**
+- **Vector Databases:** Best suited for applications dealing primarily with unstructured data where semantic similarities are key.
+- **Knowledge Graphs:** More appropriate for structured data where understanding and exploring complex relationships are crucial.
+
+**Scalability Requirements:**
+- **Vector Databases:** Excel in handling massive datasets and are highly scalable, making them suitable for applications with significant data growth.
+- **Knowledge Graphs:** Excel in scenarios where efficient traversal and understanding of relationships are critical, though they may come at a higher cost.
+
+**Query Complexity:**
+- **Vector Databases:** Suitable for less complex queries focused on similarity search and fast retrieval.
+- **Knowledge Graphs:** Advantageous for applications requiring complex, relationship-based queries and sophisticated data exploration.
+
+**Explainability Needs:**
+- **Knowledge Graphs:** Provide greater explainability and traceability, making them suitable for applications where understanding the reasoning behind outputs is important.
+
+**Cost and Performance:**
+- **Vector Databases:** Typically offer lower cost and higher speed, making them efficient for large-scale, fast retrieval tasks.
+- **Knowledge Graphs:** May be more expensive but provide accurate and context-rich outputs essential for intricate problem-solving.
+
+**Combining Both Approaches**
+
+In some scenarios, a hybrid approach that leverages the strengths of both vector databases and knowledge graphs can be beneficial. For example:
+- **Hybrid Solutions:** Use a knowledge graph to maintain structured, domain-specific knowledge and a vector database to handle unstructured data and leverage machine learning models. This combination can provide both the deep, structured understanding of a knowledge graph and the flexibility and scalability of a vector database.
+
+**Conclusion**
+
+The decision to use a vector database or a knowledge graph for RAG with LLMs depends on several factors:
+- **Data Nature and Complexity:** Structured vs. unstructured data and the complexity of relationships.
+- **Scalability and Speed Requirements:** The need for handling massive datasets efficiently.
+- **Query and Explainability Needs:** The complexity of queries and the need for transparent reasoning.
+- **Cost Considerations:** Balancing cost against the benefits of accuracy and explainability.
+
+Understanding these factors will help IT leaders and CIOs make informed decisions to enhance the performance, scalability, and effectiveness of their RAG systems with LLMs, ultimately driving innovation, productivity, and enhanced user experiences.
+
+(1)Vector Databases vs Graph Databases for Large Language Models https://medium.com/@vkrntkmrsngh/vector-databases-vs-graph-databases-for-large-language-models-33f795f4eda2
+(2)Vector Database vs. Knowledge Graph: Making the Right Choice When Implementing RAG https://www.cio.com/article/1308631/vector-database-vs-knowledge-graph-making-the-right-choice-when-implementing-rag.html
+(3)RAG: Vector Databases vs Knowledge Graphs? https://medium.com/@ahmedbehairy/rag-vector-databases-vs-knowledge-graphs-f22697b1a940
