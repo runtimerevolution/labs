@@ -627,5 +627,132 @@ The decision to use a vector database or a knowledge graph for RAG with LLMs dep
 Understanding these factors will help IT leaders and CIOs make informed decisions to enhance the performance, scalability, and effectiveness of their RAG systems with LLMs, ultimately driving innovation, productivity, and enhanced user experiences.
 
 (1)Vector Databases vs Graph Databases for Large Language Models https://medium.com/@vkrntkmrsngh/vector-databases-vs-graph-databases-for-large-language-models-33f795f4eda2
+
 (2)Vector Database vs. Knowledge Graph: Making the Right Choice When Implementing RAG https://www.cio.com/article/1308631/vector-database-vs-knowledge-graph-making-the-right-choice-when-implementing-rag.html
+
 (3)RAG: Vector Databases vs Knowledge Graphs? https://medium.com/@ahmedbehairy/rag-vector-databases-vs-knowledge-graphs-f22697b1a940
+
+---
+
+## Retrieval
+
+First of all, the summaries of three articles are presented.
+Then a sum up of everything is presented.
+
+***Techniques to improve the retrieval in RAG systems**
+
+**4 Advanced RAG Algorithms to Optimize Retrieval**
+
+Here's an explanation of the techniques to improve retrieval in RAG systems:
+
+1. **Query Expansion**:
+   - **Problem**: Traditional retrieval methods query the vector database using a single point, covering only a small area of the embedding space. This might lead to irrelevant retrieved context if the embedding doesn't encompass all necessary information.
+   - **Solution**: Utilize an LLM to generate multiple queries based on the initial query, providing different perspectives. These expanded queries hit various relevant areas in the embedding space. Zero-shot prompt engineering can be employed for query expansion.
+
+2. **Self Query**:
+   - **Problem**: When embedding a query, there's no guarantee that all required aspects are present. For instance, ensuring retrieval relies on specific tags provided in the query.
+   - **Solution**: Extract critical metadata fields (e.g., tags, author ID) from the query using an LLM. Self-query ensures that essential metadata is considered alongside the embedded query. Few-shot learning might be necessary for optimizing the extraction of multiple metadata types.
+
+3. **Hybrid & Filtered Vector Search**:
+   - **Problem**: Embeddings excel at capturing general semantics but may not be optimal for querying specific keywords or exact phrase matching.
+   - **Solution**: Combine vector search with complementary search strategies, such as traditional keyword-based search, to find exact word matches. Hybrid search merges similarity scores from different techniques using a weighted average. Filtered vector search applies a filter based on keywords to the metadata of retrieved results, without altering similarity scores.
+
+4. **Post-Retrieval Optimization - Rerank using an LLM**:
+   - **Problem**: Retrieved context may contain irrelevant chunks, add noise, increase costs, or be unaligned with the query.
+   - **Solution**: Rerank all retrieved chunks based on relevance to the initial question. This ensures the most relevant chunks are prioritized. Rerank is especially effective when combined with query expansion, gathering potentially useful context from multiple perspectives in the embedding space. LLM with prompt engineering is proposed as a reranker, although open-source Bi-Encoders from sentence transformers can also be used.
+
+These techniques collectively aim to enhance the effectiveness of retrieval in RAG systems by addressing various challenges associated with traditional retrieval methods and optimizing the post-retrieval process.
+
+(1)Advanced RAG Algorithms to Optimize Retrieval https://www.comet.com/site/blog/advanced-rag-algorithms-optimize-retrieval/
+
+---
+**10 Ways to Improve the Performance of Retrieval Augmented Generation Systems**
+
+Here are techniques to improve the performance of Retrieval Augmented Generation (RAG) systems:
+
+1. **Clean Your Data**:
+   - Ensure data clarity and consistency to enhance retrieval accuracy.
+   - Combine documents logically, remove conflicting or redundant information.
+   - Utilize LLM to create summaries for easier retrieval.
+   
+2. **Explore Different Index Types**:
+   - Consider using keyword-based search alongside embedding-based retrieval.
+   - Hybrid approaches may be suitable for different use cases.
+   
+3. **Experiment with Chunking Approach**:
+   - Optimize the size of context chunks for better retrieval.
+   - Test different chunk sizes to find the optimal balance.
+   
+4. **Play Around with Base Prompt**:
+   - Customize base prompts to guide LLM behavior.
+   - Experiment with different prompt formats for specific query types.
+   
+5. **Try Metadata Filtering**:
+   - Add metadata to context chunks to aid in filtering and prioritizing results.
+   - Utilize metadata like date for relevance sorting.
+   
+6. **Use Query Routing**:
+   - Employ multiple indexes and route queries accordingly.
+   - Optimize indexes for specific query types or behaviors.
+   
+7. **Implement Reranking**:
+   - Reorder retrieved results based on relevance to improve accuracy.
+   - Utilize reranking tools like Cohere Rereanker.
+   
+8. **Consider Query Transformations**:
+   - Alter user queries for better matching.
+   - Explore techniques like rephrasing, HyDE, and sub-queries.
+   
+9. **Fine-Tune Embedding Model**:
+   - Customize embedding models for domain-specific relevance.
+   - Fine-tune embeddings to improve retrieval performance.
+   
+10. **Start Using LLM Dev Tools**:
+    - Leverage debugging tools in frameworks like LlamaIndex and LangChain.
+    - Explore external tools for deeper insights into RAG system workings.
+   
+Each of these techniques offers a potential avenue for improving the retrieval performance of RAG systems, with considerations for data preprocessing, index optimization, query handling, and model fine-tuning.
+
+(1)10 Ways to Improve the Performance of Retrieval Augmented Generation Systems https://towardsdatascience.com/10-ways-to-improve-the-performance-of-retrieval-augmented-generation-systems-5fa2cee7cd5c
+
+---
+**How to Improve RAG Performance: 5 Key Techniques with Examples**
+
+Here's an explanation of the techniques to improve RAG results:
+
+**Improving RAG Performance By Updating Chunk Size:**
+- Customizing the chunk size and overlap helps in better document representation.
+- Adjusting parameters like chunk size (e.g., from 1024 to 512) and overlap (e.g., from 20 to 50) can improve the retrieval of relevant information.
+- Increasing the number of top retrieved chunks can enhance the comprehensiveness of retrieved information.
+
+**Improving RAG Performance with Re-Ranking:**
+- Re-Ranking techniques reorder and filter documents based on relevance to the query.
+- Two main approaches are highlighted:
+  - Using Re-Ranking models as alternatives to embedding models to return similarity scores instead of embeddings.
+  - Leveraging Large Language Models (LLMs) to efficiently capture semantic information within documents.
+- Re-Ranking with specific models like FlagEmbeddingReranker and RankGPTRerank can significantly improve retrieval performance.
+
+**Improving RAG Performance with Query Transformations:**
+- Query transformation, or query rewriting, converts a query into another query to improve retrieval.
+- Techniques include:
+  - HyDE (Hypothetical Document Embeddings) transforms queries and hypothetical answers into embeddings to retrieve closely matching documents.
+  - Multi-Step Query Transformations divide complex queries into sequential subquestions for better processing.
+
+**Improving RAG Performance with HyDE:**
+- HyDE involves creating hypothetical answers to user queries and transforming them along with the query into embeddings for retrieval.
+- It improves retrieval by focusing more on origins rather than actors' relationships with their families.
+
+**Improving RAG Performance with Multi-Step Query Transformations:**
+- Multi-Step Query Transformations split user queries into sequential subquestions for effective processing.
+- Particularly useful when comparing multiple facts or dealing with complex questions.
+- Helps improve performance when comparing aspects like family backgrounds of actors.
+
+In conclusion, these techniques offer various ways to enhance RAG performance, catering to different use cases and desired outputs for specific queries. Choosing the right approach depends on factors like query complexity and the nature of the information being sought.
+
+(1)How to Improve RAG Performance: 5 Key Techniques with Examples https://www.datacamp.com/tutorial/how-to-improve-rag-performance-5-key-techniques-with-examples
+
+
+---
+
+***Sum up***
+
