@@ -677,12 +677,14 @@ Understanding these factors will help IT leaders and CIOs make informed decision
 9. **Query Expansion**
 - Utilize an LLM to generate multiple queries from the initial query for different perspectives.
 - Employ zero-shot prompt engineering for query expansion.
+![image info](images/generate_multiple_queries.png)
 
 10. **Reranking**
 - Rerank retrieved chunks based on relevance to the initial question.
 - Combine reranking with query expansion for comprehensive context retrieval.
 - Use LLMs or Bi-Encoders for reranking to capture semantic information efficiently.
 - Consider specific reranking models like FlagEmbeddingReranker, RankGPTRerank, and Cohere Reranker.
+![image info](images/reranking.png)
 
 11. **Improving RAG Performance with HyDE**
 - Create hypothetical answers to user queries and transform them with the query into embeddings for retrieval.
@@ -699,3 +701,104 @@ Understanding these factors will help IT leaders and CIOs make informed decision
 (3)How to Improve RAG Performance: 5 Key Techniques with Examples https://www.datacamp.com/tutorial/how-to-improve-rag-performance-5-key-techniques-with-examples
 
 (4) RAG Value Chain: Retrieval Strategies in Information Augmentation for Large Language Models https://medium.com/@abhinavkimothi/rag-value-chain-retrieval-strategies-in-information-augmentation-for-large-language-models-3a44845e1e26#:~:text=According%20to%20LangChain's%202023%20State,Multi%2Dquery%20and%20time%20weighted.
+
+
+---
+
+## QA Model
+
+1. **Stuff method**
+- All of the retrieved documents are passed to the LLM at the same time.
+
+![image info](images/QA_models.png)
+
+2. **Map reduce**
+- Each of the retrieved documents is passed to the LLM, then all the results are stuffed and passed to the final LLM.
+   - This method is slower than the stuff method.
+   - Because each retrieved document has little information and context, the end result may be worse than the stuff method.
+
+3. **Refine**
+- In this method, the first retrieved document is passed to the LLM. Then the result is joined together with the second document and passed again, and so on, until we have the result of the final document.
+- In other words, this method generates a response to the first retrieved document and then improves that answer iteratively based on the subsequent documents.
+   - This method generally produces a better result than the map reduce method, since it keeps adding new information to the response.
+
+4. **Map rerank**
+- With map rerank, all the retrieved documents are passed to the LLM, but in this case we ask the LLM to rank the passed documents according to their relevance compared to the question asked. Only the most relevant documents will be passed to the final LLM.
+   - This method may produce good results because it gets rid of noise introduced by irrelevant retrieved documents and produces an answer based only on relevent content.
+
+(1)05_question_answering https://learn.deeplearning.ai/courses/langchain-chat-with-your-data/lesson/6/question-answering
+
+---
+
+## LLMs
+
+***What Are LLMs?***
+
+1. **What Are LLMs?**
+   - LLMs, or Large Language Models, are AI systems designed to understand and generate human language.
+   - They process vast amounts of text data, learning patterns and connections between words and phrases.
+   - LLMs can mimic human intelligence by analyzing context and generating coherent responses¹⁵.
+
+2. **Types of LLMs**:
+   - **Autoregressive Models**:
+     - Generate text one token at a time based on previously generated tokens.
+     - Examples include OpenAI's GPT series and Google's BERT².
+   - **Conditional Generative Models**:
+     - Generate text conditioned on input (e.g., prompts or context).
+     - Used for tasks like text completion and specific style generation².
+
+(1) What Are Large Language Models (LLMs)? | IBM. https://www.ibm.com/topics/large-language-models.
+(2) Large Language Models explained | boost.ai. https://boost.ai/blog/llms-large-language-models/.
+(3) What are Large Language Models(LLMs)? - Analytics Vidhya. https://www.analyticsvidhya.com/blog/2023/03/an-introduction-to-large-language-models-llms/.
+(4) Large language model - Wikipedia. https://en.wikipedia.org/wiki/Large_language_model.
+(5) What is a Large Language Model (LLM) - GeeksforGeeks. https://www.geeksforgeeks.org/large-language-model-llm/.
+(6) What Are Large Language Models Used For? - NVIDIA Blog. https://blogs.nvidia.com/blog/what-are-large-language-models-used-for/.
+
+---
+
+***Relevant LLMs in 2024***
+
+### GPT-4 (OpenAI)
+- **Capabilities**: Advanced reasoning, image processing, and text comprehension.
+- **Context Window**: Handles over 25,000 words.
+- **Special Features**: Emotional intelligence, reduced biases, robust security.
+- **Ideal For**: Complex problem-solving, multimodal applications (text and images), and high-context tasks.
+
+### Claude 3 (Anthropic)
+- **Token Processing**: Capable of processing up to 200,000 tokens.
+- **Focus**: Safety and reducing risks in AI applications.
+- **Special Features**: Emphasis on generating reliable, high-quality outputs.
+- **Ideal For**: Applications needing extensive context, safety-critical tasks, and high accuracy in outputs.
+
+### Gemini (Google/DeepMind)
+- **Architecture**: Uses Mixture-of-Experts (MoE).
+- **Versions**: Includes Ultra, Pro, and Nano variants.
+- **Token Handling**: Can manage up to 10 million tokens.
+- **Special Features**: Energy efficiency and long-context processing.
+- **Ideal For**: Energy-sensitive applications, extensive data processing tasks, and diverse enterprise uses.
+
+### Falcon (TII)
+- **Models**: Includes Falcon-40B and Falcon-7B.
+- **Strengths**: High speed and accuracy.
+- **Efficiency**: Optimized for computational efficiency.
+- **Ideal For**: High-performance needs in text-based tasks, efficient computation environments.
+
+### Mistral (Mistral AI)
+- **Model Types**: High-parameter models and cost-effective options.
+- **Architecture**: Uses Sparse Mixture-of-Experts (SMoE).
+- **Multilingual Support**: Strong support for multiple languages.
+- **Ideal For**: Multilingual applications, cost-effective large-scale deployments, diverse language processing tasks.
+
+### Llama (Meta)
+- **Versions**: Includes Llama2 and Llama3.
+- **User-Friendliness**: Easy to access and use.
+- **Parameter Sizes**: Available in multiple sizes to suit different needs.
+- **Ideal For**: General-purpose applications, educational purposes, and user-friendly deployments.
+
+
+(1)Top 10 Best Large Language Models (LLMs) for 2024 https://em360tech.com/top-10/best-llms
+(2)10 Best Large Language Models (LLMs) in 2024 https://clickup.com/blog/large-language-models/
+(3)List of the Best 20 Large Language Models (LLMs) https://explodingtopics.com/blog/list-of-llms
+(4)Top LLMs of 2024: Only the Worthy https://zilliz.com/learn/top-llms-2024
+
+---
