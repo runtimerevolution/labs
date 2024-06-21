@@ -1,35 +1,37 @@
 import requests
-from .load_access_data import load_access_data
+from labs.config import GITHUB_ACCESS_TOKEN
+from labs.config import GITHUB_API_BASE_URL
+from labs.config import GITHUB_OWNER
+from labs.config import GITHUB_REPO
+from labs.config import GITHUB_USERNAME
+from labs.config import get_logger
 
-def get_issues_from_repo():
+logger = get_logger(__name__)
+
+def get_issues_from_repo(assignee=GITHUB_USERNAME, state='open', per_page=100):
     try:
-        access_data = load_access_data()
-        GITHUB_ACCESS_TOKEN = access_data['GITHUB_ACCESS_TOKEN']
-        BASE_URL = access_data['BASE_URL']
-        GITHUB_OWNER = access_data['GITHUB_OWNER']
-        GITHUB_REPO = access_data['GITHUB_REPO']
-        GITHUB_USERNAME = access_data['GITHUB_USERNAME']
-        
-        url = f'{BASE_URL}/repos/{GITHUB_OWNER}/{GITHUB_REPO}/issues'
+        url = f'{GITHUB_API_BASE_URL}/repos/{GITHUB_OWNER}/{GITHUB_REPO}/issues'
         headers = {
             'Authorization': f'token {GITHUB_ACCESS_TOKEN}',
             'Accept': 'application/vnd.github.v3+json',
         }
         params = {
-            'assignee': GITHUB_USERNAME,
-            'state': 'open',  # You can change this to 'all' or 'closed' as needed
-            'per_page': 100,  # Number of results per page (max is 100)
+            'state': state,
+            'per_page': per_page,
         }
+        if assignee != 'all':
+            params['assignee'] = assignee
+            
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
-        
-        return response.json()
+        response_json = response.json()
+        logger.debug(str(response_json))
+        return response_json
 
     except requests.exceptions.RequestException as e:
-        print(f"HTTP Request failed: {e}")
+        logger.error(f"HTTP Request failed: {e}")
     except KeyError as e:
-        print(f"Missing key in access data: {e}")
+        logger.error(f"Missing key in access data: {e}")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-    
+        logger.error(f"An unexpected error occurred: {e}")
     return []
