@@ -211,4 +211,5 @@ cython_debug/
 #.idea/
 
 fixtures/
+vcr_cassettes/
 mytest.py
