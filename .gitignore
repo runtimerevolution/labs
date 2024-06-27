@@ -226,3 +226,6 @@ entire idea folder.
 #.idea/
 
 
+# pixi environments
+.pixi
+*.egg-info
