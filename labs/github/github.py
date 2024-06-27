@@ -1,4 +1,5 @@
 import requests
+from dataclasses import dataclass
 from labs.config import GITHUB_ACCESS_TOKEN
 from labs.config import GITHUB_API_BASE_URL
 from labs.config import GITHUB_OWNER
@@ -6,17 +7,17 @@ from labs.config import GITHUB_REPO
 from labs.config import GITHUB_USERNAME
 from labs.config import get_logger
 
-class Github:
-    def __init__(self, access_token=GITHUB_ACCESS_TOKEN, api_base_url=GITHUB_API_BASE_URL, 
-                 owner=GITHUB_OWNER, repo=GITHUB_REPO, username=GITHUB_USERNAME):
-        self.access_token = access_token
-        self.api_base_url = api_base_url
-        self.owner = owner
-        self.repo = repo
-        self.username = username
-        self.logger = get_logger(__name__)
+@dataclass
+class GithubRequests:
+    """Class to handle Github API requests"""
+    access_token = GITHUB_ACCESS_TOKEN
+    api_base_url = GITHUB_API_BASE_URL
+    owner = GITHUB_OWNER
+    repo = GITHUB_REPO
+    username = GITHUB_USERNAME
+    logger = get_logger(__name__)
 
-    def get_issues_from_repo(self, assignee=None, state='open', per_page=100):
+    def issues(self, assignee=None, state='open', per_page=100):
         if assignee is None:
             assignee = self.username
         try:
@@ -46,7 +47,7 @@ class Github:
             self.logger.error(f"An unexpected error occurred: {e}")
         return []
 
-    def get_issue(self, issue_id):
+    def issue(self, issue_id):
         try:
             url = f'{self.api_base_url}/repos/{self.owner}/{self.repo}/issues/{issue_id}'
             headers = {
@@ -70,10 +71,3 @@ class Github:
             self.logger.error(f"An unexpected error occurred: {e}")
             return None
 
-    def issue_body(self, issue):
-        try:
-            body = issue['body']
-            return body
-        except Exception as e:
-            self.logger.error(f"An unexpected error occurred: {e}")
-            return None
