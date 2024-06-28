@@ -11,12 +11,18 @@ PYTHON_INTERPRETER = python
 #################################################################################
 
 
+## Start working on the project
+.PHONY: start
+start:
+	brew install curl
+	curl -fsSL https://pixi.sh/install.sh | bash
+	rm pixi.lock
+	pixi install
+
 ## Install Python Dependencies
 .PHONY: requirements
 requirements:
 	conda env update --name $(PROJECT_NAME) --file environment.yml --prune
-	
-
 
 
 ## Delete all compiled Python files
