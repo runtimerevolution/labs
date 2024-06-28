@@ -14,10 +14,24 @@ PYTHON_INTERPRETER = python
 ## Start working on the project
 .PHONY: start
 start:
-	brew install curl
-	curl -fsSL https://pixi.sh/install.sh | bash
-	rm pixi.lock
+	@if brew ls --versions curl; then \
+		brew upgrade curl; \
+	else \
+		brew install curl; \
+	fi
+	export PIXI_INSTALLATION=True
+	curl -fsSL https://pixi.sh/install.sh | bash || (echo "First Pixi installation attempt failed."; export PIXI_INSTALLATION=False;)
+	@if [ "$$PIXI_INSTALLATION" = "False" ]; then \
+		echo "Running brew to install pixi..."; \
+		brew install pixi; \
+	fi
+	@if [ ! -f ./pixi.lock ]; then \
+		echo "pixi.lock does not exist"; \
+	else \
+		rm pixi.lock; \
+	fi
 	pixi install
+
 
 ## Install Python Dependencies
 .PHONY: requirements
