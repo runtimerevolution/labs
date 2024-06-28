@@ -19,10 +19,12 @@ start:
 	else \
 		brew install curl; \
 	fi
-	export PIXI_INSTALLATION=True
-	curl -fsSL https://pixi.sh/install.sh | bash || (echo "First Pixi installation attempt failed."; export PIXI_INSTALLATION=False;)
-	@if [ "$$PIXI_INSTALLATION" = "False" ]; then \
+	@if curl -fsSL https://pixi.sh/install.sh | bash; then \
+		export "Pixi installed in the first attempt."; \
+	else \
+		echo "First Pixi installation attempt failed."; \
 		echo "Running brew to install pixi..."; \
+		export PIXI_INSTALLATION=False; \
 		brew install pixi; \
 	fi
 	@if [ ! -f ./pixi.lock ]; then \
