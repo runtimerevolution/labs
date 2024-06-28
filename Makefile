@@ -20,7 +20,7 @@ start:
 		brew install curl; \
 	fi
 	@if curl -fsSL https://pixi.sh/install.sh | bash; then \
-		export "Pixi installed in the first attempt."; \
+		echo "Pixi installed in the first attempt."; \
 	else \
 		echo "First Pixi installation attempt failed."; \
 		echo "Running brew to install pixi..."; \
