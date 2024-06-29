@@ -14,18 +14,19 @@ PYTHON_INTERPRETER = python
 ## Start working on the project
 .PHONY: start
 start:
-	@if brew ls --versions curl; then \
-		brew upgrade curl; \
+	@if ! which pixi 2>/dev/null; then \
+		echo "pixi not found."; \
+		if ! which curl 2>/dev/null; then \
+			echo "curl not found, installing..."; \
+			brew install curl; \
+		fi; \
+		curl -fsSL https://pixi.sh/install.sh | bash; \
+		if ! which pixi 2>/dev/null; then \
+			echo "pixi still not found, using brew..."; \
+			brew install pixi; \
+		fi; \
 	else \
-		brew install curl; \
-	fi
-	@if curl -fsSL https://pixi.sh/install.sh | bash; then \
-		echo "Pixi installed in the first attempt."; \
-	else \
-		echo "First Pixi installation attempt failed."; \
-		echo "Running brew to install pixi..."; \
-		export PIXI_INSTALLATION=False; \
-		brew install pixi; \
+		echo "pixi already installed."; \
 	fi
 	@if [ ! -f ./pixi.lock ]; then \
 		echo "pixi.lock does not exist"; \
