@@ -22,8 +22,6 @@ In order to start working on the project you just have to run `make start` and y
 │   ├── processed      <- The final, canonical data sets for modeling.
 │   └── raw            <- The original, immutable data dump.
 │
-├── docs               <- A default mkdocs project; see mkdocs.org for details
-│
 ├── models             <- Trained and serialized models, model predictions, or model summaries
 │
 ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
