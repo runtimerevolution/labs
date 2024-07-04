@@ -123,8 +123,6 @@ target/
 profile_default/
 ipython_config.py
 
-# pyenv
-# .python-version
 
 # pdm
 __pypackages__/
@@ -172,7 +170,7 @@ cython_debug/
 # PyCharm
 #.idea/
 
-
 # pixi environments
 .pixi
 *.egg-info
+

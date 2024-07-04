@@ -6,6 +6,11 @@
 
 Runtime Labs
 
+
+## Start working on the project
+
+In order to start working on the project you just have to run `make start` and you are ready to go!
+
 ## Project Organization
 
 ```
@@ -17,8 +22,6 @@ Runtime Labs
 │   ├── interim        <- Intermediate data that has been transformed.
 │   ├── processed      <- The final, canonical data sets for modeling.
 │   └── raw            <- The original, immutable data dump.
-│
-├── docs               <- A default mkdocs project; see mkdocs.org for details
 │
 ├── models             <- Trained and serialized models, model predictions, or model summaries
 │

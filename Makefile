@@ -11,16 +11,35 @@ PYTHON_INTERPRETER = python
 #################################################################################
 
 
+## Start working on the project
+.PHONY: start
+start:
+	@if ! which pixi 2>/dev/null; then \
+		echo "pixi not found."; \
+		if ! which curl 2>/dev/null; then \
+			echo "curl not found, installing..."; \
+			brew install curl; \
+		fi; \
+		curl -fsSL https://pixi.sh/install.sh | bash; \
+		if ! which pixi 2>/dev/null; then \
+			echo "pixi still not found, using brew..."; \
+			brew install pixi; \
+		fi; \
+	else \
+		echo "pixi already installed."; \
+	fi
+	@if [ ! -f ./pixi.lock ]; then \
+		echo "pixi.lock does not exist"; \
+	else \
+		rm pixi.lock; \
+	fi
+	pixi install
+
+
 ## Install Python Dependencies
 .PHONY: requirements
 requirements:
 	conda env update --name $(PROJECT_NAME) --file environment.yml --prune
-
-
-## Update Conda Environment
-.PHONY: update_env
-update_env:
-	conda env export > environment.yml
 
 
 ## Delete all compiled Python files
@@ -56,14 +75,6 @@ sync_data_up:
 		 --profile $(PROFILE)
 	
 
-## Set up python interpreter environment
-.PHONY: create_environment
-create_environment:
-	conda env create --name $(PROJECT_NAME) -f environment.yml
-	
-	@echo ">>> conda env created. Activate with:\nconda activate $(PROJECT_NAME)"
-	
-
 #################################################################################
 # TESTS                                                                         #
 #################################################################################
@@ -71,6 +82,8 @@ create_environment:
 .PHONY: tests
 tests:
 	pytest
+=======
+
 
 #################################################################################
 # PROJECT RULES                                                                 #
