@@ -42,6 +42,12 @@ requirements:
 	conda env update --name $(PROJECT_NAME) --file environment.yml --prune
 
 
+## Update Conda Environment
+.PHONY: update_env
+update_env:
+	conda env export > environment.yml
+
+
 ## Delete all compiled Python files
 .PHONY: clean
 clean:
@@ -75,9 +81,21 @@ sync_data_up:
 		 --profile $(PROFILE)
 	
 
+## Set up python interpreter environment
+.PHONY: create_environment
+create_environment:
+	conda env create --name $(PROJECT_NAME) -f environment.yml
+	
+	@echo ">>> conda env created. Activate with:\nconda activate $(PROJECT_NAME)"
+	
 
+#################################################################################
+# TESTS                                                                         #
+#################################################################################
 
-
+.PHONY: tests
+tests:
+	pytest
 
 #################################################################################
 # PROJECT RULES                                                                 #

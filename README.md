@@ -22,6 +22,8 @@ In order to start working on the project you just have to run `make start` and y
 │   ├── processed      <- The final, canonical data sets for modeling.
 │   └── raw            <- The original, immutable data dump.
 │
+├── docs               <- A default mkdocs project; see mkdocs.org for details
+│
 ├── models             <- Trained and serialized models, model predictions, or model summaries
 │
 ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
@@ -60,7 +62,7 @@ In order to start working on the project you just have to run `make start` and y
         └── visualize.py
 ```
 
---------
+---
 
 ## Use of Pixi in Runtime Labs project
 
@@ -73,5 +75,4 @@ In order to start working on the project you just have to run `make start` and y
 7. **`python --version`**: If you check the Python version again, now it's **3.12.2**.
 8. **`which python`**: This will show you the path to the Python interpreter.
 9. **`exit`**: Exits the Pixi shell.
-10. **`python --version`**: Now, if you check the Python version outside the Pixi shell, it's back to the version you started with. 
-
+10. **`python --version`**: Now, if you check the Python version outside the Pixi shell, it's back to the version you started with.
