@@ -16,6 +16,7 @@ classifiers = [
     
 ]
 requires-python = "~=3.11"
+dependencies = ["pyautogen"]
 
 [tool.black]
 line-length = 99
@@ -42,3 +43,7 @@ labs = { path = ".", editable = true }
 
 [tool.pixi.dependencies]
 python = "==3.11.9"
+python-dotenv = ">=1.0.1,<1.1"
+git = ">=2.45.2,<2.46"
+ipython = ">=8.26.0,<8.27"
+gitpython = ">=3.1.43,<3.2"
