@@ -229,3 +229,5 @@ entire idea folder.
 # pixi environments
 .pixi
 *.egg-info
+
+.vscode/
