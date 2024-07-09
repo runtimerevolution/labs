@@ -6,6 +6,8 @@ from labs.config import GITHUB_OWNER
 from labs.config import GITHUB_REPO
 from labs.config import GITHUB_USERNAME
 from labs.config import get_logger
+import os
+import git
 
 @dataclass
 class GithubRequests:
@@ -71,3 +73,39 @@ class GithubRequests:
             self.logger.error(f"An unexpected error occurred: {e}")
             return None
 
+    def clone(self):
+        try:
+            url = f'https://github.com/{self.owner}/{self.repo}.git'
+            output_dir=f'/tmp/{self.owner}/{self.repo}'
+            branch='main'
+            probe=f'/tmp/{self.owner}/{self.repo}/.git'
+            if not os.path.exists(probe):
+                cloned_repo = git.Repo.clone_from(url, output_dir, branch=branch)
+            return output_dir
+        except Exception as e:
+            self.logger.error(f"An unexpected error occurred: {e}")
+            return None
+        
+    def repo_data(self):
+        try:
+            url = f'{self.api_base_url}/repos/{self.owner}/{self.repo}'
+            headers = {
+                'Authorization': f'token {self.access_token}',
+                'Accept': 'application/vnd.github.v3+json',
+            }
+
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            response_json = response.json()
+            self.logger.debug(str(response_json))
+            return response_json
+
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"HTTP Request failed: {e}")
+            return None
+        except KeyError as e:
+            self.logger.error(f"Missing key in access data: {e}")
+            return None
+        except Exception as e:
+            self.logger.error(f"An unexpected error occurred: {e}")
+            return None
