@@ -176,3 +176,4 @@ cython_debug/
 
 .vscode/
 vcr_cassettes/
+pixi.lock
