@@ -175,4 +175,4 @@ cython_debug/
 *.egg-info
 
 .vscode/
-
+polyglot_data/
