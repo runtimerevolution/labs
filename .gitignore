@@ -175,4 +175,5 @@ cython_debug/
 *.egg-info
 
 .vscode/
-
+vcr_cassettes/
+pixi.lock
