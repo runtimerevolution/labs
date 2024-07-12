@@ -120,11 +120,19 @@ class GithubRequests:
             "Content-Type": "application/json",
         }
         response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            self.logger.error(f"Error getting: {response}")
+            return None
+
         latest_commit_sha = response.json()["object"]["sha"]
 
         # Step 2: Get the tree SHA from the latest commit
         url = f"{self.github_api_url}/git/commits/{latest_commit_sha}"
         response = requests.get(url, headers=headers)
+        if response.status_code != 200:
+            self.logger.error(f"Error getting: {response}")
+            return None
+
         base_tree_sha = response.json()["tree"]["sha"]
 
         tree_items = []

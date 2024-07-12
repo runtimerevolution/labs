@@ -1,6 +1,3 @@
-from unittest.mock import Mock
-
-import pytest
 import requests
 from labs.github.github import GithubRequests
 
@@ -10,10 +7,8 @@ class TestGithubRequests:
     # Listing issues with default parameters returns open issues assigned to the user
     def test_list_issues_default_parameters(self, mocker):
 
-        # Mock the requests.get method
         mock_get = mocker.patch("requests.get")
 
-        # Sample response data
         sample_response = [
             {"id": 1, "title": "Issue 1", "state": "open"},
             {"id": 2, "title": "Issue 2", "state": "open"},
@@ -21,17 +16,14 @@ class TestGithubRequests:
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = sample_response
 
-        # Initialize the GithubRequests object
         github_token = "valid_token"
         repo_owner = "owner_username"
         repo_name = "repository_name"
         user_name = "your_username"
         github_requests = GithubRequests(github_token, repo_owner, repo_name, user_name)
 
-        # Call the list_issues method
         issues = github_requests.list_issues()
 
-        # Assertions
         assert issues == sample_response
         mock_get.assert_called_once_with(
             f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues",
@@ -47,7 +39,7 @@ class TestGithubRequests:
         )
 
     def test_list_issues_http_failure(self, mocker):
-        # Arrange
+
         mock_response = mocker.Mock()
         mock_response.raise_for_status.side_effect = requests.exceptions.RequestException(
             "HTTP Error"
@@ -58,33 +50,26 @@ class TestGithubRequests:
             github_token="fake_token", repo_owner="owner", repo_name="repo"
         )
 
-        # Act
         issues = github_requests.list_issues()
 
-        # Assert
         assert issues == []
 
     def test_get_issue_returns_correct_details(self, mocker):
 
-        # Mock the requests.get method
         mock_get = mocker.patch("requests.get")
 
-        # Sample response data
         sample_response = {"id": 1, "title": "Sample Issue", "state": "open"}
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = sample_response
 
-        # Initialize the GithubRequests object
         github_token = "valid_token"
         repo_owner = "owner_username"
         repo_name = "repository_name"
         user_name = "your_username"
         github_requests = GithubRequests(github_token, repo_owner, repo_name, user_name)
 
-        # Call the get_issue method
         issue = github_requests.get_issue(1)
 
-        # Assertions
         assert issue == sample_response
         mock_get.assert_called_once_with(
             f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/1",
@@ -95,7 +80,7 @@ class TestGithubRequests:
         )
 
     def test_handle_http_request_failure_get_issue(self, mocker):
-        # Arrange
+
         mock_response = mocker.Mock()
         mock_response.raise_for_status.side_effect = requests.exceptions.RequestException(
             "Mocked Request Exception"
@@ -106,14 +91,12 @@ class TestGithubRequests:
             github_token="fake_token", repo_owner="owner", repo_name="repo"
         )
 
-        # Act
         issue = github_requests.get_issue(1)
 
-        # Assert
         assert issue is None
 
     def test_change_issue_status(self, mocker):
-        # Arrange
+
         mock_response = mocker.Mock()
         mock_response.json.return_value = {"status": "closed"}
         mocker.patch("requests.patch", return_value=mock_response)
@@ -122,14 +105,12 @@ class TestGithubRequests:
             github_token="fake_token", repo_owner="owner", repo_name="repo"
         )
 
-        # Act
         response = github_requests.change_issue_status(issue_number=1, state="closed")
 
-        # Assert
         assert response == {"status": "closed"}
 
     def test_commit_changes_successfully(self, mocker):
-        # Arrange
+
         mock_response_get = mocker.Mock()
         mock_response_get.json.return_value = {
             "object": {"sha": "fake_sha"},

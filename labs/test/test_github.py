@@ -19,7 +19,7 @@ def github_instance():
 
 @vcr.use_cassette("labs/test/vcr_cassettes/github_issue_invalid_token.yml")
 def test_issue_invalid_token(github_instance):
-    github_instance.access_token = "invalid_token"
+    github_instance.github_token = "invalid_token"
     issue_id = 1
     issue = github_instance.get_issue(issue_id)
     assert issue is None
@@ -27,7 +27,7 @@ def test_issue_invalid_token(github_instance):
 
 @vcr.use_cassette("labs/test/vcr_cassettes/github_issues_invalid_token.yml")
 def test_issues_invalid_token(github_instance):
-    github_instance.access_token = "invalid_token"
+    github_instance.github_token = "invalid_token"
     issues = github_instance.list_issues()
     assert issues == []
 
