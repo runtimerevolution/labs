@@ -2,6 +2,8 @@ import base64
 import requests
 from dataclasses import dataclass
 import logging
+import git
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -173,3 +175,16 @@ class GithubRequests:
         data = {"title": title, "body": body, "head": head, "base": base}
         response = requests.post(url, headers=headers, json=data)
         return response.json()
+    
+    def clone(self):
+        try:
+            url = f'https://github.com/{self.repo_owner}/{self.repo_name}.git'
+            output_dir=f'/tmp/{self.repo_owner}/{self.repo_name}'
+            branch='main'
+            probe=f'/tmp/{self.repo_owner}/{self.repo_name}/.git'
+            if not os.path.exists(probe):
+                cloned_repo = git.Repo.clone_from(url, output_dir, branch=branch)
+            return output_dir
+        except Exception as e:
+            self.logger.error(f"An unexpected error occurred: {e}")
+            return None
