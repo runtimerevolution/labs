@@ -73,7 +73,11 @@ sync_data_down:
 sync_data_up:
 	aws s3 sync s3://bucket-name/data/ data/\
 		 --profile $(PROFILE)
-	
+
+## Set up project
+.PHONY: setup
+setup:
+	$(PYTHON_INTERPRETER) labs/setup.py
 
 #################################################################################
 # TESTS                                                                         #
@@ -91,6 +95,7 @@ clean_tests:
 	else \
 		rm -rf labs/test/vcr_cassettes; \
 	fi
+
 
 
 #################################################################################
