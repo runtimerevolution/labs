@@ -5,6 +5,7 @@ from labs.config import get_logger, spacy_models, SUMMARIZATION_MODEL
 import spacy
 from spacytextblob.spacytextblob import SpacyTextBlob
 from transformers import pipeline
+import json
 
 # Download necessary NLTK data files if not already downloaded
 nltk.download('stopwords', quiet=True)
@@ -141,19 +142,23 @@ class NLP_Interface:
         keywords = self.keyword_extraction()
         sentiment = self.sentiment_analysis()
         summary = self.summarization()
-        ner = self.ner()   
-        ner_text=""
+        ner = self.ner()
+        ner_list = []
+
         for ent in ner:
-            ner_text+=f"\t{ent.text}: {spacy.explain(ent.label_)}\n"
+            ner_list.append({
+                "text": ent.text,
+                "label": ent.label_,
+                "explanation": spacy.explain(ent.label_)
+            })
         
-        result = ""
-        result += "Keywords: " + '; '.join(keywords) + "\n"
-        result += "\nSentiment:\t\tPolarity = "
-        result += str('{:.2f}'.format(sentiment['polarity']))
-        result += "\t\tSubjectivity = "
-        result += str('{:.2f}'.format(sentiment['subjectivity'])) + "\n"
-        if len(ner) > 0:
-            result += "\nNamed-entities:\n" + ner_text
-        result += "\nSummary: " + summary + "\n"
+        result = {
+            "language": self.language_name,
+            "language_code": self.language_code,
+            "keywords": keywords,
+            "sentiment": sentiment,
+            "summary": summary,
+            "named-entities": ner_list
+        }
         
         return result
