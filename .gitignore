@@ -175,5 +175,7 @@ cython_debug/
 *.egg-info
 
 .vscode/
+polyglot_data/
 vcr_cassettes/
 pixi.lock
+
