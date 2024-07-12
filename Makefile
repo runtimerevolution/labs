@@ -88,6 +88,16 @@ tests:
 	pytest
 
 
+.PHONY: clean_tests
+clean_tests:
+	@if [ ! -d ./labs/test/vcr_cassettes ]; then \
+		echo "labs/test/vcr_cassettes does not exist"; \
+	else \
+		rm -rf labs/test/vcr_cassettes; \
+	fi
+
+
+
 #################################################################################
 # PROJECT RULES                                                                 #
 #################################################################################
