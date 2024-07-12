@@ -16,7 +16,7 @@ classifiers = [
     
 ]
 requires-python = "~=3.11"
-dependencies = ["polyglot", "pycld2", "spacytextblob"]
+dependencies = ["polyglot", "pycld2", "spacytextblob", "ipykernel", "jwt", "pytest", "pytest-mock"]
 
 [tool.black]
 line-length = 99
@@ -55,4 +55,7 @@ spacy = ">=3.7.5,<3.8"
 pyicu = ">=2.13.1,<2.14"
 morfessor = ">=2.0.6,<2.1"
 pip = ">=24.0,<25"
+git = ">=2.45.2,<2.46"
+gitpython = ">=3.1.43,<3.2"
+
 
