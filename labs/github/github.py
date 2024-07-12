@@ -10,12 +10,12 @@ logger = logging.getLogger(__name__)
 class GithubRequests:
     """Class to handle Github API requests"""
 
-    def __init__(self, github_token, repo_owner, repo_name):
+    def __init__(self, github_token, repo_owner, repo_name, user_name=None):
 
         self.github_token = github_token
         self.repo_owner = repo_owner
         self.repo_name = repo_name
-        self.username = "FilipaSdS"  # TO_DO make optional
+        self.username = user_name
         self.github_api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
 
     logger = logging.getLogger(__name__)

@@ -3,17 +3,14 @@ import vcr
 from labs.github import GithubRequests
 from labs.config import (
     GITHUB_ACCESS_TOKEN,
-    GITHUB_API_BASE_URL,
     GITHUB_OWNER,
     GITHUB_REPO,
-    GITHUB_USERNAME,
 )
 
 
 @pytest.fixture
 def github_instance():
     access_token = GITHUB_ACCESS_TOKEN
-
     owner = GITHUB_OWNER
     repo = GITHUB_REPO
 
@@ -32,8 +29,6 @@ def test_issue_invalid_token(github_instance):
 def test_issues_invalid_token(github_instance):
     github_instance.access_token = "invalid_token"
     issues = github_instance.list_issues()
-    # TO-DO
-    # assert issues[status] ==403
     assert issues == []
 
 

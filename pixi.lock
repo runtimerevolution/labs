@@ -90,6 +90,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/22/a6/858897256d0deac81a172289110f31629fc4cee19b6f01283303e18c8db3/ptyprocess-0.7.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/2b/27/77f9d5684e6bce929f5cfe18d6cfbe5133013c06cb2fbf5933670e60761d/pure_eval-0.2.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/f7/3f/01c8b82017c199075f8f788d0d906b9ffbbc5a47dc9918a945e13d5a2bda/pygments-2.18.0-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/f2/3b/b26f90f74e2986a82df6e7ac7e319b8ea7ccece1caec9f8ab6104dc70603/pytest_mock-3.14.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/4b/60/4e5170ffdf1720791752f09261a813efd5e59ec8ccf3e909d50d62a13b7d/pyzmq-26.0.3-cp311-cp311-macosx_10_15_universal2.whl
       - pypi: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
@@ -689,10 +690,12 @@ packages:
   name: labs
   version: 0.0.1
   path: .
-  sha256: 2da1664b09c7d0ff3804c6b196e029e7b7139d52569baf6eac70702f49a52def
+  sha256: 1aec3148e41e5331fad60154885bfdc9d0a1017420c2b91dcbc3c0847ea1263b
   requires_dist:
   - ipykernel
   - jwt
+  - pytest
+  - pytest-mock
   requires_python: ~=3.11
   editable: true
 - kind: conda
@@ -1153,6 +1156,17 @@ packages:
   - pkg:pypi/pytest?source=conda-forge-mapping
   size: 257061
   timestamp: 1717533913269
+- kind: pypi
+  name: pytest-mock
+  version: 3.14.0
+  url: https://files.pythonhosted.org/packages/f2/3b/b26f90f74e2986a82df6e7ac7e319b8ea7ccece1caec9f8ab6104dc70603/pytest_mock-3.14.0-py3-none-any.whl
+  sha256: 0b72c38033392a5f4621342fe11e9219ac11ec9d375f8e2a0c164539e0d70f6f
+  requires_dist:
+  - pytest>=6.2.5
+  - pre-commit ; extra == 'dev'
+  - pytest-asyncio ; extra == 'dev'
+  - tox ; extra == 'dev'
+  requires_python: '>=3.8'
 - kind: conda
   name: python
   version: 3.11.9
