@@ -20,8 +20,6 @@ services:
       - "4000:4000"
     env_file:
       - .env
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
     volumes:
       - ./litellm-config.yaml:/app/config.yaml
     command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
