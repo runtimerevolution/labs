@@ -21,7 +21,7 @@ class RequestLiteLLM:
             json=data,
         )
 
-        return result
+        return result.json()["choices"][0]["message"]["content"]
 
 
-RequestLiteLLM()
+# print(RequestLiteLLM().completion(messages=["Say hello."]))
