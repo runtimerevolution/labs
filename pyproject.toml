@@ -16,6 +16,7 @@ classifiers = [
     
 ]
 requires-python = "~=3.11"
+dependencies = ["ipykernel", "jwt"]
 
 [tool.black]
 line-length = 99
@@ -47,4 +48,6 @@ python-json-logger = ">=2.0.7,<2.1"
 vcrpy = ">=6.0.1,<6.1"
 pytest = ">=8.2.2,<8.3"
 requests = ">=2.32.3,<2.33"
+git = ">=2.45.2,<2.46"
+gitpython = ">=3.1.43,<3.2"
 
