@@ -18,13 +18,10 @@ services:
     image: ghcr.io/berriai/litellm:main-latest
     ports:
       - "4000:4000"
+    env_file:
+      - .env
     environment:
-      - LITELLM_MASTER_KEY=sk-123456789
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
-      - OPENAI_API_KEY=sk-proj-gUo7SppHxuozaGZXqU6IT3BlbkFJ29aGpS5kFyxSXXrY7yxL
-      - GEMINI_API_KEY=AIzaSyAWeHgGh012JfIFG5t24GwTgCLO6OR86Bk
-      - COHERE_API_KEY=ArV0dKgLlomDa5hJkegZ3rHUOgv8IPV4EPfulQA4
-      - GROQ_API_KEY=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
     volumes:
       - ./litellm-config.yaml:/app/config.yaml
     command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]

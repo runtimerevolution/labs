@@ -1,9 +1,12 @@
 import os
 import requests
+from dotenv import load_dotenv
 
 
 class RequestLiteLLM:
     def __init__(self):
+        load_dotenv("litellm_service/.env")
+
         self.api_key = os.environ.get("LITELLM_API_KEY", None)
         if not self.api_key:
             raise Exception("LITELLM_API_KEY missing.")
