@@ -1,4 +1,5 @@
 import json
+import time
 from labs.github import GithubRequests
 from labs.config import GITHUB_ACCESS_TOKEN, GITHUB_REPO, GITHUB_OWNER, LITELLM_API_KEY
 from labs.nlp import NLP_Interface
@@ -26,7 +27,9 @@ def get_issue(issue_number):
 
 
 def create_branch(issue_number, issue_title):
-    return gh_requests.create_branch(branch_name=f"{issue_number}/{issue_title}")
+    branch_name = f"{issue_number}-{issue_title}"
+    create_result = gh_requests.create_branch(branch_name=branch_name)
+    return create_result, branch_name
 
 
 def apply_nlp_to_issue(issue_text):
@@ -46,32 +49,40 @@ def call_llm_with_context(context, nlp_summary):
     prepared_context = []
     for file in context:
         prepared_context.append(
-            {"role": "system", "context": f"File: {file['file_name']} Content: {file['content']}"}
+            {"role": "system", "content": f"File: {file['file_name']} Content: {file['content']}"}
         )
     prepared_context.append(
         {
             "role": "user",
-            "context": nlp_summary,
+            "content": nlp_summary,
         }
     )
 
-    return litellm_requests.completion(prepared_context)
+    return litellm_requests.completion_without_proxy(prepared_context)
 
 
-def call_agent_to_apply_code_changes(llm_response):
-    return None
+def call_agent_to_apply_code_changes(llm_response, repo_dir):
+    response_string = llm_response.choices[0].model_extra["message"].model_extra["content"]
+    new_file_name = f"new_issue_{int(time.time())}.py"
+    new_file_path = f"{repo_dir}/{new_file_name}"
+    new_file = open(new_file_path, "x")
+    new_file.write(response_string)
+    new_file.close()
+    return new_file_path, new_file_name
 
 
-def commit_changes(id):
-    return None
+def commit_changes(branch_name, new_file_path, new_file_name):
+    return gh_requests.commit_changes(
+        "fix", branch_name=branch_name, files=[{"path": new_file_path, "name": new_file_name}]
+    )
 
 
-def create_pull_request(id):
-    return None
+def create_pull_request(branch_name):
+    return gh_requests.create_pull_request(branch_name)
 
 
-def change_issue_to_in_review(id):
-    return None
+def change_issue_to_in_review():
+    pass
 
 
 def run():
@@ -79,15 +90,17 @@ def run():
 
     setup()
     issue = get_issue(issue_number)
-    branch = create_branch(issue_number, issue["title"])
+    branch, branch_name = create_branch(issue_number, issue["title"].replace(" ", "-"))
     nlped_text = apply_nlp_to_issue(issue["body"])
     change_issue_to_in_progress()
-    context = load_context()
-    llm_response = call_llm_with_context(context, 'Add a file to print sentence "Hello World"')
-    call_agent_to_apply_code_changes(llm_response)
-    commit_changes()
-    create_pull_request()
-    change_issue_to_in_review(id)
+    context, repo_dir = load_context()
+    llm_response = call_llm_with_context(
+        context, 'Add a file to print sentence "Hello World"'
+    )  # nlped_text["summary"])
+    new_file_path, new_file_name = call_agent_to_apply_code_changes(llm_response, repo_dir)
+    commit_result = commit_changes(branch_name, new_file_path, new_file_name)
+    pr_result = create_pull_request(branch_name)
+    change_issue_to_in_review()
 
 
 run()

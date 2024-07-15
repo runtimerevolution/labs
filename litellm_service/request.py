@@ -1,5 +1,6 @@
 import os
 import requests
+from litellm import completion
 
 
 class RequestLiteLLM:
@@ -31,3 +32,21 @@ class RequestLiteLLM:
         )
 
         return result.json()
+
+    def completion_without_proxy(self, messages, model="llm-model"):
+        """
+        messages expected to be in the following format:
+        [
+            {
+                "role": "user",
+                "content": ""
+            }
+        ]
+        Where role can be "user", "assistant", "system".
+        And content is the body of the message.
+        """
+        response = completion(
+            model="openai/gpt-3.5-turbo",
+            messages=messages,
+        )
+        return response
