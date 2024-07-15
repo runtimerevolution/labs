@@ -114,7 +114,7 @@ class GithubRequests:
         response = requests.patch(url, headers=headers, json=data)
         return response.json()
 
-    def commit_changes(self, message, branch_name, file_paths):
+    def commit_changes(self, message, branch_name, files):
         # Step 1: Get the latest commit SHA on the specified branch
         url = f"{self.github_api_url}/git/refs/heads/{branch_name}"
         headers = {
@@ -138,7 +138,9 @@ class GithubRequests:
         base_tree_sha = response.json()["tree"]["sha"]
 
         tree_items = []
-        for file_path in file_paths:
+        for file_obj in files:
+            file_path = file_obj["path"]
+            file_name = file_obj["name"]
             # Step 3: Read the file content and encode it in Base64
             with open(file_path, "rb") as file:
                 file_content = base64.b64encode(file.read()).decode("utf-8")
@@ -149,7 +151,7 @@ class GithubRequests:
             blob_sha = blob_response.json()["sha"]
 
             tree_items.append(
-                {"path": file_path, "mode": "100644", "type": "blob", "sha": blob_sha}
+                {"path": file_name, "mode": "100644", "type": "blob", "sha": blob_sha}
             )
         # Step 5: Create a new tree with the updated files
         tree_data = {"base_tree": base_tree_sha, "tree": tree_items}
@@ -175,13 +177,13 @@ class GithubRequests:
         data = {"title": title, "body": body, "head": head, "base": base}
         response = requests.post(url, headers=headers, json=data)
         return response.json()
-    
+
     def clone(self):
         try:
-            url = f'https://github.com/{self.repo_owner}/{self.repo_name}.git'
-            output_dir=f'/tmp/{self.repo_owner}/{self.repo_name}'
-            branch='main'
-            probe=f'/tmp/{self.repo_owner}/{self.repo_name}/.git'
+            url = f"https://github.com/{self.repo_owner}/{self.repo_name}.git"
+            output_dir = f"/tmp/{self.repo_owner}/{self.repo_name}"
+            branch = "main"
+            probe = f"/tmp/{self.repo_owner}/{self.repo_name}/.git"
             if not os.path.exists(probe):
                 cloned_repo = git.Repo.clone_from(url, output_dir, branch=branch)
             return output_dir

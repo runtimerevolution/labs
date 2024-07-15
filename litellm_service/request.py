@@ -1,30 +1,52 @@
 import os
 import requests
-from dotenv import load_dotenv
+from litellm import completion
 
 
 class RequestLiteLLM:
-    def __init__(self):
-        load_dotenv("litellm_service/.env")
-
-        self.api_key = os.environ.get("LITELLM_API_KEY", None)
-        if not self.api_key:
-            raise Exception("LITELLM_API_KEY missing.")
+    def __init__(self, litellm_api_key):
+        self.api_key = litellm_api_key
 
     def completion(self, messages, model="llm-model"):
+        """
+        messages expected to be in the following format:
+        [
+            {
+                "role": "user",
+                "content": ""
+            }
+        ]
+        Where role can be "user", "assistant", "system".
+        And content is the body of the message.
+        """
         headers = {
             "Accept": "application/json",
             "API-Key": self.api_key,
         }
 
-        data = {"messages": [{"role": "user", "content": message} for message in messages]}
+        data = {"messages": messages}
         result = requests.post(
             f"http://0.0.0.0:4000/chat/completions?model={model}",
             headers=headers,
             json=data,
         )
 
-        return result.json()["choices"][0]["message"]["content"]
+        return result.json()
 
-
-# print(RequestLiteLLM().completion(messages=["Say hello."]))
+    def completion_without_proxy(self, messages, model="llm-model"):
+        """
+        messages expected to be in the following format:
+        [
+            {
+                "role": "user",
+                "content": ""
+            }
+        ]
+        Where role can be "user", "assistant", "system".
+        And content is the body of the message.
+        """
+        response = completion(
+            model="openai/gpt-3.5-turbo",
+            messages=messages,
+        )
+        return response

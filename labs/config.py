@@ -5,7 +5,7 @@ import logging
 from pythonjsonlogger import jsonlogger
 
 # Load environment variables from .env file if it exists
-load_dotenv(dotenv_path="labs/.env")
+load_dotenv(dotenv_path=".env")
 
 # Paths
 PROJ_ROOT = Path(__file__).resolve().parents[1]
@@ -37,23 +37,25 @@ GITHUB_REPO = os.environ["GITHUB_REPO"]
 GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
 GITHUB_API_BASE_URL = "https://api.github.com"
 
+LITELLM_MASTER_KEY = os.environ["LITELLM_MASTER_KEY"]
+LITELLM_API_KEY = os.environ["LITELLM_API_KEY"]
+
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+COHERE_API_KEY = os.environ["COHERE_API_KEY"]
+GROQ_API_KEY = os.environ["GROQ_API_KEY"]
+
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 POLYGLOT_DIR = PROJ_ROOT / "labs" / "polyglot_data"
 
 spacy_models = [
-    {
-        'language_code': 'pt',
-        'language_name': 'portuguese',
-        'model': 'pt_core_news_lg'
-    },
-    {
-        'language_code': 'en',
-        'language_name': 'english',
-        'model': 'en_core_web_md'
-    }
+    {"language_code": "pt", "language_name": "portuguese", "model": "pt_core_news_lg"},
+    {"language_code": "en", "language_name": "english", "model": "en_core_web_md"},
 ]
 
-SUMMARIZATION_MODEL='facebook/bart-large-cnn'
+SUMMARIZATION_MODEL = "facebook/bart-large-cnn"
+
 
 def get_logger(module_name):
     return logging.getLogger(module_name)
