@@ -1,0 +1,1 @@
+Sure! I will add a new file named `hello.py` in the `litellm_service` directory with the content `print('Hello World')`. Let's proceed with creating the file.
