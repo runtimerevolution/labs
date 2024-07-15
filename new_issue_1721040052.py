@@ -1,0 +1,1 @@
+Sure, I will add a new file named `hello.py` in the `labs` directory to print the sentence "Hello World." Let's proceed with adding the file.
