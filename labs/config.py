@@ -45,6 +45,8 @@ GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 COHERE_API_KEY = os.environ["COHERE_API_KEY"]
 GROQ_API_KEY = os.environ["GROQ_API_KEY"]
 
+ACTIVELOOP_TOKEN = os.environ["ACTIVELOOP_TOKEN"]
+
 DATABASE_URL = os.environ["DATABASE_URL"]
 
 POLYGLOT_DIR = PROJ_ROOT / "labs" / "polyglot_data"

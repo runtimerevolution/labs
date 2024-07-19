@@ -3,6 +3,15 @@ import requests
 from litellm import completion
 
 
+models = [
+    "openai/gpt-3.5-turbo",
+    "cohere/command-light",
+    "gemini/gemini-pro",
+    "groq/llama3-8b-8192",
+    "huggingface/tiiuae/falcon-7b-instruct",
+]
+
+
 class RequestLiteLLM:
     def __init__(self, litellm_api_key):
         self.api_key = litellm_api_key
@@ -33,7 +42,7 @@ class RequestLiteLLM:
 
         return result.json()
 
-    def completion_without_proxy(self, messages, model="llm-model"):
+    def completion_without_proxy(self, messages, model=None):
         """
         messages expected to be in the following format:
         [
@@ -45,8 +54,16 @@ class RequestLiteLLM:
         Where role can be "user", "assistant", "system".
         And content is the body of the message.
         """
-        response = completion(
-            model="openai/gpt-3.5-turbo",
-            messages=messages,
-        )
-        return response
+        if model:
+            return model, completion(
+                model=model,
+                messages=messages,
+            )
+
+        for model in models:
+            try:
+                response = completion(model=model, messages=messages)
+                return model, response
+            except Exception as ex:
+                pass
+        return model, None
