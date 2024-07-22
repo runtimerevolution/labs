@@ -31,7 +31,9 @@ def setup():
     # global litellm_requests
     # litellm_requests = RequestLiteLLM(LITELLM_API_KEY)
     global barebone_requests
-    barebone_requests = RequestBarebones(activeloop_dataset_path="hub://cmartinez/labs_db")
+    barebone_requests = RequestBarebones(
+        activeloop_dataset_path="hub://cmartinez/labs_db"
+    )
 
 
 def get_issue(issue_number):
@@ -80,7 +82,9 @@ def call_llm_with_context(context, nlp_summary):
 
 
 def call_agent_to_apply_code_changes(llm_response, repo_dir):
-    response_string = llm_response.choices[0].model_extra["message"].model_extra["content"]
+    response_string = (
+        llm_response.choices[0].model_extra["message"].model_extra["content"]
+    )
     # Find actions to apply from the llm_response
     actions = parse_llm_output(response_string)
     files = []
@@ -115,13 +119,16 @@ def run():
     issue = get_issue(issue_number)
     branch, branch_name = create_branch(issue_number, issue["title"].replace(" ", "-"))
     nlped_text = apply_nlp_to_issue(issue["body"])
+    print(nlped_text)
     # change_issue_to_in_progress()
     context, repo_dir = load_context()
     nlp_summary = f"""
     Add a multiplication function to the Calculator class in labs/code_examples/calculator.py and add a unit tests for the new multiplication function in the file labs/code_examples/test_calculator.py file.
     """
     llm_response = call_llm_with_context(context, nlp_summary)  # nlped_text["summary"])
-    new_file_path, new_file_name = call_agent_to_apply_code_changes(llm_response, repo_dir)
+    new_file_path, new_file_name = call_agent_to_apply_code_changes(
+        llm_response, repo_dir
+    )
     commit_result = commit_changes(branch_name, new_file_path, new_file_name)
     pr_result = create_pull_request(branch_name)
     # change_issue_to_in_review()
