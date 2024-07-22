@@ -49,7 +49,9 @@ def call_llm_with_context(context, nlp_summary):
     prompt = f"""
     You're a diligent software engineer AI. You can't see, draw, or interact with a 
     browser, but you can read and write files, and you can think.
-    You've been given the following task: {nlp_summary}.Your answer will be in yaml format. Please provide a list of actions to perform in order to complete it, considering the current project.
+    You've been given the following task: {nlp_summary}.Your answer will be in yaml format.
+    Please provide a list of actions to perform in order to complete it, considering the current project.
+    Any imports will be at the beggining of the file.
     Each action should contain two fields: action, which is either create or modify,and args, which is a map of key-value pairs, specifying the arguments for that action:
     path - the path of the file to create/modify and content - the content to write to the file.
     Please don't add any text formatting to the answer, making it as clean as possible.
