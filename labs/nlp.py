@@ -1,5 +1,3 @@
-#import nltk
-from nltk.corpus import stopwords
 from polyglot.detect import Detector
 from labs.config import get_logger, spacy_models, SUMMARIZATION_MODEL
 import spacy
@@ -10,9 +8,6 @@ from string import punctuation
 from heapq import nlargest
 from transformers import pipeline
 import json
-
-# Download necessary NLTK data files if not already downloaded
-# nltk.download('stopwords', quiet=True)
 
 class NLP_Interface:
     def __init__(self, text: str = None):
