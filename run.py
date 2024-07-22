@@ -4,10 +4,20 @@ from labs.config import GITHUB_ACCESS_TOKEN, GITHUB_REPO, GITHUB_OWNER, LITELLM_
 from labs.nlp import NLP_Interface
 from labs.context_loading import load_project
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
-from litellm_service.request import RequestLiteLLM
+from litellm_service.request import RequestBarebones  # , RequestLiteLLM
 
 gh_requests: GithubRequests = None
-litellm_requests: RequestLiteLLM = None
+# litellm_requests: RequestLiteLLM = None
+barebone_requests: RequestBarebones = None
+
+
+LLM_PROXY_LITELLM = "LITELLM"
+LLM_PROXY_BAREBONES = "BAREBONES"
+LLM_PROXY_VALUES = [
+    LLM_PROXY_LITELLM,
+    LLM_PROXY_BAREBONES,
+]
+ACTIVE_LLM_PROXY = LLM_PROXY_BAREBONES
 
 
 def setup():
@@ -18,8 +28,10 @@ def setup():
         repo_name=GITHUB_REPO,
     )
 
-    global litellm_requests
-    litellm_requests = RequestLiteLLM(LITELLM_API_KEY)
+    # global litellm_requests
+    # litellm_requests = RequestLiteLLM(LITELLM_API_KEY)
+    global barebone_requests
+    barebone_requests = RequestBarebones(activeloop_dataset_path="hub://cmartinez/labs_db")
 
 
 def get_issue(issue_number):
@@ -46,28 +58,25 @@ def load_context():
 
 
 def call_llm_with_context(context, nlp_summary):
-    prompt = f"""
-    You're a diligent software engineer AI. You can't see, draw, or interact with a 
-    browser, but you can read and write files, and you can think.
-    You've been given the following task: {nlp_summary}.Your answer will be in yaml format. Please provide a list of actions to perform in order to complete it, considering the current project.
-    Each action should contain two fields: action, which is either create or modify,and args, which is a map of key-value pairs, specifying the arguments for that action:
-    path - the path of the file to create/modify and content - the content to write to the file.
-    Please don't add any text formatting to the answer, making it as clean as possible.
-    """
-
-    prepared_context = []
-    for file in context:
+    if ACTIVE_LLM_PROXY == LLM_PROXY_LITELLM:
+        prepared_context = []
+        for file in context:
+            prepared_context.append(
+                {
+                    "role": "system",
+                    "content": f"File: {file['file_name']} Content: {file['content']}",
+                }
+            )
         prepared_context.append(
-            {"role": "system", "content": f"File: {file['file_name']} Content: {file['content']}"}
+            {
+                "role": "user",
+                "content": nlp_summary,
+            }
         )
-    prepared_context.append(
-        {
-            "role": "user",
-            "content": prompt,
-        }
-    )
 
-    return litellm_requests.completion_without_proxy(prepared_context)
+        # return litellm_requests.completion_without_proxy(prepared_context)
+    elif ACTIVE_LLM_PROXY == LLM_PROXY_BAREBONES:
+        return barebone_requests.completion(nlp_summary)
 
 
 def call_agent_to_apply_code_changes(llm_response, repo_dir):
@@ -108,12 +117,12 @@ def run():
     nlped_text = apply_nlp_to_issue(issue["body"])
     # change_issue_to_in_progress()
     context, repo_dir = load_context()
-    llm_response = call_llm_with_context(
-        context,
-        'Add a file to print sentence "Hello World", add a file with a method do calculate the sum of two numbers',
-    )  # nlped_text["summary"])
-    files = call_agent_to_apply_code_changes(llm_response, repo_dir)
-    commit_result = commit_changes(branch_name, file_list=files)
+    nlp_summary = f"""
+    Add a multiplication function to the Calculator class in labs/code_examples/calculator.py and add a unit tests for the new multiplication function in the file labs/code_examples/test_calculator.py file.
+    """
+    llm_response = call_llm_with_context(context, nlp_summary)  # nlped_text["summary"])
+    new_file_path, new_file_name = call_agent_to_apply_code_changes(llm_response, repo_dir)
+    commit_result = commit_changes(branch_name, new_file_path, new_file_name)
     pr_result = create_pull_request(branch_name)
     # change_issue_to_in_review()
 
