@@ -1,14 +1,13 @@
-import nltk
-from nltk.corpus import stopwords
 from polyglot.detect import Detector
 from labs.config import get_logger, spacy_models, SUMMARIZATION_MODEL
 import spacy
 from spacytextblob.spacytextblob import SpacyTextBlob
+from spacy.lang.en.stop_words import STOP_WORDS as stop_words_en
+from spacy.lang.pt.stop_words import STOP_WORDS as stop_words_pt
+from string import punctuation
+from heapq import nlargest
 from transformers import pipeline
 import json
-
-# Download necessary NLTK data files if not already downloaded
-nltk.download('stopwords', quiet=True)
 
 class NLP_Interface:
     def __init__(self, text: str = None):
@@ -19,13 +18,19 @@ class NLP_Interface:
         self.default_spacy_model = self.find_spacy_model(self.language_code)
         self.spacy_model = self.default_spacy_model
         self.text = text
+        self.text = self.text.replace("\n\n","\n")
         if text:
             self.language_code = self.detect_language()
             self.load_spacy_language()
+            if self.language_code == 'pt':
+                self.stop_words = stop_words_pt
+            else:
+                self.stop_words = stop_words_en
             self.preprocessed_text = ' '.join(self.preprocess_text())
         else:
             self.text = ''
             self.preprocessed_text = ''
+            self.stop_words = []
 
     def detect_language(self) -> str:
         try:
@@ -74,8 +79,7 @@ class NLP_Interface:
             tokens_wo_punctuation = [token for token in tokens_normalized if token.isalnum()]
 
             # Stopword Removal
-            stop_words = set(stopwords.words(self.language_name))
-            tokens_wo_stopwords = [token for token in tokens_wo_punctuation if token not in stop_words]
+            tokens_wo_stopwords = [token for token in tokens_wo_punctuation if token not in self.stop_words]
 
             # Lemmatization
             doc = self.nlp(' '.join(tokens_wo_stopwords))
@@ -125,23 +129,110 @@ class NLP_Interface:
             self.logger.error(f"Error executing NER: {str(e)}")
             return None
         
-    def summarization(self):
+    def summarization(self, percentage):
         try:
             doc = self.nlp(self.text)
             tokens = [token.text for token in doc]
-            minlen = 15
-            maxlen = max(len(tokens), minlen +1)
+            minlen = 1
+            maxlen = max(int(len(tokens)*percentage),minlen+1)
             summarizer = pipeline("summarization", model=SUMMARIZATION_MODEL)
-            result = summarizer(self.text, max_length=maxlen, min_length=15, do_sample=False)
+            result = summarizer(self.text, max_length=maxlen, min_length=minlen, do_sample=False)
             return result[0]['summary_text']
         except Exception as e:
             self.logger.error(f"Error during summarization: {str(e)}")
+            return ''
+        
+    def spacy_summarization(self, percentage):
+        try:
+            doc = self.nlp(self.text)
+            #tokens=[token.text for token in doc]
+            freq_of_word=dict()
+            # Text cleaning and vectorization 
+            for word in doc:
+                if word.text.lower() not in list(self.stop_words):
+                    if word.text.lower() not in punctuation:
+                        if word.text not in freq_of_word.keys():
+                            freq_of_word[word.text] = 1
+                        else:
+                            freq_of_word[word.text] += 1
+                
+            # Maximum frequency of word
+            max_freq=max(freq_of_word.values())
+            
+            # Normalization of word frequency
+            for word in freq_of_word.keys():
+                freq_of_word[word]=freq_of_word[word]/max_freq
+                
+            # In this part, each sentence is weighed based on how often it contains the token.
+            sent_tokens= [sent for sent in doc.sents]
+            # If there is only one sentence, just return the text.
+            if len(sent_tokens) == 1:
+                return self.text
+            sent_scores = dict()
+            for sent in sent_tokens:
+                for word in sent:
+                    if word.text.lower() in freq_of_word.keys():
+                        if sent not in sent_scores.keys():                            
+                            sent_scores[sent]=freq_of_word[word.text.lower()]
+                        else:
+                            sent_scores[sent]+=freq_of_word[word.text.lower()]
+            
+            num_sent = len(sent_tokens)*percentage
+            len_tokens=int(num_sent)
+
+            # It must write at least one sentence
+            if len_tokens < 1:
+                len_tokens = 1
+            
+            # If the number of sentences is not integer, add one sentence
+            if (num_sent - len_tokens) > 0:
+                len_tokens += 1
+                
+            # print("Number of sentences: ", len_tokens)
+            
+            # Summary for the sentences with maximum score. Here, each sentence in the list is of spacy.span type
+            summary = nlargest(n = len_tokens, iterable = sent_scores,key=sent_scores.get)
+            
+             # Sort the selected sentences based on their original order in the text
+            summary_sorted = sorted(summary, key=lambda sent: sent.start)
+
+            # Prepare for final summary
+            final_summary=[word.text for word in summary_sorted]
+
+            #convert to a string
+            result=" ".join(final_summary)
+            
+            # Return final summary
+            return result
+        except Exception as e:
+            self.logger.error(f"Error during spacy summarization: {str(e)}")
+            return ''
+        
+    def generate_title(self):
+        try:
+            doc = self.nlp(self.text)
+    
+            # Extract named entities and noun chunks as potential title candidates
+            entities = [ent.text for ent in doc.ents]
+            noun_chunks = [chunk.text for chunk in doc.noun_chunks]
+            
+            # Combine entities and noun chunks to form the title
+            title_candidates = entities + noun_chunks
+            
+            # Filter out very short candidates
+            title_candidates = [cand for cand in title_candidates if len(cand.split()) > 1]
+            # Join the top few candidates to create a title
+            title = " ".join(title_candidates[0])
+            
+            return title
+        except Exception as e:
+            self.logger.error(f"Error during title generation: {str(e)}")
             return ''
 
     def run(self):
         keywords = self.keyword_extraction()
         sentiment = self.sentiment_analysis()
-        summary = self.summarization()
+        summary = self.spacy_summarization(0.5)
         ner = self.ner()
         ner_list = []
 
