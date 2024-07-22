@@ -138,9 +138,8 @@ class GithubRequests:
         base_tree_sha = response.json()["tree"]["sha"]
 
         tree_items = []
-        for file_obj in files:
-            file_path = file_obj["path"]
-            file_name = file_obj["name"]
+        for file_path in files:
+            file_name = os.path.basename(file_path)
             # Step 3: Read the file content and encode it in Base64
             with open(file_path, "rb") as file:
                 file_content = base64.b64encode(file.read()).decode("utf-8")
