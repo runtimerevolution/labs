@@ -10,38 +10,6 @@ PYTHON_INTERPRETER = python
 # COMMANDS                                                                      #
 #################################################################################
 
-
-## Start working on the project
-.PHONY: start
-start:
-	@if ! which pixi 2>/dev/null; then \
-		echo "pixi not found."; \
-		if ! which curl 2>/dev/null; then \
-			echo "curl not found, installing..."; \
-			brew install curl; \
-		fi; \
-		curl -fsSL https://pixi.sh/install.sh | bash; \
-		if ! which pixi 2>/dev/null; then \
-			echo "pixi still not found, using brew..."; \
-			brew install pixi; \
-		fi; \
-	else \
-		echo "pixi already installed."; \
-	fi
-	@if [ ! -f ./pixi.lock ]; then \
-		echo "pixi.lock does not exist"; \
-	else \
-		rm pixi.lock; \
-	fi
-	pixi install
-
-
-## Install Python Dependencies
-.PHONY: requirements
-requirements:
-	conda env update --name $(PROJECT_NAME) --file environment.yml --prune
-
-
 ## Delete all compiled Python files
 .PHONY: clean
 clean:
@@ -60,20 +28,6 @@ lint:
 format:
 	black --config pyproject.toml labs
 
-
-## Download Data from storage system
-.PHONY: sync_data_down
-sync_data_down:
-	aws s3 sync s3://bucket-name/data/\
-		data/ 
-	
-
-## Upload Data to storage system
-.PHONY: sync_data_up
-sync_data_up:
-	aws s3 sync s3://bucket-name/data/ data/\
-		 --profile $(PROFILE)
-
 ## Set up project
 .PHONY: setup
 setup:
@@ -87,7 +41,6 @@ setup:
 tests:
 	pytest
 
-
 .PHONY: clean_tests
 clean_tests:
 	@if [ ! -d ./labs/test/vcr_cassettes ]; then \
@@ -95,19 +48,6 @@ clean_tests:
 	else \
 		rm -rf labs/test/vcr_cassettes; \
 	fi
-
-
-
-#################################################################################
-# PROJECT RULES                                                                 #
-#################################################################################
-
-
-## Make Dataset
-.PHONY: data
-data: requirements
-	$(PYTHON_INTERPRETER) labs/data/make_dataset.py
-
 
 #################################################################################
 # Self Documenting Commands                                                     #
