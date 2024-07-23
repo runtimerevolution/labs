@@ -6,73 +6,25 @@
 
 Runtime Labs
 
+## Getting Started
 
-## Start working on the project
+Here's the steps to setup the project locally:
 
-In order to start working on the project you just have to run `make start` and you are ready to go!
+1. poetry shell
+2. poetry install
+3. make setup
+4. make tests
 
-## Project Organization
+# Troubleshooting
 
-```
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
-├── data
-│   ├── external       <- Data from third party sources.
-│   ├── interim        <- Intermediate data that has been transformed.
-│   ├── processed      <- The final, canonical data sets for modeling.
-│   └── raw            <- The original, immutable data dump.
-│
-├── models             <- Trained and serialized models, model predictions, or model summaries
-│
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
-│
-├── pyproject.toml     <- Project configuration file with package metadata for labs
-│                         and configuration for tools like black
-│
-├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-│
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
-│
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
-│
-├── setup.cfg          <- Configuration file for flake8
-│
-└── labs                <- Source code for use in this project.
-    │
-    ├── __init__.py    <- Makes labs a Python module
-    │
-    ├── data           <- Scripts to download or generate data
-    │   └── make_dataset.py
-    │
-    ├── features       <- Scripts to turn raw data into features for modeling
-    │   └── build_features.py
-    │
-    ├── models         <- Scripts to train models and then use trained models to make
-    │   │                 predictions
-    │   ├── predict_model.py
-    │   └── train_model.py
-    │
-    └── visualization  <- Scripts to create exploratory and results oriented visualizations
-        └── visualize.py
-```
+## PyICU
 
---------
+Please install pkg-config on your system or set the ICU_VERSION environment
+variable to the version of ICU you have installed
 
-## Use of Pixi in Runtime Labs project
+If you see this error, when installing the package PyICU, you can solve the issue with these steps:
 
-1. **`pixi init .`**: Initializes Pixi for the current directory.
-2. **`pixi shell`**: Opens a Pixi shell with the Pixi-managed Python version.
-3. **`python --version`**: Checks the Python version, which will show your current python version.
-4. **`pixi add python==3.11.9`**: Adds Python version **3.11.9** to the project.
-5. **`python --version`**: If you check the Python version, now it's **3.11.9**.
-6. **`pixi add python==3.12.2`**: If for some reason you made a mistake you can add a new version.
-7. **`python --version`**: If you check the Python version again, now it's **3.12.2**.
-8. **`which python`**: This will show you the path to the Python interpreter.
-9. **`exit`**: Exits the Pixi shell.
-10. **`python --version`**: Now, if you check the Python version outside the Pixi shell, it's back to the version you started with. 
-
+1. brew install pkg-config icu4c;
+2. brew info icu4c;
+3. Look for the lines that export the path for icu to the PATH environment variable and add them to you your bashrc (or zshrc, whichever you use);
+4. Rerun poetry install again and there should be no error.
