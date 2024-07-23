@@ -170,12 +170,6 @@ cython_debug/
 # PyCharm
 #.idea/
 
-# pixi environments
-.pixi
-*.egg-info
-
 .vscode/
 polyglot_data/
 vcr_cassettes/
-pixi.lock
-

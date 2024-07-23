@@ -1,65 +1,40 @@
-[build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
-
-[project]
+[tool.poetry]
 name = "labs"
-version = "0.0.1"
-description = "Runtime Labs"
+version = "0.1.0"
+description = ""
 authors = [
-  { name = "runtimerevolution" },
+    "Carlos Martinez <c.martinez@runtime-revolution.com>",
+    "Filipa Silva <filipa.silva@runtime-revolution.com>",
+    "Luis Moreira <l.moreira@runtime-revolution.com>",
+    "Sérgio Ildefonso <s.ildefonso@runtime-revolution.com>"
 ]
-
 readme = "README.md"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    
-]
-requires-python = "~=3.11"
-dependencies = ["polyglot", "pycld2", "spacytextblob", "ipykernel", "jwt", "pytest", "pytest-mock", "google-generativeai"]
 
-[project.optional-dependencies]
-all = ["litellm[proxy]"]
+[tool.poetry.dependencies]
+python = "^3.11"
+python-dotenv = "^1.0.1"
+requests = "^2.32.3"
+transformers = "^4.42.4"
+nltk = "^3.8.1"
+spacy = "^3.7.5"
+polyglot = "^16.7.4"
+spacytextblob = "^4.0.0"
+deeplake = "^3.9.14"
+langchain = "^0.2.10"
+litellm = "^1.41.25"
+gitpython = "^3.1.43"
+pyicu = "^2.13.1"
+pycld2 = "^0.41"
+langchain-community = "^0.2.9"
+python-json-logger = "^2.0.7"
 
-[tool.black]
-line-length = 99
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.venv
-)/
-'''
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+jupyterlab = "^4.2.4"
+vcrpy = "^6.0.1"
+pytest = "^8.3.1"
+pytest-mock = "^3.14.0"
 
-[tool.ruff.lint.isort]
-known_first_party = ["labs"]
-force_sort_within_sections = true
-
-[tool.pixi.project]
-channels = ["conda-forge"]
-platforms = ["osx-64"]
-
-[tool.pixi.pypi-dependencies]
-labs = { path = ".", editable = true }
-
-[tool.pixi.tasks]
-
-[tool.pixi.dependencies]
-python = "==3.11.9"
-jupyterlab = ">=4.2.3,<4.3"
-pip = ">=24.0,<25"
-python-dotenv = ">=1.0.1,<1.1"
-python-json-logger = ">=2.0.7,<2.1"
-vcrpy = ">=6.0.1,<6.1"
-pytest = ">=8.2.2,<8.3"
-requests = ">=2.32.3,<2.33"
-transformers = ">=4.42.3,<4.43"
-pytorch = ">=2.3.1,<2.4"
-nltk = ">=3.8.1,<3.9"
-spacy = ">=3.7.5,<3.8"
-pyicu = ">=2.13.1,<2.14"
-morfessor = ">=2.0.6,<2.1"
-git = ">=2.45.2,<2.46"
-gitpython = ">=3.1.43,<3.2"
-rouge-score = ">=0.1.2,<0.2"
-litellm = ">=1.39.6,<1.40"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
