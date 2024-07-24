@@ -1,10 +1,9 @@
-from pathlib import Path
 from configparser import ConfigParser
+import pathlib
 
-from app import DB_INIT_FILE
 
-
-def db_config(filename: Path = DB_INIT_FILE, section: str = "postgresql"):
+def db_config(section: str = "postgresql"):
+    filename = f"{pathlib.Path().resolve()}/database.ini"
     parser = ConfigParser()
     parser.read(filename)
     if parser.has_section(section):

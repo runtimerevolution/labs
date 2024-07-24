@@ -1,13 +1,9 @@
-from pgvector.connect import create_db_connection
-
-import os
+from connect import create_db_connection
 import psycopg2
-from openai.embeddings_utils import get_embeddings
+from litellm import embedding
 
 
 if __name__ == "__main__":
-
-    # Write five example sentences that will be converted to embeddings
     texts = [
         "I like to eat broccoli and bananas.",
         "I ate a banana and spinach smoothie for breakfast.",
@@ -16,16 +12,15 @@ if __name__ == "__main__":
         "Look at this cute hamster munching on a piece of broccoli.",
     ]
 
-    embeddings = get_embeddings(texts, os.getenv("EMBEDDING_MODEL"))
+    embeddings = embedding(model="text-embedding-ada-002", input=texts)
 
-    # Write text and embeddings to database
     connection = create_db_connection()
     cursor = connection.cursor()
     try:
-        for text, embedding in zip(texts, embeddings):
+        for text, embedding_obj in zip(texts, embeddings.data):
             cursor.execute(
                 "INSERT INTO embeddings (embedding, text) VALUES (%s, %s)",
-                (embedding, text),
+                (embedding_obj["embedding"], text),
             )
         connection.commit()
     except (Exception, psycopg2.Error) as error:

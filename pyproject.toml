@@ -27,6 +27,7 @@ pyicu = "^2.13.1"
 pycld2 = "^0.41"
 langchain-community = "^0.2.9"
 python-json-logger = "^2.0.7"
+psycopg2 = "^2.9.9"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
