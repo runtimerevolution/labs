@@ -95,8 +95,9 @@ def process(repo_url, include_file_extensions, repo_destination):
     clone_repository(repo_url, repo_destination)
     docs = load_docs(repo_destination, include_file_extensions)
     texts = split_docs(docs)
+    texts_only = [text.page_content for text in texts]
 
-    add_data(texts)
+    add_data(texts_only)
 
     # embeddings = OpenAIEmbeddings()
 
