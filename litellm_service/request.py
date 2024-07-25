@@ -1,4 +1,4 @@
-import os
+from litellm import completion
 import requests
 
 # from litellm import completion
@@ -6,8 +6,6 @@ from langchain.vectorstores import DeepLake
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.chat_models.openai import ChatOpenAI
-import openai
-from labs.config import OPENAI_API_KEY
 
 
 models = [
@@ -19,61 +17,61 @@ models = [
 ]
 
 
-# class RequestLiteLLM:
-#     def __init__(self, litellm_api_key):
-#         self.api_key = litellm_api_key
+class RequestLiteLLM:
+    def __init__(self, litellm_api_key):
+        self.api_key = litellm_api_key
 
-#     def completion(self, messages, model="llm-model"):
-#         """
-#         messages expected to be in the following format:
-#         [
-#             {
-#                 "role": "user",
-#                 "content": ""
-#             }
-#         ]
-#         Where role can be "user", "assistant", "system".
-#         And content is the body of the message.
-#         """
-#         headers = {
-#             "Accept": "application/json",
-#             "API-Key": self.api_key,
-#         }
+    def completion(self, messages, model="llm-model"):
+        """
+        messages expected to be in the following format:
+        [
+            {
+                "role": "user",
+                "content": ""
+            }
+        ]
+        Where role can be "user", "assistant", "system".
+        And content is the body of the message.
+        """
+        headers = {
+            "Accept": "application/json",
+            "API-Key": self.api_key,
+        }
 
-#         data = {"messages": messages}
-#         result = requests.post(
-#             f"http://0.0.0.0:4000/chat/completions?model={model}",
-#             headers=headers,
-#             json=data,
-#         )
+        data = {"messages": messages}
+        result = requests.post(
+            f"http://0.0.0.0:4000/chat/completions?model={model}",
+            headers=headers,
+            json=data,
+        )
 
-#         return result.json()
+        return result.json()
 
-#     def completion_without_proxy(self, messages, model=None):
-#         """
-#         messages expected to be in the following format:
-#         [
-#             {
-#                 "role": "user",
-#                 "content": ""
-#             }
-#         ]
-#         Where role can be "user", "assistant", "system".
-#         And content is the body of the message.
-#         """
-#         if model:
-#             return model, completion(
-#                 model=model,
-#                 messages=messages,
-#             )
+    def completion_without_proxy(self, messages, model=None):
+        """
+        messages expected to be in the following format:
+        [
+            {
+                "role": "user",
+                "content": ""
+            }
+        ]
+        Where role can be "user", "assistant", "system".
+        And content is the body of the message.
+        """
+        if model:
+            return model, completion(
+                model=model,
+                messages=messages,
+            )
 
-#         for model in models:
-#             try:
-#                 response = completion(model=model, messages=messages)
-#                 return model, response
-#             except Exception as ex:
-#                 pass
-#         return model, None
+        for model in models:
+            try:
+                response = completion(model=model, messages=messages)
+                return model, response
+            except Exception as ex:
+                pass
+        return model, None
 
 
 class RequestBarebones:

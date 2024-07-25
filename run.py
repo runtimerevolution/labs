@@ -1,13 +1,14 @@
-import time
+from labs.context_loading import load_project
 from labs.github import GithubRequests
 from labs.config import GITHUB_ACCESS_TOKEN, GITHUB_REPO, GITHUB_OWNER, LITELLM_API_KEY
 from labs.nlp import NLP_Interface
-from labs.context_loading import load_project
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
-from litellm_service.request import RequestBarebones  # , RequestLiteLLM
+from litellm_service.request import RequestBarebones, RequestLiteLLM
+from pgvector.vectorize_to_db import vectorize_to_db
+from pgvector.queries import select_embeddings
 
 gh_requests: GithubRequests = None
-# litellm_requests: RequestLiteLLM = None
+litellm_requests: RequestLiteLLM = None
 barebone_requests: RequestBarebones = None
 
 
@@ -28,8 +29,8 @@ def setup():
         repo_name=GITHUB_REPO,
     )
 
-    # global litellm_requests
-    # litellm_requests = RequestLiteLLM(LITELLM_API_KEY)
+    global litellm_requests
+    litellm_requests = RequestLiteLLM(LITELLM_API_KEY)
     global barebone_requests
     barebone_requests = RequestBarebones(
         activeloop_dataset_path="hub://cmartinez/labs_db"
@@ -56,7 +57,8 @@ def change_issue_to_in_progress():
 
 
 def load_context():
-    return load_project()
+    vectorize_to_db()
+    return select_embeddings(), f"/tmp/{GITHUB_OWNER}/{GITHUB_REPO}"
 
 
 def call_llm_with_context(context, nlp_summary):
@@ -119,7 +121,6 @@ def run():
     issue = get_issue(issue_number)
     branch, branch_name = create_branch(issue_number, issue["title"].replace(" ", "-"))
     nlped_text = apply_nlp_to_issue(issue["body"])
-    print(nlped_text)
     # change_issue_to_in_progress()
     context, repo_dir = load_context()
     nlp_summary = f"""
@@ -132,6 +133,3 @@ def run():
     commit_result = commit_changes(branch_name, new_file_path, new_file_name)
     pr_result = create_pull_request(branch_name)
     # change_issue_to_in_review()
-
-
-run()

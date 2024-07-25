@@ -1,15 +1,6 @@
 version: "3.9"
 
 services:
-  # postgres:
-  #   image: postgres:13
-  #   environment:
-  #     - POSTGRES_PASSWORD=postgres
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_DB=postgres
-  #   ports:
-  #     - "63044:5432"
-    
   db:
     image: ankane/pgvector
     ports:
@@ -21,7 +12,8 @@ services:
       - POSTGRES_PASSWORD=testpwd
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
 
   litellm:
     build:
