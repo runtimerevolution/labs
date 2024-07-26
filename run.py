@@ -18,7 +18,7 @@ LLM_PROXY_VALUES = [
     LLM_PROXY_LITELLM,
     LLM_PROXY_BAREBONES,
 ]
-ACTIVE_LLM_PROXY = LLM_PROXY_BAREBONES
+ACTIVE_LLM_PROXY = LLM_PROXY_LITELLM
 
 
 def setup():
@@ -57,20 +57,27 @@ def change_issue_to_in_progress():
 
 
 def load_context():
-    vectorize_to_db()
-    return select_embeddings(), f"/tmp/{GITHUB_OWNER}/{GITHUB_REPO}"
+    destination = f"/tmp/{GITHUB_OWNER}/{GITHUB_REPO}"
+    vectorize_to_db("https://github.com/runtimerevolution/labs", None, destination)
+    return select_embeddings(), destination
 
 
 def call_llm_with_context(context, nlp_summary):
     if ACTIVE_LLM_PROXY == LLM_PROXY_LITELLM:
         prepared_context = []
         for file in context:
-            prepared_context.append(
-                {
-                    "role": "system",
-                    "content": f"File: {file['file_name']} Content: {file['content']}",
-                }
-            )
+            if (
+                file[2] == "/tmp/runtimerevolution/labs/code_examples/__init__.py"
+                or file[2] == "/tmp/runtimerevolution/labs/code_examples/calculator.py"
+                or file[2]
+                == "/tmp/runtimerevolution/labs/code_examples/test_calculator.py"
+            ):
+                prepared_context.append(
+                    {
+                        "role": "system",
+                        "content": f"File: {file[2]} Content: {file[3]}",
+                    }
+                )
         prepared_context.append(
             {
                 "role": "user",
@@ -78,15 +85,16 @@ def call_llm_with_context(context, nlp_summary):
             }
         )
 
-        # return litellm_requests.completion_without_proxy(prepared_context)
+        return litellm_requests.completion_without_proxy(
+            prepared_context,
+            model="openai/gpt-3.5-turbo",
+        )
     elif ACTIVE_LLM_PROXY == LLM_PROXY_BAREBONES:
         return barebone_requests.completion(nlp_summary)
 
 
 def call_agent_to_apply_code_changes(llm_response, repo_dir):
-    response_string = (
-        llm_response.choices[0].model_extra["message"].model_extra["content"]
-    )
+    response_string = llm_response[1].choices[0].message.content
     # Find actions to apply from the llm_response
     actions = parse_llm_output(response_string)
     files = []

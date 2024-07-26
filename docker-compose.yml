@@ -13,7 +13,6 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - postgres_data:/var/lib/postgresql/data
 
   litellm:
     build:

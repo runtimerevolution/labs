@@ -67,7 +67,7 @@ def load_docs(root_dir, file_extensions=None):
 
 def split_docs(docs):
     """Split the input documents into smaller chunks."""
-    text_splitter = CharacterTextSplitter(chunk_size=5000, chunk_overlap=0)
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     return text_splitter.split_documents(docs)
 
 
@@ -85,4 +85,4 @@ def vectorize_to_db(repo_url, include_file_extensions, repo_destination):
 
     embeddings = embedding(model="text-embedding-ada-002", input=texts)
 
-    reembed_code(files_and_texts, texts, embeddings)
+    reembed_code(files_and_texts, embeddings)
