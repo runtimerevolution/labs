@@ -90,7 +90,9 @@ class GithubRequests:
                 sha = response.json()["object"]["sha"]
                 create_ref_url = f"{self.github_api_url}/git/refs"
                 data = {"ref": f"refs/heads/{branch_name}", "sha": sha}
-                create_response = requests.post(create_ref_url, headers=headers, json=data)
+                create_response = requests.post(
+                    create_ref_url, headers=headers, json=data
+                )
                 return create_response.json()
 
             else:
@@ -139,7 +141,8 @@ class GithubRequests:
 
         tree_items = []
         for file_path in files:
-            file_name = os.path.basename(file_path)
+
+            file_name = file_path.replace("/tmp/runtimerevolution/labs/", "")
             # Step 3: Read the file content and encode it in Base64
             with open(file_path, "rb") as file:
                 file_content = base64.b64encode(file.read()).decode("utf-8")
@@ -159,7 +162,11 @@ class GithubRequests:
         new_tree_sha = tree_response.json()["sha"]
 
         # Step 6: Create a new commit with the new tree
-        commit_data = {"message": message, "parents": [latest_commit_sha], "tree": new_tree_sha}
+        commit_data = {
+            "message": message,
+            "parents": [latest_commit_sha],
+            "tree": new_tree_sha,
+        }
         commit_url = f"{self.github_api_url}/git/commits"
         commit_response = requests.post(commit_url, headers=headers, json=commit_data)
         new_commit_sha = commit_response.json()["sha"]
@@ -167,7 +174,9 @@ class GithubRequests:
         # Step 7: Update the reference of the branch to point to the new commit
         update_ref_data = {"sha": new_commit_sha, "force": False}
         update_ref_url = f"{self.github_api_url}/git/refs/heads/{branch_name}"
-        update_ref_response = requests.patch(update_ref_url, headers=headers, json=update_ref_data)
+        update_ref_response = requests.patch(
+            update_ref_url, headers=headers, json=update_ref_data
+        )
         return update_ref_response.json()
 
     def create_pull_request(self, head, base="main", title="New Pull Request", body=""):
