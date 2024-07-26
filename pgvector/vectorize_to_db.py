@@ -1,4 +1,5 @@
 import deeplake
+from litellm import embedding
 import openai
 import os
 import pathspec
@@ -6,7 +7,7 @@ import subprocess
 from langchain.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from labs.config import OPENAI_API_KEY
-from pgvector.add_data import add_data
+from pgvector.queries import reembed_code
 
 # Set the OpenAI API key
 openai.api_key = OPENAI_API_KEY
@@ -44,8 +45,9 @@ def load_docs(root_dir, file_extensions=None):
         for file in filenames:
             file_path = os.path.join(dirpath, file)
 
-            # Skip dotfiles
             if file.startswith("."):
+                continue
+            if file.endswith(".lock"):
                 continue
 
             # Skip files that match .gitignore rules
@@ -69,37 +71,18 @@ def split_docs(docs):
     return text_splitter.split_documents(docs)
 
 
-def create_deeplake_dataset(activeloop_dataset_path, activeloop_token):
-    """Create an empty DeepLake dataset with the specified path and token."""
-    ds = deeplake.empty(
-        activeloop_dataset_path,
-        token=activeloop_token,
-        overwrite=True,
-    )
-
-    ds.create_tensor("ids")
-    ds.create_tensor("metadata")
-    ds.create_tensor("embedding")
-    ds.create_tensor("text")
-
-
-def process(repo_url, include_file_extensions, repo_destination):
+def vectorize_to_db(repo_url, include_file_extensions, repo_destination):
     """
     Process a git repository by cloning it, filtering files, splitting documents,
     creating embeddings, and storing everything in pgvector database.
     """
-    # activeloop_token = ACTIVELOOP_TOKEN
-
-    # create_deeplake_dataset(activeloop_dataset_path, activeloop_token)
-
     clone_repository(repo_url, repo_destination)
     docs = load_docs(repo_destination, include_file_extensions)
     texts = split_docs(docs)
-    texts_only = [text.page_content for text in texts]
 
-    add_data(texts_only)
+    files_and_texts = [(text.metadata["source"], text.page_content) for text in texts]
+    texts = [file_and_text[1] for file_and_text in files_and_texts]
 
-    # embeddings = OpenAIEmbeddings()
+    embeddings = embedding(model="text-embedding-ada-002", input=texts)
 
-    # db = DeepLake(dataset_path=activeloop_dataset_path, embedding_function=embeddings)
-    # db.add_documents(texts)
+    reembed_code(files_and_texts, embeddings)
