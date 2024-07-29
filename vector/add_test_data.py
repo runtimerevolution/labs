@@ -1,7 +1,7 @@
+
 from connect import create_db_connection
 import psycopg2
 from litellm import embedding
-
 
 if __name__ == "__main__":
     texts = [
@@ -11,16 +11,15 @@ if __name__ == "__main__":
         "My sister adopted a kitten yesterday.",
         "Look at this cute hamster munching on a piece of broccoli.",
     ]
-
     embeddings = embedding(model="text-embedding-ada-002", input=texts)
-
+    
     connection = create_db_connection()
     cursor = connection.cursor()
     try:
         for text, embedding_obj in zip(texts, embeddings.data):
             cursor.execute(
-                "INSERT INTO embeddings (embedding, text) VALUES (%s, %s)",
-                (embedding_obj["embedding"], text),
+                "INSERT INTO embeddings (embedding, file_and_path, text) VALUES (%s, %s, %s)",
+                (embedding_obj["embedding"], text[0], text[1]),
             )
         connection.commit()
     except (Exception, psycopg2.Error) as error:
