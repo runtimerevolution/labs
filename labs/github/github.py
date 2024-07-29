@@ -19,6 +19,7 @@ class GithubRequests:
         self.repo_name = repo_name
         self.username = user_name
         self.github_api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
+        self.directory_dir = f"/tmp/{self.repo_owner}/{self.repo_name}"
 
     logger = logging.getLogger(__name__)
 
@@ -142,7 +143,7 @@ class GithubRequests:
         tree_items = []
         for file_path in files:
 
-            file_name = file_path.replace("/tmp/runtimerevolution/labs/", "")
+            file_name = file_path.replace(f"{self.directory_dir}/", "")
             # Step 3: Read the file content and encode it in Base64
             with open(file_path, "rb") as file:
                 file_content = base64.b64encode(file.read()).decode("utf-8")
@@ -189,12 +190,13 @@ class GithubRequests:
     def clone(self):
         try:
             url = f"https://github.com/{self.repo_owner}/{self.repo_name}.git"
-            output_dir = f"/tmp/{self.repo_owner}/{self.repo_name}"
             branch = "main"
             probe = f"/tmp/{self.repo_owner}/{self.repo_name}/.git"
             if not os.path.exists(probe):
-                cloned_repo = git.Repo.clone_from(url, output_dir, branch=branch)
-            return output_dir
+                cloned_repo = git.Repo.clone_from(
+                    url, self.directory_dir, branch=branch
+                )
+            return self.directory_dir
         except Exception as e:
             self.logger.error(f"An unexpected error occurred: {e}")
             return None
