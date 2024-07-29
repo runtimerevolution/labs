@@ -2,6 +2,7 @@ from labs.config import get_logger, POLYGLOT_DIR, spacy_models
 import typer
 from polyglot.downloader import Downloader
 import spacy
+from vector.queries import setup_db
 
 app = typer.Typer()
 
@@ -37,6 +38,10 @@ def main():
         if model["model"] not in installed_models:
             logger.debug(f"Installing {model['model']}...")
             spacy.cli.download(model["model"])
+
+    logger.debug("    Setting up database...")
+    setup_db()
+    logger.debug("    Database was set up...")
 
 
 if __name__ == "__main__":
