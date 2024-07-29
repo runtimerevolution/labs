@@ -2492,6 +2492,19 @@ files = [
 ptyprocess = ">=0.5"
 
 [[package]]
+name = "pgvector"
+version = "0.3.2"
+description = "pgvector support for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pgvector-0.3.2-py2.py3-none-any.whl", hash = "sha256:a44541c75a7340993b2840015820a910e5d7625d2ddd1235c1ee659732531bf6"},
+]
+
+[package.dependencies]
+numpy = "*"
+
+[[package]]
 name = "platformdirs"
 version = "4.2.2"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
@@ -4730,4 +4743,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "1523046f458cd7adbdd04dd27ed72371a24f967f24fa26110595ee31b70c04bb"
+content-hash = "9cb744a88b04fa77ef0af231e06c4770a61e3f6b699ec1f00d7e4a1b275bca6a"

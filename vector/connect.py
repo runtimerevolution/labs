@@ -1,6 +1,6 @@
 import psycopg2
 
-from pgvector.vector_config import db_config
+from vector.vector_config import db_config
 
 
 def create_db_connection():

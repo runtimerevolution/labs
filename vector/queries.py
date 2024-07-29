@@ -1,5 +1,5 @@
 import psycopg2
-from pgvector.connect import create_db_connection
+from vector.connect import create_db_connection
 
 
 def select_embeddings():

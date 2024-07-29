@@ -4,8 +4,9 @@ from labs.config import GITHUB_ACCESS_TOKEN, GITHUB_REPO, GITHUB_OWNER, LITELLM_
 from labs.nlp import NLP_Interface
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
 from litellm_service.request import RequestLiteLLM
-from pgvector.vectorize_to_db import vectorize_to_db
-from pgvector.queries import select_embeddings
+from rag.rag import find_similar_embeddings
+from vector.vectorize_to_db import vectorize_to_db
+from vector.queries import select_embeddings
 
 gh_requests: GithubRequests = None
 litellm_requests: RequestLiteLLM = None
@@ -42,26 +43,22 @@ def change_issue_to_in_progress():
     pass
 
 
-def load_context():
+def load_context(nlp_summary):
     destination = f"/tmp/{GITHUB_OWNER}/{GITHUB_REPO}"
     vectorize_to_db("https://github.com/runtimerevolution/labs", None, destination)
-    return select_embeddings(), destination
+    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
+    return find_similar_embeddings(nlp_summary), destination
 
 
 def call_llm_with_context(context, nlp_summary):
     prepared_context = []
     for file in context:
-        if (
-            file[2] == "/tmp/runtimerevolution/labs/code_examples/__init__.py"
-            or file[2] == "/tmp/runtimerevolution/labs/code_examples/calculator.py"
-            or file[2] == "/tmp/runtimerevolution/labs/code_examples/test_calculator.py"
-        ):
-            prepared_context.append(
-                {
-                    "role": "system",
-                    "content": f"File: {file[2]} Content: {file[3]}",
-                }
-            )
+        prepared_context.append(
+            {
+                "role": "system",
+                "content": f"File: {file[1]} Content: {file[2]}",
+            }
+        )
     prepared_context.append(
         {
             "role": "user",
@@ -112,7 +109,6 @@ def run():
     branch, branch_name = create_branch(issue_number, issue["title"].replace(" ", "-"))
     nlped_text = apply_nlp_to_issue(issue["body"])
     # change_issue_to_in_progress()
-    context, repo_dir = load_context()
     nlp_summary = f"""
     Add a multiplication function to the Calculator class in labs/code_examples/calculator.py and add a unit tests for the new multiplication function in the file labs/code_examples/test_calculator.py file.
     """
@@ -123,6 +119,7 @@ def run():
     path - the path of the file to create/modify and content - the content to write to the file.
     Please don't add any text formatting to the answer, making it as clean as possible.
     """
+    context, repo_dir = load_context(nlp_summary)
     llm_response = call_llm_with_context(context, user_input)  # nlped_text["summary"])
     new_file_path, new_file_name = call_agent_to_apply_code_changes(
         llm_response, repo_dir
