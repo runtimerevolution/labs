@@ -12,7 +12,8 @@ services:
       - POSTGRES_PASSWORD=testpwd
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./vector/scripts:/docker-entrypoint-initdb.d
+      - db-data:/var/lib/postgresql/data:rw
 
   litellm:
     build:
@@ -27,3 +28,7 @@ services:
     volumes:
       - ./litellm-config.yaml:/app/config.yaml
     command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
+
+
+volumes:
+  db-data: { }

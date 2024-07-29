@@ -1,5 +1,33 @@
 import psycopg2
-from pgvector.connect import create_db_connection
+from vector.connect import create_db_connection
+
+
+create_extension_sql = "CREATE EXTENSION IF NOT EXISTS vector;"
+create_table_embeddings_sql = """
+CREATE TABLE IF NOT EXISTS embeddings (
+  id SERIAL PRIMARY KEY,
+  embedding vector,
+  file_and_path text,
+  text text,
+  created_at timestamptz DEFAULT now()
+);
+"""
+
+
+def setup_db():
+    connection = create_db_connection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(create_extension_sql)
+        cursor.execute(create_table_embeddings_sql)
+        connection.commit()
+    except (Exception, psycopg2.Error) as error:
+        print("Error while getting data from DB", error)
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 
 def select_embeddings():
