@@ -39,6 +39,7 @@ def main():
             logger.debug(f"Installing {model['model']}...")
             spacy.cli.download(model["model"])
 
+    logger.debug("# DATABASE")
     logger.debug("    Setting up database...")
     setup_db()
     logger.debug("    Database was set up...")
