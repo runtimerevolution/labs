@@ -1,3 +1,4 @@
+
 from litellm import embedding
 import psycopg2
 from sqlalchemy import create_engine, Column, Integer, String
@@ -9,7 +10,6 @@ from vector.connect import create_db_connection
 Base = declarative_base()
 N_DIM = 1536
 
-
 class Embedding(Base):
     __tablename__ = "embeddings"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -17,13 +17,11 @@ class Embedding(Base):
     text = Column(String)
     embedding = Column(Vector(N_DIM))
 
-
 def insert_embeddings(session, embeddings):
     for embedding in embeddings:
         new_embedding = Embedding(embedding=embedding)
         session.add(new_embedding)
     session.commit()
-
 
 def find_similar_embeddings(query):
     k = 5
@@ -35,10 +33,10 @@ def find_similar_embeddings(query):
     query_embedding = result.data[0]["embedding"]
 
     query = f"""SELECT emb.id, emb.file_and_path, emb.text, (1 - (emb.embedding <=> '{query_embedding}')) AS similarity
-    FROM embeddings emb
-    WHERE (1 - (emb.embedding <=> '{query_embedding}')) > {similarity_threshold}
-    ORDER BY emb.embedding <=> '{query_embedding}'
-    LIMIT {k};"""
+        FROM embeddings emb
+        WHERE (1 - (emb.embedding <=> '{query_embedding}')) > {similarity_threshold}
+        ORDER BY emb.embedding <=> '{query_embedding}'
+        LIMIT {k};"""
 
     connection = create_db_connection()
     cursor = connection.cursor()
@@ -52,24 +50,3 @@ def find_similar_embeddings(query):
             cursor.close()
         if connection:
             connection.close()
-
-    # query = (
-    #     session.query(
-    #         Embedding,
-    #         Embedding.embedding.cosine_distance(query_embedding).label("distance"),
-    #     )
-    #     .filter(
-    #         Embedding.embedding.cosine_distance(query_embedding) < similarity_threshold
-    #     )
-    #     .order_by("distance")
-    #     .limit(k)
-    #     .all()
-    # )
-    # return query
-
-
-def setup():
-    engine = create_engine("postgresql+psycopg2://testuser:testpwd@db:5432/vectordb")
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    return session
