@@ -3,7 +3,7 @@ import openai
 import os
 import pathspec
 import subprocess
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from labs.config import OPENAI_API_KEY
 from vector.queries import reembed_code

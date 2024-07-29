@@ -1,6 +1,10 @@
-from labs.context_loading import load_project
 from labs.github import GithubRequests
-from labs.config import GITHUB_ACCESS_TOKEN, GITHUB_REPO, GITHUB_OWNER, LITELLM_API_KEY
+from labs.config import (
+    GITHUB_ACCESS_TOKEN,
+    GITHUB_REPO,
+    GITHUB_OWNER,
+    LITELLM_API_KEY,
+)
 from labs.nlp import NLP_Interface
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
 from litellm_service.request import RequestLiteLLM
@@ -72,7 +76,7 @@ def call_llm_with_context(context, nlp_summary):
     )
 
 
-def call_agent_to_apply_code_changes(llm_response, repo_dir):
+def call_agent_to_apply_code_changes(llm_response):
     response_string = llm_response[1].choices[0].message.content
     # Find actions to apply from the llm_response
     actions = parse_llm_output(response_string)
@@ -102,28 +106,33 @@ def change_issue_to_in_review():
 
 
 def run():
-    issue_number = 35
+    issue_number = 60
 
     setup()
     issue = get_issue(issue_number)
     branch, branch_name = create_branch(issue_number, issue["title"].replace(" ", "-"))
-    nlped_text = apply_nlp_to_issue(issue["body"])
+    # nlped_text = apply_nlp_to_issue(issue["body"])
     # change_issue_to_in_progress()
-    nlp_summary = f"""
-    Add a multiplication function to the Calculator class in labs/code_examples/calculator.py and add a unit tests for the new multiplication function in the file labs/code_examples/test_calculator.py file.
-    """
-    user_input = f"""
-    You're a diligent software engineer AI. You can't see, draw, or interact with a browser, but you can read and write files, and you can think.
-    You've been given the following task: {nlp_summary}. Your answer will be in yaml format. Please provide a list of actions to perform in order to complete it, considering the current project.
-    Each action should contain two fields: action, which is either create or modify; and args, which is a map of key-value pairs, specifying the arguments for that action:
-    path - the path of the file to create/modify and content - the content to write to the file.
+    # nlp_summary = f"""
+    # Add a multiplication function to the Calculator class in labs/code_examples/calculator.py and add a unit tests for the new multiplication function.
+    # """
+    prompt = f"""
+    You're a diligent software engineer AI. You can't see, draw, or interact with a 
+    browser, but you can read and write files, and you can think.
+    You've been given the following task: {issue['body']}.Your answer will be in yaml format.
+    Please provide a list of actions to perform in order to complete it, considering the current project.
+    Any imports will be at the beggining of the file.
+    Add tests for the new functionalities, considering any existing test files.
+    Each action should contain two fields:
+    action, which is either 'create' to add a new file  or 'modify' to edit an existing one;
+    args, which is a map of key-value pairs, specifying the arguments for that action:
+    path - the absolute path of the file to create/modify and content - the content to write to the file.
+    If the file is to be modify, on the contents send the finished version of the entire file.
     Please don't add any text formatting to the answer, making it as clean as possible.
     """
-    context, repo_dir = load_context(nlp_summary)
-    llm_response = call_llm_with_context(context, user_input)  # nlped_text["summary"])
-    new_file_path, new_file_name = call_agent_to_apply_code_changes(
-        llm_response, repo_dir
-    )
-    commit_result = commit_changes(branch_name, new_file_path, new_file_name)
+    context, repo_dir = load_context(issue["body"])
+    llm_response = call_llm_with_context(context, prompt)
+    new_file_path = call_agent_to_apply_code_changes(llm_response)
+    commit_result = commit_changes(branch_name, new_file_path)
     pr_result = create_pull_request(branch_name)
     # change_issue_to_in_review()
