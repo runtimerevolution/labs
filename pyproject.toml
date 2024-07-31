@@ -29,6 +29,8 @@ python-json-logger = "^2.0.7"
 pathspec = "^0.12.1"
 psycopg2-binary = "^2.9.9"
 pgvector = "^0.3.2"
+pytest-postgresql = "^6.0.0"
+docker = "^7.1.0"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"

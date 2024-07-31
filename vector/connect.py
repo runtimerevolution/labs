@@ -1,10 +1,41 @@
 import psycopg2
+from labs.config import (
+    TEST_ENVIRONMENT,
+    DATABASE_HOST,
+    DATABASE_USER,
+    DATABASE_PASS,
+    DATABASE_NAME,
+    DATABASE_PORT,
+    DATABASE_TEST_HOST,
+    DATABASE_TEST_USER,
+    DATABASE_TEST_PASS,
+    DATABASE_TEST_NAME,
+    DATABASE_TEST_PORT,
+)
 
-from vector.vector_config import db_config
+
+def db_config():
+    return {
+        "host": DATABASE_HOST,
+        "database": DATABASE_NAME,
+        "user": DATABASE_USER,
+        "password": DATABASE_PASS,
+        "port": DATABASE_PORT,
+    }
+
+
+def db_test_config():
+    return {
+        "host": DATABASE_TEST_HOST,
+        "database": DATABASE_TEST_NAME,
+        "user": DATABASE_TEST_USER,
+        "password": DATABASE_TEST_PASS,
+        "port": DATABASE_TEST_PORT,
+    }
 
 
 def create_db_connection():
-    params = db_config()
+    params = db_config() if not TEST_ENVIRONMENT else db_test_config()
     try:
         conn = psycopg2.connect(**params)
         return conn
