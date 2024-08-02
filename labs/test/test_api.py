@@ -1,5 +1,13 @@
 from unittest.mock import patch
-from labs.api.types import CallLLMRequest, CodeMonkeyRequest, GithubModel
+from labs.github.github import GithubRequests
+from labs.api.types import (
+    CallLLMRequest,
+    CodeMonkeyRequest,
+    CreateBranchRequest,
+    GithubModel,
+    IssueRequest,
+    ListIssuesRequest,
+)
 from fastapi.testclient import TestClient
 from labs.api.main import app
 
@@ -42,3 +50,60 @@ class TestAPIClient:
         )
 
         assert response.status_code == 200
+
+    @patch.object(GithubRequests, "list_issues")
+    def test_successfull_list_issues(self, mocked_list):
+        client = TestClient(app)
+        request = GithubModel(
+            github_token="valid_token", repo_owner="owner", repo_name="repo"
+        )
+        params = ListIssuesRequest()
+        mocked_list.return_value = [
+            {"id": 1, "title": "Issue 1", "state": "open"},
+            {"id": 2, "title": "Issue 2", "state": "open"},
+        ]
+
+        response = client.post(
+            "/github/list-issues",
+            json={"request": request.__dict__, "params": params.__dict__},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {"id": 1, "title": "Issue 1", "state": "open"},
+            {"id": 2, "title": "Issue 2", "state": "open"},
+        ]
+
+    @patch.object(GithubRequests, "get_issue")
+    def test_successfull_get_issue(self, mocked_issue):
+        client = TestClient(app)
+        request = GithubModel(
+            github_token="valid_token", repo_owner="owner", repo_name="repo"
+        )
+        params = IssueRequest(issue_number=1)
+        mocked_issue.return_value = {"id": 1, "title": "Sample Issue", "state": "open"}
+
+        response = client.post(
+            "/github/get-issue",
+            json={"request": request.__dict__, "params": params.__dict__},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {"id": 1, "title": "Sample Issue", "state": "open"}
+
+    @patch.object(GithubRequests, "create_branch")
+    def test_successfull_create_branch(self, mocked_branch):
+        client = TestClient(app)
+        request = GithubModel(
+            github_token="valid_token", repo_owner="owner", repo_name="repo"
+        )
+        params = CreateBranchRequest(branch_name="test_branch")
+        mocked_branch.return_value = []
+
+        response = client.post(
+            "/github/create-branch",
+            json={"request": request.__dict__, "params": params.__dict__},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == []

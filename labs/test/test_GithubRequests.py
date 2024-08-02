@@ -41,8 +41,8 @@ class TestGithubRequests:
     def test_list_issues_http_failure(self, mocker):
 
         mock_response = mocker.Mock()
-        mock_response.raise_for_status.side_effect = requests.exceptions.RequestException(
-            "HTTP Error"
+        mock_response.raise_for_status.side_effect = (
+            requests.exceptions.RequestException("HTTP Error")
         )
         mocker.patch("requests.get", return_value=mock_response)
 
@@ -82,8 +82,8 @@ class TestGithubRequests:
     def test_handle_http_request_failure_get_issue(self, mocker):
 
         mock_response = mocker.Mock()
-        mock_response.raise_for_status.side_effect = requests.exceptions.RequestException(
-            "Mocked Request Exception"
+        mock_response.raise_for_status.side_effect = (
+            requests.exceptions.RequestException("Mocked Request Exception")
         )
         mocker.patch("requests.get", return_value=mock_response)
 
@@ -112,6 +112,7 @@ class TestGithubRequests:
     def test_commit_changes_successfully(self, mocker):
 
         mock_response_get = mocker.Mock()
+        mock_response_get.status_code = 200
         mock_response_get.json.return_value = {
             "object": {"sha": "fake_sha"},
             "tree": {"sha": "fake_tree_sha"},
@@ -122,13 +123,15 @@ class TestGithubRequests:
         mock_response_post_blob = mocker.Mock()
         mock_response_post_blob.json.return_value = {"sha": "fake_blob_sha"}
         mocker.patch(
-            "requests.post", side_effect=[mock_response_post_blob, mock_response_post_blob]
+            "requests.post",
+            side_effect=[mock_response_post_blob, mock_response_post_blob],
         )
 
         mock_response_post_tree = mocker.Mock()
         mock_response_post_tree.json.return_value = {"sha": "fake_tree_sha"}
         mocker.patch(
-            "requests.post", side_effect=[mock_response_post_tree, mock_response_post_tree]
+            "requests.post",
+            side_effect=[mock_response_post_tree, mock_response_post_tree],
         )
 
         mock_response_post_commit = mocker.Mock()
@@ -146,7 +149,7 @@ class TestGithubRequests:
         result = github_requests.commit_changes(
             message="Commit message",
             branch_name="new_branch",
-            file_paths=["labs/test/test_GitHubRequests.py"],
+            files=["labs/test/test_GitHubRequests.py"],
         )
 
         assert result == {"sha": "fake_update_sha"}
