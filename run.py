@@ -8,7 +8,7 @@ from labs.config import (
 from labs.nlp import NLP_Interface
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
 from litellm_service.request import RequestLiteLLM
-from rag.rag import find_similar_embeddings
+from rag.embeddings import find_similar_embeddings
 from vector.vectorize_to_db import vectorize_to_db
 from vector.queries import select_embeddings
 

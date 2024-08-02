@@ -14,54 +14,53 @@ CREATE TABLE IF NOT EXISTS embeddings (
 """
 
 
-def setup_db():
-    connection = create_db_connection()
-    cursor = connection.cursor()
-    try:
-        cursor.execute(create_extension_sql)
-        cursor.execute(create_table_embeddings_sql)
-        connection.commit()
-    except (Exception, psycopg2.Error) as error:
-        print("Error while getting data from DB", error)
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+def db_connector():
+    def decorator(original_function):
+        def new_function(*args, **kwargs):
+            connection = create_db_connection()
+            cursor = connection.cursor()
+
+            try:
+                result = original_function(connection, cursor, *args, **kwargs)
+                return result
+            except (Exception, psycopg2.Error) as error:
+                print("Error while getting data from DB", error)
+            finally:
+                if cursor:
+                    cursor.close()
+                if connection:
+                    connection.close()
+
+            return result
+
+        return new_function
+
+    return decorator
 
 
-def select_embeddings():
-    connection = create_db_connection()
-    cursor = connection.cursor()
-    try:
-        cursor.execute("SELECT * FROM embeddings;")
-        return cursor.fetchall()
-    except (Exception, psycopg2.Error) as error:
-        print("Error while getting data from DB", error)
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+@db_connector()
+def setup_db(connection, cursor):
+    cursor.execute(create_extension_sql)
+    cursor.execute(create_table_embeddings_sql)
+    connection.commit()
+    return True
 
 
-def reembed_code(files_and_texts, embeddings):
-    connection = create_db_connection()
-    cursor = connection.cursor()
-    try:
-        cursor.execute("DELETE FROM embeddings;")
-        connection.commit()
+@db_connector()
+def select_embeddings(connection, cursor):
+    cursor.execute("SELECT * FROM embeddings;")
+    return cursor.fetchall()
 
-        for text, embedding_obj in zip(files_and_texts, embeddings.data):
-            cursor.execute(
-                "INSERT INTO embeddings (embedding, file_and_path, text) VALUES (%s, %s, %s)",
-                (embedding_obj["embedding"], text[0], text[1]),
-            )
-        connection.commit()
-    except (Exception, psycopg2.Error) as error:
-        print("Error while writing to DB", error)
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
+
+@db_connector()
+def reembed_code(connection, cursor, files_and_texts, embeddings):
+    cursor.execute("DELETE FROM embeddings;")
+    connection.commit()
+
+    for text, embedding_obj in zip(files_and_texts, embeddings.data):
+        cursor.execute(
+            "INSERT INTO embeddings (embedding, file_and_path, text) VALUES (%s, %s, %s)",
+            (embedding_obj["embedding"], text[0], text[1]),
+        )
+    connection.commit()
+    return True
