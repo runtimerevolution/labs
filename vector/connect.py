@@ -35,7 +35,11 @@ def db_test_config():
 
 
 def create_db_connection():
-    params = db_config() if not TEST_ENVIRONMENT else db_test_config()
+    if TEST_ENVIRONMENT:
+        params = db_test_config()
+    else:
+        params = db_config()
+
     try:
         conn = psycopg2.connect(**params)
         return conn
