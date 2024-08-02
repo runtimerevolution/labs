@@ -28,6 +28,7 @@ langchain-community = "^0.2.9"
 python-json-logger = "^2.0.7"
 pathspec = "^0.12.1"
 psycopg2-binary = "^2.9.9"
+fastapi = "^0.111.1"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
