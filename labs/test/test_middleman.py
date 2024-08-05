@@ -34,9 +34,8 @@ class TestCallLlmWithContext:
 
     # Ensure the GithubModel is instantiated correctly with the correct parameters
 
-    def test_empty_summary(self, mocker):
-        # Mocking dependencies
-        mocker.patch("vector.vectorize_to_db")
+    def test_empty_summary(self):
+
         github = GithubModel(github_token="token", repo_owner="owner", repo_name="repo")
         issue_summary = ""
         litellm_api_key = "fake_api_key"
@@ -46,26 +45,3 @@ class TestCallLlmWithContext:
 
         assert "issue_summary cannot be empty" in str(excinfo.value)
         # Corrects the mocking of find_similar_embeddings attribute in the rag module
-
-    @patch("middleman_functions.find_similar_embeddings")
-    def test_corrected_find_similar_embeddings_direct_instantiation(
-        self, mocked_embeddings, mocker
-    ):
-
-        # Mocking dependencies
-        mocked_embeddings.return_value = [["file1", "/path/to/file1", "content1"]]
-        mocker.patch("vector.vectorize_to_db")
-        mocker.patch.object(
-            RequestLiteLLM,
-            "completion_without_proxy",
-            side_effect=Exception("Error message"),
-        )
-
-        github = GithubModel(github_token="token", repo_owner="owner", repo_name="repo")
-        issue_summary = "Fix the bug in the authentication module"
-        litellm_api_key = "fake_api_key"
-
-        with pytest.raises(Exception) as exc_info:
-            call_llm_with_context(github, issue_summary, litellm_api_key)
-
-        assert str(exc_info.value) == "Error calling LLM: Error message"

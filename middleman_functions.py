@@ -6,6 +6,8 @@ from vector.vectorize_to_db import vectorize_to_db
 
 
 def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
+    if not issue_summary:
+        raise ValueError("issue_summary cannot be empty")
     litellm_requests = RequestLiteLLM(litellm_api_key)
     destination = f"/tmp/{github.repo_owner}/{github.repo_name}"
     vectorize_to_db("https://github.com/runtimerevolution/labs", None, destination)

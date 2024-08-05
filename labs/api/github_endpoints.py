@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from labs.api.types import (
     ChangeIssueStatusRequest,
@@ -16,86 +16,107 @@ router = APIRouter()
 
 @router.post("/github/list-issues")
 async def list_issues(request: GithubModel, params: ListIssuesRequest):
-    github_requests = GithubRequests(
-        github_token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        user_name=request.user_name,
-    )
-    return github_requests.list_issues(
-        assignee=params.assignee, state=params.state, per_page=params.per_page
-    )
+    try:
+        github_requests = GithubRequests(
+            github_token=request.github_token,
+            repo_owner=request.repo_owner,
+            repo_name=request.repo_name,
+            user_name=request.user_name,
+        )
+        return github_requests.list_issues(
+            assignee=params.assignee, state=params.state, per_page=params.per_page
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
 
 
 @router.post("/github/get-issue")
 async def get_issue(request: GithubModel, params: IssueRequest):
-    github_requests = GithubRequests(
-        github_token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        user_name=request.user_name,
-    )
-    return github_requests.get_issue(issue_number=params.issue_number)
+    try:
+        github_requests = GithubRequests(
+            github_token=request.github_token,
+            repo_owner=request.repo_owner,
+            repo_name=request.repo_name,
+            user_name=request.user_name,
+        )
+        return github_requests.get_issue(issue_number=params.issue_number)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
 
 
 @router.post("/github/create-branch")
 async def create_branch(request: GithubModel, params: CreateBranchRequest):
-    github_requests = GithubRequests(
-        github_token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        user_name=request.user_name,
-    )
-    return github_requests.create_branch(
-        branch_name=params.branch_name, original_branch=params.original_branch
-    )
+    try:
+        github_requests = GithubRequests(
+            github_token=request.github_token,
+            repo_owner=request.repo_owner,
+            repo_name=request.repo_name,
+            user_name=request.user_name,
+        )
+        return github_requests.create_branch(
+            branch_name=params.branch_name, original_branch=params.original_branch
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
 
 
 @router.post("/github/change-issue-status")
 async def change_issue_status(request: GithubModel, params: ChangeIssueStatusRequest):
-    github_requests = GithubRequests(
-        github_token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        user_name=request.user_name,
-    )
-    return github_requests.change_issue_status(
-        issue_number=params.issue_number, state=params.state
-    )
+    try:
+        github_requests = GithubRequests(
+            github_token=request.github_token,
+            repo_owner=request.repo_owner,
+            repo_name=request.repo_name,
+            user_name=request.user_name,
+        )
+        return github_requests.change_issue_status(
+            issue_number=params.issue_number, state=params.state
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
 
 
 @router.post("/github/commit-changes")
 async def commit_changes(request: GithubModel, params: CommitChangesRequest):
-    github_requests = GithubRequests(
-        github_token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        user_name=request.user_name,
-    )
-    return github_requests.commit_changes(
-        message=params.message, branch_name=params.branch_name, files=params.files
-    )
+    try:
+        github_requests = GithubRequests(
+            github_token=request.github_token,
+            repo_owner=request.repo_owner,
+            repo_name=request.repo_name,
+            user_name=request.user_name,
+        )
+        return github_requests.commit_changes(
+            message=params.message, branch_name=params.branch_name, files=params.files
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
 
 
 @router.post("/github/create-pull-request")
 async def create_pull_request(request: GithubModel, params: CreatePullRequest):
-    github_requests = GithubRequests(
-        github_token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        user_name=request.user_name,
-    )
-    return github_requests.create_pull_request(
-        head=params.head, base=params.base, title=params.title, body=params.body
-    )
+    try:
+        github_requests = GithubRequests(
+            github_token=request.github_token,
+            repo_owner=request.repo_owner,
+            repo_name=request.repo_name,
+            user_name=request.user_name,
+        )
+        return github_requests.create_pull_request(
+            head=params.head, base=params.base, title=params.title, body=params.body
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
 
 
 @router.post("/github/clone")
 async def clone_repo(request: GithubModel):
-    github_requests = GithubRequests(
-        github_token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        user_name=request.user_name,
-    )
-    return github_requests.clone()
+    try:
+        github_requests = GithubRequests(
+            github_token=request.github_token,
+            repo_owner=request.repo_owner,
+            repo_name=request.repo_name,
+            user_name=request.user_name,
+        )
+        return github_requests.clone()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))

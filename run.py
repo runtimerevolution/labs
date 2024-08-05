@@ -71,6 +71,6 @@ def run(request: CodeMonkeyRequest):
         issue_summary=issue["body"],
         litellm_api_key=request.litellm_api_key,
     )
-    # commit_changes(branch_name, response_output)
+    commit_changes(branch_name, response_output)
     # create_pull_request(branch_name)
     # change_issue_to_in_review()

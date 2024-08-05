@@ -3,7 +3,9 @@ from labs.github.github import GithubRequests
 from labs.api.types import (
     CallLLMRequest,
     CodeMonkeyRequest,
+    CommitChangesRequest,
     CreateBranchRequest,
+    CreatePullRequest,
     GithubModel,
     IssueRequest,
     ListIssuesRequest,
@@ -107,3 +109,71 @@ class TestAPIClient:
 
         assert response.status_code == 200
         assert response.json() == []
+
+    @patch.object(GithubRequests, "commit_changes")
+    def test_successfull_commit_changes(self, mocked_branch):
+        client = TestClient(app)
+        request = GithubModel(
+            github_token="valid_token", repo_owner="owner", repo_name="repo"
+        )
+        params = CommitChangesRequest(
+            branch_name="test_branch",
+            message="Test message",
+            files=["file1.py", "file2.py"],
+        )
+        mocked_branch.return_value = []
+
+        response = client.post(
+            "/github/commit-changes",
+            json={"request": request.__dict__, "params": params.__dict__},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == []
+
+    @patch.object(GithubRequests, "create_pull_request")
+    def test_successfull_create_pull_request(self, mocked_branch):
+        client = TestClient(app)
+        request = GithubModel(
+            github_token="valid_token", repo_owner="owner", repo_name="repo"
+        )
+        params = CreatePullRequest(head="test_branch")
+        mocked_branch.return_value = []
+
+        response = client.post(
+            "/github/create-pull-request",
+            json={"request": request.__dict__, "params": params.__dict__},
+        )
+
+        assert response.status_code == 200
+        assert response.json() == []
+
+    @patch.object(GithubRequests, "clone")
+    def test_successfull_clone(self, mocked_branch):
+        client = TestClient(app)
+        request = GithubModel(
+            github_token="valid_token", repo_owner="owner", repo_name="repo"
+        )
+
+        mocked_branch.return_value = []
+
+        response = client.post(
+            "/github/clone",
+            json=request.__dict__,
+        )
+
+        assert response.status_code == 200
+        assert response.json() == []
+
+    @patch.object(GithubRequests, "clone")
+    def test_wrong_input_format_clone(self, mocked_branch):
+        client = TestClient(app)
+
+        mocked_branch.return_value = []
+
+        response = client.post(
+            "/github/clone",
+            json={"github_token": "valid_token", "repo_owner": "owner"},
+        )
+
+        assert response.status_code == 422
