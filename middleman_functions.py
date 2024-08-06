@@ -10,7 +10,7 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
         raise ValueError("issue_summary cannot be empty")
     litellm_requests = RequestLiteLLM(litellm_api_key)
     destination = f"/tmp/{github.repo_owner}/{github.repo_name}"
-    vectorize_to_db("https://github.com/runtimerevolution/labs", None, destination)
+    vectorize_to_db(f"https://github.com/{github.repo_owner}/{github.repo_name}", None, destination)
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
     context = find_similar_embeddings(issue_summary)
     prompt = f"""
