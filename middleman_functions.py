@@ -16,8 +16,8 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
     prompt = f"""
     You're a diligent software engineer AI. You can't see, draw, or interact with a 
     browser, but you can read and write files, and you can think.
-    You've been given the following task: {issue_summary}.Your answer will be in yaml format.
-    Please provide a list of actions to perform in order to complete it, considering the current project.
+    You've been given the following task: {issue_summary}. Your answer will be in yaml format.
+    Please provide a list of actions to perform in order to complete it, considering the current project, cloned into {destination} .
     Any imports will be at the beggining of the file.
     Add tests for the new functionalities, considering any existing test files.
     Each action should contain two fields:
