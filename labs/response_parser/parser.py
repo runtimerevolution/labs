@@ -42,7 +42,7 @@ def parse_llm_output(text_output):
 
 
 def create_file(path, content):
-
+    print(f"Creating file on path: {path}")
     try:
         with open(path, "w") as file:
             file.write(content)
@@ -54,6 +54,7 @@ def create_file(path, content):
 
 
 def modify_file(path, content):
+    print(f"Creating file on path: {path}")
     try:
         with open(path, "w") as file:
             file.write("\n" + content)
