@@ -1,0 +1,19 @@
+// Class Diagram
+digraph {
+	subgraph "cluster_./labs/nlp.py" {
+		color=lightgrey label="./labs/nlp.py" style=filled
+		NLP_Interface [label="{ NLP_Interface | + __init__(self, text: str)\l+ detect_language(self)\l+ find_spacy_model(self, language_code)\l+ load_spacy_language(self)\l+ preprocess_text(self)\l+ sentiment_analysis(self)\l+ keyword_extraction(self)\l+ ner(self)\l+ summarization(self, percentage)\l+ spacy_summarization(self, percentage)\l+ generate_title(self)\l+ run(self)\l }" shape=record]
+	}
+	subgraph "cluster_./labs/github/github.py" {
+		color=lightgrey label="./labs/github/github.py" style=filled
+		GithubRequests [label="{ GithubRequests | + __init__(self, github_token, repo_owner, repo_name, user_name)\l+ list_issues(self, assignee, state, per_page)\l+ get_issue(self, issue_number)\l+ create_branch(self, branch_name, original_branch)\l+ change_issue_status(self, issue_number, state)\l+ commit_changes(self, message, branch_name, files)\l+ create_pull_request(self, head, base, title, body)\l+ clone(self)\l }" shape=record]
+	}
+	subgraph "cluster_./code_examples/calculator.py" {
+		color=lightgrey label="./code_examples/calculator.py" style=filled
+		Calculator [label="{ Calculator | + add(self, x, y)\l+ subtract(self, x, y)\l }" shape=record]
+	}
+	subgraph "cluster_./litellm_service/request.py" {
+		color=lightgrey label="./litellm_service/request.py" style=filled
+		RequestLiteLLM [label="{ RequestLiteLLM | + __init__(self, litellm_api_key)\l+ completion(self, messages, model)\l+ completion_without_proxy(self, messages, model)\l }" shape=record]
+	}
+}
