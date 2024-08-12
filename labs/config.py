@@ -45,6 +45,9 @@ GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 COHERE_API_KEY = os.environ["COHERE_API_KEY"]
 GROQ_API_KEY = os.environ["GROQ_API_KEY"]
 
+CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "/tmp/")
+LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "openai/gpt-3.5-turbo")
+
 ACTIVELOOP_TOKEN = os.environ["ACTIVELOOP_TOKEN"]
 
 DATABASE_URL = os.environ["DATABASE_URL"]
