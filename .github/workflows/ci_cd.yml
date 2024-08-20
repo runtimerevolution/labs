@@ -20,7 +20,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          cd tutorial && python manage.py test
+          python manage.py test
 
       - name: Run formatter
         run: |
