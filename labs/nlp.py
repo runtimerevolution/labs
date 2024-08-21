@@ -1,7 +1,9 @@
-from polyglot.detect import Detector
+from langdetect import detect
 from labs.config import get_logger, spacy_models, SUMMARIZATION_MODEL
 import spacy
 
+# Do not remove this import as it is used for self.nlp.add_pipe("spacytextblob")
+from spacytextblob.spacytextblob import SpacyTextBlob
 from spacy.lang.en.stop_words import STOP_WORDS as stop_words_en
 from spacy.lang.pt.stop_words import STOP_WORDS as stop_words_pt
 from string import punctuation
@@ -34,9 +36,9 @@ class NLP_Interface:
 
     def detect_language(self) -> str:
         try:
-            detector = Detector(self.text)
-            self.language_code = detector.language.code
-            self.language_name = detector.language.name.lower()
+            language = detect(self.text)
+            self.language_code = language
+            self.language_name = language
             self.logger.debug(f"Language detected: '{self.language_code}'")
             return self.language_code
         except Exception as e:
