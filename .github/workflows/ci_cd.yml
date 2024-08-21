@@ -19,8 +19,7 @@ jobs:
         uses: knowsuchagency/poetry-install@v2
 
       - name: Run Tests
-        run: poetry install pytest
-            pytest
+        run: pytest
 
       - name: Run formatter
         run: |

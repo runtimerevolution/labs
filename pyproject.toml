@@ -31,6 +31,9 @@ psycopg2-binary = "^2.9.9"
 fastapi = "^0.111.1"
 pgvector = "^0.3.2"
 graphviz = "^0.20.3"
+pytest = "^8.3.2"
+rouge-score = "^0.1.2"
+pandas = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
