@@ -17,9 +17,9 @@ jobs:
 
       - name: Poetry Install
         uses: knowsuchagency/poetry-install@v2
-     
+
       - name: Run pytest
-        run: poetry run pytest --ignore=labs/test/test_nlp_performance.py --ignore=labs/test/test_nlp.py
+        run: poetry run pytest
 
       - name: Run formatter
         run: |
