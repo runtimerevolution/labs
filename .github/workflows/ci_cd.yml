@@ -18,8 +18,15 @@ jobs:
       - name: Poetry Install
         uses: knowsuchagency/poetry-install@v2
 
-      - name: Run Tests
-        run: pytest
+      - name: Run pytest
+        uses: pavelzw/pytest-action@v2
+        with:
+          verbose: true
+          emoji: true
+          job-summary: true
+          custom-arguments: '-q'
+          click-to-expand: true
+          report-title: 'Test Report'
 
       - name: Run formatter
         run: |
