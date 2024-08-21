@@ -18,7 +18,7 @@ jobs:
       - name: Poetry Install
         uses: knowsuchagency/poetry-install@v2
       - name: Poetry Install Pytest
-        run: pip install pytest pytest-emoji job-summary
+        run: pip install pytest pytest-emoji pytest-md
       - name: Run pytest
         uses: pavelzw/pytest-action@v2
         with:
