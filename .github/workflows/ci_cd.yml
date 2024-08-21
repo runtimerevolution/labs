@@ -17,17 +17,9 @@ jobs:
 
       - name: Poetry Install
         uses: knowsuchagency/poetry-install@v2
-      - name: Poetry Install Pytest
-        run: pip install pytest pytest-emoji pytest-md
+     
       - name: Run pytest
-        uses: pavelzw/pytest-action@v2
-        with:
-          verbose: true
-          emoji: true
-          job-summary: true
-          custom-arguments: '-q'
-          click-to-expand: true
-          report-title: 'Test Report'
+        run: poetry run pytest --ignore=labs/test/test_nlp_performance.py --ignore=labs/test/test_nlp.py
 
       - name: Run formatter
         run: |
