@@ -19,7 +19,7 @@ jobs:
         uses: knowsuchagency/poetry-install@v2
 
       - name: Setup Spacy
-        run: python labs/setup_spacy.py
+        run: python setup_spacy.py
 
       - name: Run pytest
         run: poetry run pytest
