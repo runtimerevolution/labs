@@ -7,18 +7,11 @@ on:
 jobs:
   geral:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./
         
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      - name: Echo1
-        run: echo ${{ github.workspace }} 
-      - name: Echo2
-        run: echo $GITHUB_WORKSPACE
-        
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
@@ -26,13 +19,9 @@ jobs:
 
       - name: Poetry Install
         uses: knowsuchagency/poetry-install@v2
-        
-      - name: Check files
-        run: ls -la
-      - name: Check labs
-        run: ls labs -la
+
       - name: Setup Spacy
-        run: python labs/setup_spacy.py
+        run:  poetry run python labs/setup_spacy.py 
 
       - name: Run pytest
         run: poetry run pytest
