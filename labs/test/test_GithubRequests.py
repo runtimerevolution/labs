@@ -150,7 +150,9 @@ class TestGithubRequests:
         result = github_requests.commit_changes(
             message="Commit message",
             branch_name="new_branch",
-            files=[f"{os.getcwd()}/labs/test/test_GitHubRequests.py"],
+            files=[
+                f"{os.path.dirname(os.path.realpath(__file__))}/test_GitHubRequests.py"
+            ],
         )
 
         assert result == {"sha": "fake_update_sha"}
