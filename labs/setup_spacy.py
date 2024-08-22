@@ -1,4 +1,4 @@
-from labs.config import get_logger, spacy_models
+from config import get_logger, spacy_models
 import typer
 import spacy
 
