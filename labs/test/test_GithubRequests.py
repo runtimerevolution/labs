@@ -1,5 +1,6 @@
 import requests
 from labs.github.github import GithubRequests
+import os
 
 
 class TestGithubRequests:
@@ -149,7 +150,7 @@ class TestGithubRequests:
         result = github_requests.commit_changes(
             message="Commit message",
             branch_name="new_branch",
-            files=["labs/test/test_GitHubRequests.py"],
+            files=[f"{os.getcwd()}/labs/test/test_GitHubRequests.py"],
         )
 
         assert result == {"sha": "fake_update_sha"}
