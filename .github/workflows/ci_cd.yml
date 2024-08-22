@@ -32,7 +32,7 @@ jobs:
       - name: Check labs
         run: ls labs -la
       - name: Setup Spacy
-        run: python setup_spacy.py
+        run: python labs/setup_spacy.py
 
       - name: Run pytest
         run: poetry run pytest
