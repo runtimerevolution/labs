@@ -146,7 +146,7 @@ class TestGithubRequests:
         github_requests = GithubRequests(
             github_token="fake_token", repo_owner="owner", repo_name="repo"
         )
-        print(f"{os.path.dirname(os.path.realpath(__file__))}/test_GithubRequests.py")
+
         result = github_requests.commit_changes(
             message="Commit message",
             branch_name="new_branch",
