@@ -14,8 +14,10 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
-      - name: Echo
-        run: echo ${{ github.workspace }} echo $GITHUB_WORKSPACE
+      - name: Echo1
+        run: echo ${{ github.workspace }} 
+      - name: Echo2
+        run: echo $GITHUB_WORKSPACE
         
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -30,6 +32,7 @@ jobs:
       - name: Check labs
         run: ls labs -la
       - name: Setup Spacy
+        working-directory: ./
         run: python setup_spacy.py
 
       - name: Run pytest
