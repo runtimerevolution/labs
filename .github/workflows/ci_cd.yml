@@ -7,9 +7,16 @@ on:
 jobs:
   geral:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cd ..
+        
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+      - name: Echo
+        run: echo ${{ github.workspace } echo $GITHUB_WORKSPACE
+        
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
