@@ -3,7 +3,7 @@ from labs.config import get_logger, spacy_models, SUMMARIZATION_MODEL
 import spacy
 
 # Do not remove this import as it is used for self.nlp.add_pipe("spacytextblob")
-from spacytextblob.spacytextblob import SpacyTextBlob
+from spacytextblob.spacytextblob import SpacyTextBlob  # noqa: F401
 from spacy.lang.en.stop_words import STOP_WORDS as stop_words_en
 from spacy.lang.pt.stop_words import STOP_WORDS as stop_words_pt
 from string import punctuation
