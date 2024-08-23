@@ -27,4 +27,7 @@ jobs:
         run: poetry run pytest
 
       - name: Ruff
-      - uses: chartboost/ruff-action@v1
+        uses: chartboost/ruff-action@v1
+        with:
+          changed-files: 'true'
+      
