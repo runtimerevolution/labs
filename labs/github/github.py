@@ -193,9 +193,7 @@ class GithubRequests:
             branch = "main"
             probe = f"/tmp/{self.repo_owner}/{self.repo_name}/.git"
             if not os.path.exists(probe):
-                cloned_repo = git.Repo.clone_from(
-                    url, self.directory_dir, branch=branch
-                )
+                git.Repo.clone_from(url, self.directory_dir, branch=branch)
             return self.directory_dir
         except Exception as e:
             self.logger.error(f"An unexpected error occurred: {e}")
