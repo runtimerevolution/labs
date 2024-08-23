@@ -25,3 +25,6 @@ jobs:
 
       - name: Run pytest
         run: poetry run pytest
+
+      - name: Ruff
+      - uses: chartboost/ruff-action@v1
