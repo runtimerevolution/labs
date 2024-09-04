@@ -19,8 +19,8 @@ class Embedding(Base):
 
 
 def insert_embeddings(session, embeddings):
-    for embedding in embeddings:
-        new_embedding = Embedding(embedding=embedding)
+    for emb in embeddings:
+        new_embedding = Embedding(embedding=emb)
         session.add(new_embedding)
     session.commit()
 

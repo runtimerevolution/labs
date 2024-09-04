@@ -31,23 +31,23 @@ MODELS_DIR = PROJ_ROOT / "models"
 REPORTS_DIR = PROJ_ROOT / "reports"
 FIGURES_DIR = REPORTS_DIR / "figures"
 
-GITHUB_ACCESS_TOKEN = os.environ["GITHUB_ACCESS_TOKEN"]
-GITHUB_OWNER = os.environ["GITHUB_OWNER"]
-GITHUB_REPO = os.environ["GITHUB_REPO"]
-GITHUB_USERNAME = os.environ["GITHUB_USERNAME"]
+GITHUB_ACCESS_TOKEN = os.environ.get("GITHUB_ACCESS_TOKEN")
+GITHUB_OWNER = os.environ.get("GITHUB_OWNER")
+GITHUB_REPO = os.environ.get("GITHUB_REPO")
+GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_API_BASE_URL = "https://api.github.com"
 
-LITELLM_MASTER_KEY = os.environ["LITELLM_MASTER_KEY"]
-LITELLM_API_KEY = os.environ["LITELLM_API_KEY"]
+LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
+LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
 
-OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-COHERE_API_KEY = os.environ["COHERE_API_KEY"]
-GROQ_API_KEY = os.environ["GROQ_API_KEY"]
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
-ACTIVELOOP_TOKEN = os.environ["ACTIVELOOP_TOKEN"]
+ACTIVELOOP_TOKEN = os.environ.get("ACTIVELOOP_TOKEN")
 
-DATABASE_URL = os.environ["DATABASE_URL"]
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 POLYGLOT_DIR = PROJ_ROOT / "labs" / "polyglot_data"
 

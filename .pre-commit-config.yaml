@@ -1,0 +1,19 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0 # Use the ref you want to point at
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=1024"] # throw an error if we try to commit a 1MB or greater file
+      - id: check-case-conflict # so we don't rename files that will break case insensitive filesystems
+      - id: check-merge-conflict # don't accidentally commit files with incomplete merges
+      - id: end-of-file-fixer # makes all files end in a newline
+      - id: mixed-line-ending # fixes mixed line endings automatically
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.6.2
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args: [--fix]
+      # Run the formatter.
+      - id: ruff-format

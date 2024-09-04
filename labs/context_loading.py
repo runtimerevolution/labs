@@ -1,4 +1,4 @@
-from labs.github import GithubRequests
+from labs.github.github import GithubRequests
 import labs.fnmatch as fnmatch
 import os
 from labs.config import GITHUB_ACCESS_TOKEN, GITHUB_OWNER, GITHUB_REPO
