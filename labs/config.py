@@ -37,6 +37,8 @@ GITHUB_REPO = os.environ.get("GITHUB_REPO")
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_API_BASE_URL = "https://api.github.com"
 
+TEST_ENVIRONMENT = bool(os.environ.get("TEST_ENVIRONMENT", True))
+
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
 
@@ -47,7 +49,19 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 ACTIVELOOP_TOKEN = os.environ.get("ACTIVELOOP_TOKEN")
 
+DATABASE_HOST = os.environ.get("DATABASE_HOST")
+DATABASE_USER = os.environ.get("DATABASE_USER")
+DATABASE_PASS = os.environ.get("DATABASE_PASS")
+DATABASE_NAME = os.environ.get("DATABASE_NAME")
+DATABASE_PORT = os.environ.get("DATABASE_PORT")
 DATABASE_URL = os.environ.get("DATABASE_URL")
+
+DATABASE_TEST_HOST = os.environ.get("DATABASE_TEST_HOST")
+DATABASE_TEST_USER = os.environ.get("DATABASE_TEST_USER")
+DATABASE_TEST_PASS = os.environ.get("DATABASE_TEST_PASS")
+DATABASE_TEST_NAME = os.environ.get("DATABASE_TEST_NAME")
+DATABASE_TEST_PORT = os.environ.get("DATABASE_TEST_PORT")
+DATABASE_TEST_URL = os.environ.get("DATABASE_TEST_URL")
 
 POLYGLOT_DIR = PROJ_ROOT / "labs" / "polyglot_data"
 
