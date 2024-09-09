@@ -63,6 +63,6 @@ class RequestLiteLLM:
             try:
                 response = completion(model=model, messages=messages)
                 return model, response
-            except Exception as ex:
+            except Exception:
                 pass
         return model, None
