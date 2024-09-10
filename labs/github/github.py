@@ -20,8 +20,6 @@ class GithubRequests:
         self.github_api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
         self.directory_dir = f"/tmp/{self.repo_owner}/{self.repo_name}"
 
-    logger = logging.getLogger(__name__)
-
     def list_issues(self, assignee=None, state="open", per_page=100):
         if assignee is None:
             assignee = self.username
@@ -42,15 +40,15 @@ class GithubRequests:
             response = requests.get(url, headers=headers, params=params)
             response.raise_for_status()
             response_json = response.json()
-            self.logger.debug(str(response_json))
+            logger.debug(str(response_json))
             return response_json
 
         except requests.exceptions.RequestException as e:
-            self.logger.error(f"HTTP Request failed: {e}")
+            logger.error(f"HTTP Request failed: {e}")
         except KeyError as e:
-            self.logger.error(f"Missing key in access data: {e}")
+            logger.error(f"Missing key in access data: {e}")
         except Exception as e:
-            self.logger.error(f"An unexpected error occurred: {e}")
+            logger.error(f"An unexpected error occurred: {e}")
         return []
 
     def get_issue(self, issue_number):
@@ -65,17 +63,17 @@ class GithubRequests:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             response_json = response.json()
-            self.logger.debug(str(response_json))
+            logger.debug(str(response_json))
             return response_json
 
         except requests.exceptions.RequestException as e:
-            self.logger.error(f"HTTP Request failed: {e}")
+            logger.error(f"HTTP Request failed: {e}")
             return None
         except KeyError as e:
-            self.logger.error(f"Missing key in access data: {e}")
+            logger.error(f"Missing key in access data: {e}")
             return None
         except Exception as e:
-            self.logger.error(f"An unexpected error occurred: {e}")
+            logger.error(f"An unexpected error occurred: {e}")
             return None
 
     def create_branch(self, branch_name, original_branch="main"):
@@ -96,11 +94,11 @@ class GithubRequests:
                 return create_response.json()
 
             else:
-                self.logger.error(f"Error getting: {response}")
+                logger.error(f"Error getting: {response}")
                 return None
 
         except Exception as e:
-            self.logger.error(f"An unexpected error occurred: {e}")
+            logger.error(f"An unexpected error occurred: {e}")
             return None
 
     def change_issue_status(self, issue_number, state):
@@ -125,7 +123,7 @@ class GithubRequests:
         }
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            self.logger.error(f"Error getting: {response}")
+            logger.error(f"Error getting: {response}")
             return None
 
         latest_commit_sha = response.json()["object"]["sha"]
@@ -134,7 +132,7 @@ class GithubRequests:
         url = f"{self.github_api_url}/git/commits/{latest_commit_sha}"
         response = requests.get(url, headers=headers)
         if response.status_code != 200:
-            self.logger.error(f"Error getting: {response}")
+            logger.error(f"Error getting: {response}")
             return None
 
         base_tree_sha = response.json()["tree"]["sha"]
@@ -194,5 +192,5 @@ class GithubRequests:
                 git.Repo.clone_from(url, self.directory_dir, branch=branch)
             return self.directory_dir
         except Exception as e:
-            self.logger.error(f"An unexpected error occurred: {e}")
+            logger.error(f"An unexpected error occurred: {e}")
             return None

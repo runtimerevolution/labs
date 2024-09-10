@@ -1,5 +1,6 @@
+import logging
 from langdetect import detect
-from labs.config import get_logger, spacy_models, SUMMARIZATION_MODEL
+from labs.config import spacy_models, SUMMARIZATION_MODEL
 import spacy
 
 # Do not remove this import as it is used for self.nlp.add_pipe("spacytextblob")
@@ -10,10 +11,11 @@ from string import punctuation
 from heapq import nlargest
 from transformers import pipeline
 
+logger = logging.getLogger(__name__)
+
 
 class NLP_Interface:
     def __init__(self, text: str = None):
-        self.logger = get_logger(__name__)
         self.nlp = None
         self.language_code = "en"
         self.language_name = "english"
@@ -39,10 +41,10 @@ class NLP_Interface:
             language = detect(self.text)
             self.language_code = language
             self.language_name = language
-            self.logger.debug(f"Language detected: '{self.language_code}'")
+            logger.debug(f"Language detected: '{self.language_code}'")
             return self.language_code
         except Exception as e:
-            self.logger.error(f"Error detecting language: {str(e)}")
+            logger.error(f"Error detecting language: {str(e)}")
             return "en"  # default to English if detection fails
 
     def find_spacy_model(self, language_code):
@@ -57,18 +59,18 @@ class NLP_Interface:
             if model:
                 self.spacy_model = model
             self.nlp = spacy.load(self.spacy_model)
-            self.logger.debug(
+            logger.debug(
                 f"Loaded Spacy model for language: '{self.language_code}'"
             )
             return True
         except Exception as e:
-            self.logger.error(f"Error loading Spacy model: {str(e)}")
+            logger.error(f"Error loading Spacy model: {str(e)}")
             self.nlp = spacy.load(self.default_spacy_model)  # fallback to default model
             return False
 
     def preprocess_text(self) -> list:
         if not self.nlp:
-            self.logger.error("Spacy language model is not loaded.")
+            logger.error("Spacy language model is not loaded.")
             return []
 
         try:
@@ -95,13 +97,13 @@ class NLP_Interface:
 
             return output_tokens
         except Exception as e:
-            self.logger.error(f"Error during text preprocessing: {str(e)}")
+            logger.error(f"Error during text preprocessing: {str(e)}")
             return []
 
     def sentiment_analysis(self):
         try:
             if not self.nlp:
-                self.logger.error("Spacy language model is not loaded.")
+                logger.error("Spacy language model is not loaded.")
                 return None
             self.nlp.add_pipe("spacytextblob")
             doc = self.nlp(self.preprocessed_text)
@@ -111,30 +113,30 @@ class NLP_Interface:
             }
             return result
         except Exception as e:
-            self.logger.error(f"Error during sentiment analysis: {str(e)}")
+            logger.error(f"Error during sentiment analysis: {str(e)}")
             return None
 
     def keyword_extraction(self) -> list:
         try:
             if not self.nlp:
-                self.logger.error("Spacy language model is not loaded.")
+                logger.error("Spacy language model is not loaded.")
                 return []
             doc = self.nlp(self.preprocessed_text)
             keywords = [chunk.text for chunk in doc.noun_chunks]
             return keywords
         except Exception as e:
-            self.logger.error(f"Error during keyword extraction: {str(e)}")
+            logger.error(f"Error during keyword extraction: {str(e)}")
             return []
 
     def ner(self):
         try:
             if not self.nlp:
-                self.logger.error("Spacy language model is not loaded.")
+                logger.error("Spacy language model is not loaded.")
                 return None
             doc = self.nlp(text=self.preprocessed_text)
             return doc.ents
         except Exception as e:
-            self.logger.error(f"Error executing NER: {str(e)}")
+            logger.error(f"Error executing NER: {str(e)}")
             return None
 
     def summarization(self, percentage):
@@ -149,7 +151,7 @@ class NLP_Interface:
             )
             return result[0]["summary_text"]
         except Exception as e:
-            self.logger.error(f"Error during summarization: {str(e)}")
+            logger.error(f"Error during summarization: {str(e)}")
             return ""
 
     def spacy_summarization(self, percentage):
@@ -215,7 +217,7 @@ class NLP_Interface:
             # Return final summary
             return result
         except Exception as e:
-            self.logger.error(f"Error during spacy summarization: {str(e)}")
+            logger.error(f"Error during spacy summarization: {str(e)}")
             return ""
 
     def generate_title(self):
@@ -238,7 +240,7 @@ class NLP_Interface:
 
             return title
         except Exception as e:
-            self.logger.error(f"Error during title generation: {str(e)}")
+            logger.error(f"Error during title generation: {str(e)}")
             return ""
 
     def run(self):

@@ -8,7 +8,6 @@ dependencies:
   - isort
   - pip
   - typer
-  - loguru
   - tqdm
   - pip:
     - python-dotenv

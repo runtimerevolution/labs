@@ -1,10 +1,12 @@
 from pathlib import Path
 
 import typer
-from loguru import logger
+import logging
 from tqdm import tqdm
 
 from labs.config import FIGURES_DIR, PROCESSED_DATA_DIR
+
+logger = logging.getLogger(__name__)
 
 app = typer.Typer()
 

@@ -7,7 +7,7 @@ router = APIRouter()
 
 
 @router.post("/codemonkey/run")
-async def list_issues(request: CodeMonkeyRequest):
+async def codemonkey_run(request: CodeMonkeyRequest):
     try:
         return run(request=request)
     except Exception as e:

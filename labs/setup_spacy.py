@@ -1,13 +1,16 @@
-from config import get_logger, spacy_models
+from config import spacy_models
 import typer
 import spacy
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 app = typer.Typer()
 
 
 @app.command()
 def main():
-    logger = get_logger(__name__)
     logger.debug("# SPACY")
     logger.debug("    Getting installed models...")
     installed_models = spacy.util.get_installed_models()
