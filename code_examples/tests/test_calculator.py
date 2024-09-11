@@ -1,3 +1,4 @@
+
 import unittest
 
 from code_examples.calculator import Calculator
@@ -32,7 +33,7 @@ class TestCalculator(unittest.TestCase):
 
     def test_multiply(self):
         self.assertEqual(self.calc.multiply(10, 5), 50)
-
+    
     def test_divide(self):
         self.assertEqual(self.calc.divide(10, 2), 5)
 
