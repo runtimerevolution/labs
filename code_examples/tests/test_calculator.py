@@ -33,17 +33,24 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(self.calc.subtract(0, 0), 0)
 
     def test_multiply(self):
-        self.assertEqual(self.calc.multiply(10, 10), 100)
+        self.assertEqual(self.calc.multiply(10, 5), 50)
 
-    def test_multiply_negative(self):
-        self.assertEqual(self.calc.multiply(-1, 5), -5)
+    def test_multiply_negative_with_positive(self):
+        self.assertEqual(self.calc.multiply(-1, 1), -1)
+
+    def test_multiply_negative_with_negative(self):
+        self.assertEqual(self.calc.multiply(-1, -1), 1)
+
+    def test_multiply_zeros(self):
+        self.assertEqual(self.calc.multiply(0, 10), 0)
 
     def test_divide(self):
-        self.assertEqual(self.calc.divide(10, 2), 5)
+        self.assertEqual(self.calc.divide(10, 4), 2.5)
 
-    def test_divide_by_zero(self):
-        with self.assertRaises(ValueError):
+    def test_divide_with_zero_denominator(self):
+        with self.assertRaises(ZeroDivisionError):
             self.calc.divide(10, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
