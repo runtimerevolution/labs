@@ -1,4 +1,3 @@
-
 import unittest
 
 from code_examples.calculator import Calculator
