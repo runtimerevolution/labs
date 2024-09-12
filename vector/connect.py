@@ -13,6 +13,10 @@ from labs.config import (
     DATABASE_TEST_PORT,
 )
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def db_config():
     return {
@@ -41,8 +45,7 @@ def create_db_connection():
         params = db_config()
 
     try:
-        conn = psycopg2.connect(**params)
-        return conn
-    except (Exception, psycopg2.Error) as error:
-        print("Error while connecting", error)
+        return psycopg2.connect(**params)
+    except (Exception, psycopg2.Error):
+        logger.exception("Error while connecting to the database.")
     return None

@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 from pythonjsonlogger import jsonlogger
 
 
-DEFAULT_MAX_BYTES = 10000
+DEFAULT_MAX_BYTES = 10000000
 DEFAULT_BACKUP_COUNT = 5
 LOG_FORMAT = "%Y-%m-%d %H:%M:%S"
 
@@ -21,28 +21,22 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         else:
             log_record["level"] = record.levelname
 
-def setup_logger_rotating_file_handler(logger: logging.Logger, log_file, level, max_bytes=DEFAULT_MAX_BYTES, backup_count=DEFAULT_BACKUP_COUNT):
-    formatter = CustomJsonFormatter("[%(timestamp)s][%(level)s][%(name)s]: %(message)s")
-
-    handler = RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count)
-    handler.setFormatter(formatter)
-    handler.setLevel(level)
-
-    logger.addHandler(handler)
-
-    return handler
 
 def setup_logger():
     logging.basicConfig(level=logging.DEBUG, datefmt=LOG_FORMAT)
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("labs")
     logger.propagate = False
 
-    logformat = "[%(asctime)s][%(levelname)s][%(name)s]: %(message)s"                 
-    formatter = logging.Formatter(fmt=logformat, datefmt=LOG_FORMAT)
-
+    log_format = "[%(asctime)s][%(levelname)s][%(name)s]: %(message)s"
+    formatter = logging.Formatter(fmt=log_format, datefmt=LOG_FORMAT)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
 
-    setup_logger_rotating_file_handler(logger, "debug.log", logging.DEBUG)
-  
+    formatter = CustomJsonFormatter(log_format)
+    handler = RotatingFileHandler(
+        "logs/debug.log", maxBytes=DEFAULT_MAX_BYTES, backupCount=DEFAULT_BACKUP_COUNT
+    )
+    handler.setFormatter(formatter)
+
+    logger.addHandler(stream_handler)
+    logger.addHandler(handler)

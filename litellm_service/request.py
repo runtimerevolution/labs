@@ -31,7 +31,6 @@ class RequestLiteLLM:
             "Accept": "application/json",
             "API-Key": self.api_key,
         }
-
         data = {"messages": messages}
         result = requests.post(
             f"http://0.0.0.0:4000/chat/completions?model={model}",

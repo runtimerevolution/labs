@@ -1,5 +1,9 @@
 import psycopg2
 from vector.connect import create_db_connection
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 create_extension_sql = "CREATE EXTENSION IF NOT EXISTS vector;"
@@ -23,8 +27,8 @@ def db_connector():
             try:
                 result = original_function(connection, cursor, *args, **kwargs)
                 return result
-            except (Exception, psycopg2.Error) as error:
-                print("Error while getting data from DB", error)
+            except (Exception, psycopg2.Error):
+                logger.exception("Error while getting data from DB.")
             finally:
                 if cursor:
                     cursor.close()

@@ -5,6 +5,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pgvector.sqlalchemy import Vector
 from vector.connect import create_db_connection
+import logging
+
+logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 N_DIM = 1536
@@ -40,13 +43,17 @@ def find_similar_embeddings(query):
     ORDER BY emb.embedding <=> '{query_embedding}'
     LIMIT {k};"""
 
-    connection = create_db_connection()
-    cursor = connection.cursor()
+    try:
+        connection = create_db_connection()
+        cursor = connection.cursor()
+    except Exception:
+        logger.exception("Error while creating a connection to the database.")
+
     try:
         cursor.execute(query)
         return cursor.fetchall()
-    except (Exception, psycopg2.Error) as error:
-        print("Error while getting data from DB", error)
+    except (Exception, psycopg2.Error):
+        logger.exception("Error while getting data from DB.")
     finally:
         if cursor:
             cursor.close()
@@ -69,7 +76,12 @@ def find_similar_embeddings(query):
 
 
 def setup():
-    engine = create_engine("postgresql+psycopg2://testuser:testpwd@db:5432/vectordb")
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    return session
+    try:
+        engine = create_engine(
+            "postgresql+psycopg2://testuser:testpwd@db:5432/vectordb"
+        )
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        return session
+    except Exception:
+        logger.exception("Error while creating the engine for the database.")

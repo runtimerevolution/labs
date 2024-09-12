@@ -1,20 +1,30 @@
 from labs.api.types import GithubModel
+from labs.decorators import time_and_log_function
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
 from litellm_service.request import RequestLiteLLM
 from rag.embeddings import find_similar_embeddings
 from vector.vectorize_to_db import vectorize_to_db
+import logging
+
+logger = logging.getLogger(__name__)
 
 
+@time_and_log_function
 def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
     if not issue_summary:
-        raise ValueError("issue_summary cannot be empty")
+        logger.error("issue_summary cannot be empty.")
+        raise ValueError("issue_summary cannot be empty.")
+
     litellm_requests = RequestLiteLLM(litellm_api_key)
     destination = f"/tmp/{github.repo_owner}/{github.repo_name}"
+
     vectorize_to_db(
         f"https://github.com/{github.repo_owner}/{github.repo_name}", None, destination
     )
+
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
     context = find_similar_embeddings(issue_summary)
+
     prompt = f"""
     You're a diligent software engineer AI. You can't see, draw, or interact with a 
     browser, but you can read and write files, and you can think.
@@ -49,25 +59,27 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
             model="openai/gpt-3.5-turbo",
         )
 
-    except Exception as e:
-        raise Exception(f"Error calling LLM: {str(e)}")
+    except Exception:
+        logger.exception("Error calling LLM.")
+        raise Exception("Error calling LLM.")
 
     output = call_agent_to_apply_code_changes(llm_response)
     return output
 
 
+@time_and_log_function
 def call_agent_to_apply_code_changes(llm_response):
     response_string = llm_response[1].choices[0].message.content
-    # Find actions to apply from the llm_response
     actions = parse_llm_output(response_string)
+
     files = []
-    # Apply the actions
     for action in actions:
         if action.action_type == "create":
             files.append(create_file(action.path, action.content))
         elif action.action_type == "modify":
             files.append(modify_file(action.path, action.content))
         else:
-            print(f"Unknown action '{action.action_type}' in step {action.step_number}")
-
+            logger.error(
+                f"Unknown action '{action.action_type}' in step {action.step_number}"
+            )
     return files
