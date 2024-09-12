@@ -1,10 +1,10 @@
 from labs.api.types import CodeMonkeyRequest, GithubModel
-from labs.github import GithubRequests
 from labs.config import (
     GITHUB_ACCESS_TOKEN,
     GITHUB_REPO,
     GITHUB_OWNER,
 )
+from labs.github.github import GithubRequests
 from labs.nlp import NLP_Interface
 from middleman_functions import call_llm_with_context
 

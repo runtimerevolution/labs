@@ -1,7 +1,7 @@
 from labs.api.types import GithubModel
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
 from litellm_service.request import RequestLiteLLM
-from rag.rag import find_similar_embeddings
+from rag.embeddings import find_similar_embeddings
 from vector.vectorize_to_db import vectorize_to_db
 from labs.config import CLONE_DESTINATION_DIR, LLM_MODEL_NAME, get_logger
 
@@ -13,6 +13,7 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
     litellm_requests = RequestLiteLLM(litellm_api_key)
     destination = CLONE_DESTINATION_DIR + f"{github.repo_owner}/{github.repo_name}"
     vectorize_to_db(f"https://github.com/{github.repo_owner}/{github.repo_name}", None, destination)
+
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
     context = find_similar_embeddings(issue_summary)
     prompt = f"""

@@ -6,7 +6,6 @@ from litellm_service.request import RequestLiteLLM
 
 
 class TestCallLlmWithContext:
-
     # Successfully calls the LLM with the provided context and returns the expected output
     @patch("middleman_functions.find_similar_embeddings")
     @patch.object(RequestLiteLLM, "completion_without_proxy")
@@ -15,7 +14,6 @@ class TestCallLlmWithContext:
     def test_successful_llm_call_with_context(
         self, mocked_agent, mocked_vectorized, mocked_completion, mocked_embeddings
     ):
-
         # Mocking dependencies
         mocked_embeddings.return_value = [["file1", "/path/to/file1", "content1"]]
         mocked_completion.return_value = (
@@ -35,7 +33,6 @@ class TestCallLlmWithContext:
     # Ensure the GithubModel is instantiated correctly with the correct parameters
 
     def test_empty_summary(self):
-
         github = GithubModel(github_token="token", repo_owner="owner", repo_name="repo")
         issue_summary = ""
         litellm_api_key = "fake_api_key"

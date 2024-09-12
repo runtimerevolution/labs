@@ -12,7 +12,6 @@ class GithubRequests:
     """Class to handle Github API requests"""
 
     def __init__(self, github_token, repo_owner, repo_name, user_name=None):
-
         self.github_token = github_token
         self.repo_owner = repo_owner
         self.repo_name = repo_name
@@ -141,7 +140,6 @@ class GithubRequests:
 
         tree_items = []
         for file_path in files:
-
             file_name = file_path.replace(f"{self.directory_dir}/", "")
             # Step 3: Read the file content and encode it in Base64
             with open(file_path, "rb") as file:
@@ -192,9 +190,7 @@ class GithubRequests:
             branch = "main"
             probe = CLONE_DESTINATION_DIR + f"{self.repo_owner}/{self.repo_name}/.git"
             if not os.path.exists(probe):
-                cloned_repo = git.Repo.clone_from(
-                    url, self.directory_dir, branch=branch
-                )
+                git.Repo.clone_from(url, self.directory_dir, branch=branch)
             return self.directory_dir
         except Exception as e:
             self.logger.error(f"An unexpected error occurred: {e}")

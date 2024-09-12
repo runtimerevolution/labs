@@ -1,12 +1,11 @@
 import requests
 from labs.github.github import GithubRequests
+import os
 
 
 class TestGithubRequests:
-
     # Listing issues with default parameters returns open issues assigned to the user
     def test_list_issues_default_parameters(self, mocker):
-
         mock_get = mocker.patch("requests.get")
 
         sample_response = [
@@ -39,7 +38,6 @@ class TestGithubRequests:
         )
 
     def test_list_issues_http_failure(self, mocker):
-
         mock_response = mocker.Mock()
         mock_response.raise_for_status.side_effect = (
             requests.exceptions.RequestException("HTTP Error")
@@ -55,7 +53,6 @@ class TestGithubRequests:
         assert issues == []
 
     def test_get_issue_returns_correct_details(self, mocker):
-
         mock_get = mocker.patch("requests.get")
 
         sample_response = {"id": 1, "title": "Sample Issue", "state": "open"}
@@ -80,7 +77,6 @@ class TestGithubRequests:
         )
 
     def test_handle_http_request_failure_get_issue(self, mocker):
-
         mock_response = mocker.Mock()
         mock_response.raise_for_status.side_effect = (
             requests.exceptions.RequestException("Mocked Request Exception")
@@ -96,7 +92,6 @@ class TestGithubRequests:
         assert issue is None
 
     def test_change_issue_status(self, mocker):
-
         mock_response = mocker.Mock()
         mock_response.json.return_value = {"status": "closed"}
         mocker.patch("requests.patch", return_value=mock_response)
@@ -110,7 +105,6 @@ class TestGithubRequests:
         assert response == {"status": "closed"}
 
     def test_commit_changes_successfully(self, mocker):
-
         mock_response_get = mocker.Mock()
         mock_response_get.status_code = 200
         mock_response_get.json.return_value = {
@@ -149,13 +143,14 @@ class TestGithubRequests:
         result = github_requests.commit_changes(
             message="Commit message",
             branch_name="new_branch",
-            files=["labs/test/test_GitHubRequests.py"],
+            files=[
+                f"{os.path.dirname(os.path.realpath(__file__))}/test_GithubRequests.py"
+            ],
         )
 
         assert result == {"sha": "fake_update_sha"}
 
     def test_create_pull_request_default_parameters(self, mocker):
-
         mock_response = mocker.Mock()
         expected_json = {"id": 123, "title": "New Pull Request"}
         mock_response.json.return_value = expected_json

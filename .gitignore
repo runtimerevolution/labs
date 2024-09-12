@@ -172,4 +172,3 @@ cython_debug/
 
 .vscode/
 polyglot_data/
-vcr_cassettes/
