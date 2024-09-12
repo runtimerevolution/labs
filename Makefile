@@ -1,6 +1,7 @@
 PROJECT_NAME = labs
 PYTHON_VERSION = 3.11
 PYTHON_INTERPRETER = python
+PROJECT_DIR := $(shell pwd)
 
 #################################################################################
 # COMMANDS                                                                      #
@@ -27,7 +28,7 @@ format:
 ## Set up project
 .PHONY: setup
 setup:
-	$(PYTHON_INTERPRETER) labs/setup.py
+	export PYTHONPATH=$(PROJECT_DIR):$$PYTHONPATH && $(PYTHON_INTERPRETER) labs/setup.py
 
 .PHONY: tests
 tests:
