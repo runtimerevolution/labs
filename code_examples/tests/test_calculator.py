@@ -3,6 +3,7 @@ import unittest
 
 from code_examples.calculator import Calculator
 
+
 class TestCalculator(unittest.TestCase):
     def setUp(self):
         self.calc = Calculator()
@@ -32,11 +33,11 @@ class TestCalculator(unittest.TestCase):
         self.assertEqual(self.calc.subtract(0, 0), 0)
 
     def test_multiply(self):
-        self.assertEqual(self.calc.multiply(10, 5), 50)
-    
-    def test_divide(self):
-        self.assertEqual(self.calc.divide(10, 2), 5)
+        self.assertEqual(self.calc.multiply(3, 4), 12)
 
-    def test_divide_with_zero_denominator(self):
-        with self.assertRaises(ZeroDivisionError):
+    def test_divide(self):
+        self.assertEqual(self.calc.divide(10, 5), 2.0)
+
+    def test_divide_by_zero(self):
+        with self.assertRaises(ValueError):
             self.calc.divide(10, 0)
