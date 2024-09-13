@@ -1,9 +1,10 @@
 import base64
 import requests
 from dataclasses import dataclass
-import logging
+from labs.config import CLONE_DESTINATION_DIR
 import git
 import os
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +19,9 @@ class GithubRequests:
         self.repo_name = repo_name
         self.username = user_name
         self.github_api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
-        self.directory_dir = f"/tmp/{self.repo_owner}/{self.repo_name}"
+        self.directory_dir = (
+            CLONE_DESTINATION_DIR + f"{self.repo_owner}/{self.repo_name}"
+        )
 
     def _get(self, url, headers={}, params={}):
         try:
@@ -197,7 +200,7 @@ class GithubRequests:
         try:
             url = f"https://github.com/{self.repo_owner}/{self.repo_name}.git"
             branch = "main"
-            probe = f"/tmp/{self.repo_owner}/{self.repo_name}/.git"
+            probe = CLONE_DESTINATION_DIR + f"{self.repo_owner}/{self.repo_name}/.git"
             if not os.path.exists(probe):
                 git.Repo.clone_from(url, self.directory_dir, branch=branch)
             return self.directory_dir

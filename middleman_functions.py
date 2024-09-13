@@ -5,6 +5,7 @@ from litellm_service.request import RequestLiteLLM
 from rag.embeddings import find_similar_embeddings
 from vector.vectorize_to_db import vectorize_to_db
 import logging
+from labs.config import CLONE_DESTINATION_DIR, LLM_MODEL_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +17,7 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
         raise ValueError("issue_summary cannot be empty.")
 
     litellm_requests = RequestLiteLLM(litellm_api_key)
-    destination = f"/tmp/{github.repo_owner}/{github.repo_name}"
-
+    destination = CLONE_DESTINATION_DIR + f"{github.repo_owner}/{github.repo_name}"
     vectorize_to_db(
         f"https://github.com/{github.repo_owner}/{github.repo_name}", None, destination
     )
@@ -38,6 +38,20 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
     path - the absolute path of the file to create/modify and content - the content to write to the file.
     If the file is to be modify, on the contents send the finished version of the entire file.
     Please don't add any text formatting to the answer, making it as clean as possible.
+    
+    **Output example**:
+    
+    - action: create
+      args:
+          path: path_to_some_file
+          content: |
+          some file content
+  
+    - action: modify
+      args:
+          path: path_to_some_other_file
+          content: |
+          some other file content
     """
     prepared_context = []
     for file in context:
@@ -56,9 +70,8 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
     try:
         llm_response = litellm_requests.completion_without_proxy(
             prepared_context,
-            model="openai/gpt-3.5-turbo",
+            model=LLM_MODEL_NAME,
         )
-
     except Exception:
         logger.exception("Error calling LLM.")
         raise Exception("Error calling LLM.")
