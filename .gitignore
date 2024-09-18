@@ -172,3 +172,4 @@ cython_debug/
 
 .vscode/
 polyglot_data/
+tmp/
