@@ -1,12 +1,11 @@
-from labs.api.types import CodeMonkeyRequest, GithubModel
-from labs.config import (
+from src.api.types import CodeMonkeyRequest, GithubModel
+from src.config.settings import (
     GITHUB_ACCESS_TOKEN,
     GITHUB_REPO,
     GITHUB_OWNER,
 )
-from labs.github.github import GithubRequests
-from labs.nlp import NLP_Interface
-from middleman_functions import call_llm_with_context
+from src.github.github import GithubRequests
+from src.middleware import call_llm_with_context
 
 
 gh_requests: GithubRequests = None
@@ -31,11 +30,6 @@ def create_branch(issue_number, issue_title):
     return create_result, branch_name
 
 
-def apply_nlp_to_issue(issue_text):
-    nlp = NLP_Interface(issue_text)
-    return nlp.run()
-
-
 def change_issue_to_in_progress():
     pass
 
@@ -55,11 +49,9 @@ def change_issue_to_in_review():
 def run(request: CodeMonkeyRequest):
     setup()
     issue = get_issue(request.issue_number)
-    branch, branch_name = create_branch(
+    _, branch_name = create_branch(
         request.issue_number, issue["title"].replace(" ", "-")
     )
-    # nlped_text = apply_nlp_to_issue(issue["body"])
-    # change_issue_to_in_progress()
 
     github = GithubModel(
         github_token=request.github_token,
@@ -72,5 +64,4 @@ def run(request: CodeMonkeyRequest):
         litellm_api_key=request.litellm_api_key,
     )
     commit_changes(branch_name, response_output)
-    # create_pull_request(branch_name)
-    # change_issue_to_in_review()
+    create_pull_request(branch_name)

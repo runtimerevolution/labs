@@ -8,23 +8,33 @@ Runtime Labs
 
 ## Getting Started
 
+### Local Env
+
+Create a copy of the reference env file in the root of the project and update the values accordingly.
+
+`cp .env.sample .en.local`
+
+### Test Env
+
+Create a file named `.env.test` and the the following
+
+```env
+TEST_ENVIRONMENT=True
+
+DATABASE_HOST=localhost
+DATABASE_USER=postgres
+DATABASE_PASS=postgres
+DATABASE_NAME=test
+DATABASE_PORT=65433
+DATABASE_URL=postgresql://${DATABASE_USER}:${DATABASE_PASS}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
+```
+
+## Run project
+
 Here's the steps to setup the project locally:
 
-1. poetry shell
-2. poetry install
-3. make setup
-4. make tests
-
-# Troubleshooting
-
-## PyICU
-
-Please install pkg-config on your system or set the ICU_VERSION environment
-variable to the version of ICU you have installed
-
-If you see this error, when installing the package PyICU, you can solve the issue with these steps:
-
-1. brew install pkg-config icu4c;
-2. brew info icu4c;
-3. Look for the lines that export the path for icu to the PATH environment variable and add them to you your bashrc (or zshrc, whichever you use);
-4. Rerun poetry install again and there should be no error.
+1. `poetry shell`
+2. `poetry install`
+3. `make db_up`
+4. `make api` or `ENV=local make api`
+5. `ENV=test make tests`

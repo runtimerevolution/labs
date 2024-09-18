@@ -1,7 +1,11 @@
 PROJECT_NAME = labs
 PYTHON_VERSION = 3.11
 PYTHON_INTERPRETER = python
+ENV ?= local
+ENV_FILE = ./.env.$(ENV)
 
+include $(ENV_FILE)
+export
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
@@ -24,10 +28,15 @@ lint:
 format:
 	black --config pyproject.toml labs
 
-## Set up project
-.PHONY: setup
-setup:
-	$(PYTHON_INTERPRETER) labs/setup.py
+## Teardown local database
+.PHONY: db_down
+db_down:
+	docker compose --env-file=$(ENV_FILE) down
+
+## Setup local database
+.PHONY: db_up
+db_up: db_down
+	docker compose --env-file=$(ENV_FILE) up -d
 
 .PHONY: tests
 tests:
@@ -60,4 +69,4 @@ help:
 	@python -c "${PRINT_HELP_PYSCRIPT}" < $(MAKEFILE_LIST)
 
 api:
-	fastapi dev labs/api/main.py  
+	fastapi dev src/api/main.py  

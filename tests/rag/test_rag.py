@@ -1,7 +1,4 @@
-from psycopg2 import sql
-from psycopg2.extras import DictCursor
-
-from vector.queries import select_embeddings
+from src.vector.queries import select_embeddings
 
 
 def test_embeddings_empty(db_session):
