@@ -38,8 +38,8 @@ LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
 
 
-CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "/tmp/")
-LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "openai/gpt-3.5-turbo")
+CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "tmp/")
+LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "openai/gpt-4o")
 
 ACTIVELOOP_TOKEN = os.environ["ACTIVELOOP_TOKEN"]
 

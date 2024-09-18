@@ -1,9 +1,20 @@
 from litellm import completion
 import requests
+from pydantic import BaseModel
+
+
+class Step(BaseModel):
+    type: str
+    path: str
+    content: str
+
+
+class PullRequest(BaseModel):
+    steps: list[Step]
 
 
 models = [
-    "openai/gpt-3.5-turbo",
+    "openai/gpt-4o",
     "cohere/command-light",
     "gemini/gemini-pro",
     "groq/llama3-8b-8192",
@@ -56,11 +67,16 @@ class RequestLiteLLM:
             return model, completion(
                 model=model,
                 messages=messages,
+                response_format={"type": "json_object"},
             )
 
         for model in models:
             try:
-                response = completion(model=model, messages=messages)
+                response = completion(
+                    model=model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                )
                 return model, response
             except Exception:
                 pass

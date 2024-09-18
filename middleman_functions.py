@@ -10,49 +10,31 @@ from labs.config import CLONE_DESTINATION_DIR, LLM_MODEL_NAME
 logger = logging.getLogger(__name__)
 
 
-@time_and_log_function
-def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
-    if not issue_summary:
-        logger.error("issue_summary cannot be empty.")
-        raise ValueError("issue_summary cannot be empty.")
+def get_prompt(issue_summary):
+    return f"""
+        You're a diligent software engineer AI. You can't see, draw, or interact with a 
+        browser, but you can read and write files, and you can think.
+        You've been given the following task: {issue_summary}.
+        Any imports will be at the beggining of the file.
+        Add tests for the new functionalities, considering any existing test files.
+        Please provide a json response in the following format: {{"steps": [...]}}
+        Where steps is a list of objects where each object contains three fields:
+        type, which is either 'create' to add a new file or 'modify' to edit an existing one;
+        If the file is to be modified send the finished version of the entire file.
+        path, which is the absolute path of the file to create/modify;
+        content, which is the content to write to the file.
+    """
 
-    litellm_requests = RequestLiteLLM(litellm_api_key)
-    destination = CLONE_DESTINATION_DIR + f"{github.repo_owner}/{github.repo_name}"
-    vectorize_to_db(
-        f"https://github.com/{github.repo_owner}/{github.repo_name}", None, destination
-    )
+
+def vectorize_and_find_similar(repo_owner, repo_name, issue_summary):
+    destination = CLONE_DESTINATION_DIR + f"{repo_owner}/{repo_name}"
+    vectorize_to_db(f"https://github.com/{repo_owner}/{repo_name}", None, destination)
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    context = find_similar_embeddings(issue_summary)
+    return find_similar_embeddings(issue_summary)
 
-    prompt = f"""
-    You're a diligent software engineer AI. You can't see, draw, or interact with a 
-    browser, but you can read and write files, and you can think.
-    You've been given the following task: {issue_summary}. Your answer will be in yaml format.
-    Please provide a list of actions to perform in order to complete it, considering the current project, cloned into {destination} .
-    Any imports will be at the beggining of the file.
-    Add tests for the new functionalities, considering any existing test files.
-    Each action should contain two fields:
-    action, which is either 'create' to add a new file  or 'modify' to edit an existing one;
-    args, which is a map of key-value pairs, specifying the arguments for that action:
-    path - the absolute path of the file to create/modify and content - the content to write to the file.
-    If the file is to be modify, on the contents send the finished version of the entire file.
-    Please don't add any text formatting to the answer, making it as clean as possible.
-    
-    **Output example**:
-    
-    - action: create
-      args:
-          path: path_to_some_file
-          content: |
-          some file content
-  
-    - action: modify
-      args:
-          path: path_to_some_other_file
-          content: |
-          some other file content
-    """
+
+def prepare_context(context, prompt):
     prepared_context = []
     for file in context:
         prepared_context.append(
@@ -67,32 +49,85 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
             "content": prompt,
         }
     )
-    try:
-        llm_response = litellm_requests.completion_without_proxy(
-            prepared_context,
-            model=LLM_MODEL_NAME,
-        )
-    except Exception:
-        logger.exception("Error calling LLM.")
-        raise Exception("Error calling LLM.")
+    return prepared_context
 
-    output = call_agent_to_apply_code_changes(llm_response)
-    return output
+
+def validate_llm_response(llm_response):
+    if getattr(llm_response[1].choices[0].message, "finish_reason", False) == "length":
+        return (
+            True,
+            "Conversation was too long for the context window, resulting in incomplete JSON.",
+        )
+    elif getattr(llm_response[1].choices[0].message, "refusal", False):
+        refusal_reason = llm_response.choices[0].message[0]["refusal"]
+        return (
+            True,
+            f"OpenAI safety system refused the request and generated a refusal instead. Reason: {refusal_reason}",
+        )
+    elif (
+        getattr(llm_response[1].choices[0].message, "finish_reason", False)
+        == "content_filter"
+    ):
+        return (
+            True,
+            "Model's output included restricted content. Generation of JSON was halted and may be partial",
+        )
+    else:
+        return False, ""
+
+
+def get_llm_response(litellm_api_key, prepared_context):
+    retries, max_retries = 0, 5
+    redo, redo_reason = True, None
+    litellm_requests = RequestLiteLLM(litellm_api_key)
+
+    while redo and retries < max_retries:
+        try:
+            llm_response = litellm_requests.completion_without_proxy(
+                prepared_context, model=LLM_MODEL_NAME
+            )
+            logger.debug(f"LLM Response: {llm_response}")
+            redo, redo_reason = validate_llm_response(llm_response)
+        except Exception:
+            redo, redo_reason = True, "Error calling LLM."
+            logger.exception(redo_reason)
+
+        if redo:
+            retries = retries + 1
+            logger.info(f"Redoing request due to {redo_reason}")
+
+    if retries == max_retries:
+        logger.info("Max retries reached.")
+        return False, None
+    return True, llm_response
+
+
+@time_and_log_function
+def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
+    if not issue_summary:
+        logger.error("issue_summary cannot be empty.")
+        raise ValueError("issue_summary cannot be empty.")
+
+    context = vectorize_and_find_similar(
+        github.repo_owner, github.repo_name, issue_summary
+    )
+    prompt = get_prompt(issue_summary)
+    prepared_context = prepare_context(context, prompt)
+
+    logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {LLM_MODEL_NAME}")
+
+    return get_llm_response(litellm_api_key, prepared_context)
 
 
 @time_and_log_function
 def call_agent_to_apply_code_changes(llm_response):
     response_string = llm_response[1].choices[0].message.content
-    actions = parse_llm_output(response_string)
+    pull_request = parse_llm_output(response_string)
 
     files = []
-    for action in actions:
-        if action.action_type == "create":
-            files.append(create_file(action.path, action.content))
-        elif action.action_type == "modify":
-            files.append(modify_file(action.path, action.content))
-        else:
-            logger.error(
-                f"Unknown action '{action.action_type}' in step {action.step_number}"
-            )
+    for step in pull_request.steps:
+        if step.type == "create":
+            files.append(create_file(step.path, step.content))
+        elif step.type == "modify":
+            files.append(modify_file(step.path, step.content))
     return files

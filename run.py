@@ -7,8 +7,11 @@ from labs.config import (
 from labs.decorators import time_and_log_function
 from labs.github.github import GithubRequests
 from labs.nlp import NLP_Interface
-from middleman_functions import call_llm_with_context
+from middleman_functions import call_agent_to_apply_code_changes, call_llm_with_context
+import logging
 
+
+logger = logging.getLogger(__name__)
 
 gh_requests: GithubRequests = None
 
@@ -76,11 +79,17 @@ def run(request: CodeMonkeyRequest):
         repo_owner=request.repo_owner,
         repo_name=request.repo_name,
     )
-    response_output = call_llm_with_context(
+    success, llm_response = call_llm_with_context(
         github=github,
         issue_summary=issue["body"],
         litellm_api_key=request.litellm_api_key,
     )
+    if not success:
+        logger.error("Failed to get a response from LLM, aborting run.")
+        return
+
+    response_output = call_agent_to_apply_code_changes(llm_response)
+
     commit_changes(branch_name, response_output)
-    # create_pull_request(branch_name)
+    create_pull_request(branch_name)
     # change_issue_to_in_review()
