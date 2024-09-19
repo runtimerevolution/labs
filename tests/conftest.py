@@ -1,13 +1,13 @@
 import random
 import psycopg
 import pytest
-from src.config import settings
+from labs.config import settings
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from src.rag.embeddings import Embedding
-from src.vector.connect import create_db_connection
+from labs.rag.embeddings import Embedding
+from labs.vector.connect import create_db_connection
 
 
 def is_postgres_available():
@@ -55,7 +55,7 @@ def db_session_factory(db_engine):
     return scoped_session(sessionmaker(bind=db_engine))
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def db_session(db_session_factory):
     """yields a SQLAlchemy connection which is rollbacked after the test"""
     session_ = db_session_factory()

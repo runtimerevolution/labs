@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from src.api.types import (
+from labs.api.types import (
     ChangeIssueStatusRequest,
     CommitChangesRequest,
     CreateBranchRequest,
@@ -9,7 +9,7 @@ from src.api.types import (
     IssueRequest,
     ListIssuesRequest,
 )
-from src.github.github import GithubRequests
+from labs.github.github import GithubRequests
 
 
 router = APIRouter()

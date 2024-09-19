@@ -1,6 +1,6 @@
 from unittest.mock import patch
-from src.github.github import GithubRequests
-from src.api.types import (
+from labs.github.github import GithubRequests
+from labs.api.types import (
     CallLLMRequest,
     CodeMonkeyRequest,
     CommitChangesRequest,
@@ -11,11 +11,11 @@ from src.api.types import (
     ListIssuesRequest,
 )
 from fastapi.testclient import TestClient
-from src.api.main import app
+from labs.api.main import app
 
 
 class TestAPIClient:
-    @patch("src.api.codemonkey_endpoints.call_llm_with_context")
+    @patch("labs.api.codemonkey_endpoints.call_llm_with_context")
     def test_successfull_call_llm_with_context(self, mocked_call):
         client = TestClient(app)
         github = GithubModel(
@@ -33,7 +33,7 @@ class TestAPIClient:
         assert response.status_code == 200
         assert response.json() == ["file1.py", "file2.py"]
 
-    @patch("src.api.codemonkey_endpoints.run")
+    @patch("labs.api.codemonkey_endpoints.run")
     def test_successfull_call_run(self, mocked_call):
         client = TestClient(app)
         request = CodeMonkeyRequest(

@@ -1,7 +1,7 @@
 import psycopg2 as psycopg
 from sqlalchemy import Text, text
 
-from src.vector.connect import create_db_connection
+from labs.vector.connect import create_db_connection
 
 
 create_extension_sql = "CREATE EXTENSION IF NOT EXISTS vector;"

@@ -1,4 +1,4 @@
-from src.vector.queries import select_embeddings
+from labs.vector.queries import select_embeddings
 
 
 def test_embeddings_empty(db_session):

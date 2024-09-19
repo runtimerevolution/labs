@@ -69,4 +69,4 @@ help:
 	@python -c "${PRINT_HELP_PYSCRIPT}" < $(MAKEFILE_LIST)
 
 api:
-	fastapi dev src/api/main.py  
+	fastapi dev labs/api/main.py  

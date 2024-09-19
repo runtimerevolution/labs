@@ -1,17 +1,17 @@
 from unittest.mock import patch
 import pytest
 
-from src.api.types import GithubModel
-from src.litellm_service.request import RequestLiteLLM
-from src.middleware import call_llm_with_context
+from labs.api.types import GithubModel
+from labs.litellm_service.request import RequestLiteLLM
+from labs.middleware import call_llm_with_context
 
 
 class TestCallLlmWithContext:
     # Successfully calls the LLM with the provided context and returns the expected output
-    @patch("src.middleware.find_similar_embeddings")
+    @patch("labs.middleware.find_similar_embeddings")
     @patch.object(RequestLiteLLM, "completion_without_proxy")
-    @patch("src.middleware.vectorize_to_db")
-    @patch("src.middleware.call_agent_to_apply_code_changes")
+    @patch("labs.middleware.vectorize_to_db")
+    @patch("labs.middleware.call_agent_to_apply_code_changes")
     def test_successful_llm_call_with_context(
         self, mocked_agent, mocked_vectorized, mocked_completion, mocked_embeddings
     ):

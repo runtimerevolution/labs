@@ -1,8 +1,8 @@
-from src.api.types import GithubModel
-from src.litellm_service.request import RequestLiteLLM
-from src.rag.embeddings import find_similar_embeddings
-from src.response_parser.parser import create_file, modify_file, parse_llm_output
-from src.vector.vectorize_to_db import vectorize_to_db
+from labs.api.types import GithubModel
+from labs.litellm_service.request import RequestLiteLLM
+from labs.rag.embeddings import find_similar_embeddings
+from labs.response_parser.parser import create_file, modify_file, parse_llm_output
+from labs.vector.vectorize_to_db import vectorize_to_db
 
 
 def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):

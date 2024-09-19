@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pgvector.sqlalchemy import Vector
 
-from src.vector.connect import create_db_connection
+from labs.vector.connect import create_db_connection
 
 
 Base = declarative_base()

@@ -18,5 +18,5 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      - ./src/config/litellm.yaml:/app/config.yaml
+      - ./labs/config/litellm.yaml:/app/config.yaml
     command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]

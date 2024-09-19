@@ -6,8 +6,8 @@ import subprocess
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 
-from src.config.settings import OPENAI_API_KEY
-from src.vector.queries import reembed_code
+from labs.config.settings import OPENAI_API_KEY
+from labs.vector.queries import reembed_code
 
 
 # Set the OpenAI API key

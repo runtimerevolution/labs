@@ -1,7 +1,7 @@
 import psycopg2 as psycopg
 
 
-from src.config import settings
+from labs.config import settings
 
 
 def db_config():

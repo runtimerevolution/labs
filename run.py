@@ -1,11 +1,11 @@
-from src.api.types import CodeMonkeyRequest, GithubModel
-from src.config.settings import (
+from labs.api.types import CodeMonkeyRequest, GithubModel
+from labs.config.settings import (
     GITHUB_ACCESS_TOKEN,
     GITHUB_REPO,
     GITHUB_OWNER,
 )
-from src.github.github import GithubRequests
-from src.middleware import call_llm_with_context
+from labs.github.github import GithubRequests
+from labs.middleware import call_llm_with_context
 
 
 gh_requests: GithubRequests = None

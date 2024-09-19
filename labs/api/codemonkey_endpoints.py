@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from run import call_llm_with_context, run
-from src.api.types import CallLLMRequest, CodeMonkeyRequest, GithubModel
-from src.config.settings import LITELLM_API_KEY
+from labs.api.types import CallLLMRequest, CodeMonkeyRequest, GithubModel
+from labs.config.settings import LITELLM_API_KEY
 
 router = APIRouter()
 
