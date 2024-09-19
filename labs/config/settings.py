@@ -1,22 +1,9 @@
 import os
 from pathlib import Path
 
-import logging
-from pythonjsonlogger import jsonlogger
 
 # Paths
 PROJ_ROOT = Path(__file__).resolve().parents[1]
-
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-logHandler = logging.StreamHandler()
-formatter = jsonlogger.JsonFormatter()
-logHandler.setFormatter(formatter)
-logger.addHandler(logHandler)
-logger.propagate = False
-
-logger.debug(f"PROJ_ROOT path is: {PROJ_ROOT}")
 
 DATA_DIR = PROJ_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
@@ -34,7 +21,7 @@ GITHUB_REPO = os.environ.get("GITHUB_REPO")
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_API_BASE_URL = "https://api.github.com"
 
-TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", "False"))
+TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", False))
 
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
@@ -75,7 +62,3 @@ spacy_models = [
 ]
 
 SUMMARIZATION_MODEL = "facebook/bart-large-cnn"
-
-
-def get_logger(module_name):
-    return logging.getLogger(module_name)

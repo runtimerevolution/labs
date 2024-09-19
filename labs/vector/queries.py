@@ -1,7 +1,10 @@
 import psycopg2 as psycopg
 from sqlalchemy import text
+import logging
 
 from labs.vector.connect import create_db_connection
+
+logger = logging.getLogger(__name__)
 
 
 def db_connector():
@@ -13,8 +16,8 @@ def db_connector():
             try:
                 result = original_function(connection, cursor, *args, **kwargs)
                 return result
-            except (Exception, psycopg.Error) as error:
-                print("Error while getting data from DB", error)
+            except (Exception, psycopg.Error):
+                logger.exception("Error while getting data from DB.")
             finally:
                 if cursor:
                     cursor.close()

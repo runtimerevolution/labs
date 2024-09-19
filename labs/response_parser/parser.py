@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 import yaml
-from labs.config import get_logger
+import logging
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @dataclass

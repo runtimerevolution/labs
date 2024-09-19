@@ -4,6 +4,7 @@ from labs.config.settings import (
     GITHUB_REPO,
     GITHUB_OWNER,
 )
+from labs.decorators import time_and_log_function
 from labs.github.github import GithubRequests
 from labs.middleware import call_llm_with_context
 
@@ -11,6 +12,7 @@ from labs.middleware import call_llm_with_context
 gh_requests: GithubRequests = None
 
 
+@time_and_log_function
 def setup():
     global gh_requests
     gh_requests = GithubRequests(
@@ -20,32 +22,39 @@ def setup():
     )
 
 
+@time_and_log_function
 def get_issue(issue_number):
     return gh_requests.get_issue(issue_number)
 
 
+@time_and_log_function
 def create_branch(issue_number, issue_title):
     branch_name = f"{issue_number}-{issue_title}"
     create_result = gh_requests.create_branch(branch_name=branch_name)
     return create_result, branch_name
 
 
+@time_and_log_function
 def change_issue_to_in_progress():
     pass
 
 
+@time_and_log_function
 def commit_changes(branch_name, file_list):
     return gh_requests.commit_changes("fix", branch_name=branch_name, files=file_list)
 
 
+@time_and_log_function
 def create_pull_request(branch_name):
     return gh_requests.create_pull_request(branch_name)
 
 
+@time_and_log_function
 def change_issue_to_in_review():
     pass
 
 
+@time_and_log_function
 def run(request: CodeMonkeyRequest):
     setup()
     issue = get_issue(request.issue_number)

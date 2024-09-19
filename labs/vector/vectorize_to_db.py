@@ -6,16 +6,19 @@ import subprocess
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 
+from labs.decorators import time_and_log_function
+import logging
+
 from labs.config.settings import OPENAI_API_KEY
 from labs.vector.queries import reembed_code
 
 
-# Set the OpenAI API key
+logger = logging.getLogger(__name__)
+
 openai.api_key = OPENAI_API_KEY
 
 
 def clone_repository(repo_url, local_path):
-    """Clone the specified git repository to the given local path."""
     subprocess.run(["git", "clone", repo_url, local_path])
 
 
@@ -62,7 +65,7 @@ def load_docs(root_dir, file_extensions=None):
                 loader = TextLoader(file_path, encoding="utf-8")
                 docs.extend(loader.load_and_split())
             except Exception:
-                pass
+                logger.exception("Failed to load repo documents into memory.")
     return docs
 
 
@@ -72,18 +75,23 @@ def split_docs(docs):
     return text_splitter.split_documents(docs)
 
 
+@time_and_log_function
 def vectorize_to_db(repo_url, include_file_extensions, repo_destination):
     """
     Process a git repository by cloning it, filtering files, splitting documents,
     creating embeddings, and storing everything in pgvector database.
     """
+    logger.debug(f"Cloning repo from {repo_url}")
     clone_repository(repo_url, repo_destination)
+
+    logger.debug("Loading and splitting all documents into chunks.")
     docs = load_docs(repo_destination, include_file_extensions)
     texts = split_docs(docs)
-
     files_and_texts = [(text.metadata["source"], text.page_content) for text in texts]
     texts = [file_and_text[1] for file_and_text in files_and_texts]
 
+    logger.debug("Embedding all repo documents.")
     embeddings = embedding(model="text-embedding-ada-002", input=texts)
 
+    logger.debug("Storing all embeddings.")
     reembed_code(files_and_texts, embeddings)

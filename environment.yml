@@ -1,0 +1,15 @@
+name: labs
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - black
+  - flake8
+  - isort
+  - pip
+  - typer
+  - tqdm
+  - pip:
+    - python-dotenv
+    - awscli
+    - -e .
