@@ -5,20 +5,20 @@ import pathspec
 import subprocess
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
-from labs.config import OPENAI_API_KEY
+
 from labs.decorators import time_and_log_function
-from vector.queries import reembed_code
 import logging
+
+from labs.config.settings import OPENAI_API_KEY
+from labs.vector.queries import reembed_code
 
 
 logger = logging.getLogger(__name__)
 
-# Set the OpenAI API key
 openai.api_key = OPENAI_API_KEY
 
 
 def clone_repository(repo_url, local_path):
-    """Clone the specified git repository to the given local path."""
     subprocess.run(["git", "clone", repo_url, local_path])
 
 

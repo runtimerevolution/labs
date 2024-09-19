@@ -1,32 +1,24 @@
-version: "3.9"
-
 services:
-  db:
-    image: ankane/pgvector
+  labs-db:
+    container_name: labs-db
+    image: pgvector/pgvector:pg16
     ports:
-     - 63045:5432
+     - ${DATABASE_PORT}:5432
     restart: always
     environment:
-      - POSTGRES_DB=vectordb
-      - POSTGRES_USER=testuser
-      - POSTGRES_PASSWORD=testpwd
+      - POSTGRES_DB=test
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASS}
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - ./vector/scripts:/docker-entrypoint-initdb.d
-      - db-data:/var/lib/postgresql/data:rw
+      - ./database_scripts:/docker-entrypoint-initdb.d
 
   litellm:
-    build:
-      context: .
-      args:
-        target: runtime
     image: ghcr.io/berriai/litellm:main-latest
     ports:
       - "4000:4000"
-    env_file:
-      - .env
     volumes:
-      - ./litellm-config.yaml:/app/config.yaml
+      - ./labs/config/litellm.yaml:/app/config.yaml
     command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
 
   promtail:
@@ -38,6 +30,3 @@ services:
       - .env
     entrypoint: >
       /bin/bash -c "/usr/bin/promtail -config.expand-env=true -config.file /etc/promtail/config.yml"
-
-volumes:
-  db-data: { }
