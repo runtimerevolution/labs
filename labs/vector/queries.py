@@ -1,17 +1,7 @@
-import psycopg2
-from vector.connect import create_db_connection
+import psycopg2 as psycopg
+from sqlalchemy import text
 
-
-create_extension_sql = "CREATE EXTENSION IF NOT EXISTS vector;"
-create_table_embeddings_sql = """
-CREATE TABLE IF NOT EXISTS embeddings (
-  id SERIAL PRIMARY KEY,
-  embedding vector,
-  file_and_path text,
-  text text,
-  created_at timestamptz DEFAULT now()
-);
-"""
+from labs.vector.connect import create_db_connection
 
 
 def db_connector():
@@ -23,7 +13,7 @@ def db_connector():
             try:
                 result = original_function(connection, cursor, *args, **kwargs)
                 return result
-            except (Exception, psycopg2.Error) as error:
+            except (Exception, psycopg.Error) as error:
                 print("Error while getting data from DB", error)
             finally:
                 if cursor:
@@ -38,18 +28,8 @@ def db_connector():
     return decorator
 
 
-@db_connector()
-def setup_db(connection, cursor):
-    cursor.execute(create_extension_sql)
-    cursor.execute(create_table_embeddings_sql)
-    connection.commit()
-    return True
-
-
-@db_connector()
-def select_embeddings(connection, cursor):
-    cursor.execute("SELECT * FROM embeddings;")
-    return cursor.fetchall()
+def select_embeddings(session):
+    return session.execute(text("SELECT * FROM embeddings;")).fetchall()
 
 
 @db_connector()
@@ -57,10 +37,10 @@ def reembed_code(connection, cursor, files_and_texts, embeddings):
     cursor.execute("DELETE FROM embeddings;")
     connection.commit()
 
-    for text, embedding_obj in zip(files_and_texts, embeddings.data):
+    for gen_text, embedding_obj in zip(files_and_texts, embeddings.data):
         cursor.execute(
             "INSERT INTO embeddings (embedding, file_and_path, text) VALUES (%s, %s, %s)",
-            (embedding_obj["embedding"], text[0], text[1]),
+            (embedding_obj["embedding"], gen_text[0], gen_text[1]),
         )
     connection.commit()
     return True

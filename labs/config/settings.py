@@ -1,11 +1,8 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
+
 import logging
 from pythonjsonlogger import jsonlogger
-
-# Load environment variables from .env file if it exists
-load_dotenv(dotenv_path=".env")
 
 # Paths
 PROJ_ROOT = Path(__file__).resolve().parents[1]
@@ -37,7 +34,7 @@ GITHUB_REPO = os.environ.get("GITHUB_REPO")
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_API_BASE_URL = "https://api.github.com"
 
-TEST_ENVIRONMENT = bool(os.environ.get("TEST_ENVIRONMENT", True))
+TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", "False"))
 
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")

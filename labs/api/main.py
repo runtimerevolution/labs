@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from labs.api import github_endpoints, codemonkey_endpoints
+from labs.api import codemonkey_endpoints, github_endpoints
 
 
 app = FastAPI()
