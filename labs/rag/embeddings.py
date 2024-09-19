@@ -1,13 +1,15 @@
 from litellm import embedding
-import psycopg2
+import psycopg
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pgvector.sqlalchemy import Vector
-from vector.connect import create_db_connection
+
+from labs.vector.connect import create_db_connection
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 Base = declarative_base()
 N_DIM = 1536
@@ -52,7 +54,7 @@ def find_similar_embeddings(query):
     try:
         cursor.execute(query)
         return cursor.fetchall()
-    except (Exception, psycopg2.Error):
+    except (Exception, psycopg.Error):
         logger.exception("Error while getting data from DB.")
     finally:
         if cursor:

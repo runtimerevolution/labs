@@ -1,11 +1,11 @@
 from labs.api.types import GithubModel
 from labs.decorators import time_and_log_function
-from labs.response_parser.parser import create_file, modify_file, parse_llm_output
-from litellm_service.request import RequestLiteLLM
-from rag.embeddings import find_similar_embeddings
-from vector.vectorize_to_db import vectorize_to_db
 import logging
-from labs.config import CLONE_DESTINATION_DIR, LLM_MODEL_NAME
+from labs.config.settings import CLONE_DESTINATION_DIR, LLM_MODEL_NAME
+from labs.litellm_service.request import RequestLiteLLM
+from labs.rag.embeddings import find_similar_embeddings
+from labs.response_parser.parser import create_file, modify_file, parse_llm_output
+from labs.vector.vectorize_to_db import vectorize_to_db
 
 logger = logging.getLogger(__name__)
 
