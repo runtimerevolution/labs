@@ -39,10 +39,17 @@ TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", "False"))
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
 
+
+CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "/tmp/")
+LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "openai/gpt-3.5-turbo")
+
+ACTIVELOOP_TOKEN = os.environ["ACTIVELOOP_TOKEN"]
+
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+
 
 ACTIVELOOP_TOKEN = os.environ.get("ACTIVELOOP_TOKEN")
 
