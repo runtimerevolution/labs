@@ -9,13 +9,13 @@ from labs.decorators import time_and_log_function
 
 import logging
 
-from labs.config.settings import OPENAI_API_KEY
+from labs.config import settings
 from labs.vector.queries import reembed_code
 
 
 logger = logging.getLogger(__name__)
 
-openai.api_key = OPENAI_API_KEY
+openai.api_key = settings.OPENAI_API_KEY
 
 
 def clone_repository(repo_url, local_path):

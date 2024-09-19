@@ -1,7 +1,7 @@
 from labs.api.types import GithubModel
 from labs.decorators import time_and_log_function
 import logging
-from labs.config.settings import CLONE_DESTINATION_DIR, LLM_MODEL_NAME
+from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.rag.embeddings import find_similar_embeddings
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
@@ -27,7 +27,7 @@ def get_prompt(issue_summary):
 
 
 def vectorize_and_find_similar(repo_owner, repo_name, issue_summary):
-    destination = CLONE_DESTINATION_DIR + f"{repo_owner}/{repo_name}"
+    destination = settings.CLONE_DESTINATION_DIR + f"{repo_owner}/{repo_name}"
     vectorize_to_db(f"https://github.com/{repo_owner}/{repo_name}", None, destination)
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
@@ -52,28 +52,53 @@ def prepare_context(context, prompt):
     return prepared_context
 
 
-def validate_llm_response(llm_response):
-    if getattr(llm_response[1].choices[0].message, "finish_reason", False) == "length":
+def check_length_issue(llm_response):
+    finish_reason = getattr(
+        llm_response["choices"][0]["message"], "finish_reason", None
+    )
+    if finish_reason == "length":
         return (
             True,
             "Conversation was too long for the context window, resulting in incomplete JSON.",
         )
-    elif getattr(llm_response[1].choices[0].message, "refusal", False):
-        refusal_reason = llm_response.choices[0].message[0]["refusal"]
+    return False, ""
+
+
+def check_content_filter(llm_response):
+    finish_reason = getattr(
+        llm_response["choices"][0]["message"], "finish_reason", None
+    )
+    if finish_reason == "content_filter":
         return (
             True,
-            f"OpenAI safety system refused the request and generated a refusal instead. Reason: {refusal_reason}",
+            "Model's output included restricted content. Generation of JSON was halted and may be partial.",
         )
-    elif (
-        getattr(llm_response[1].choices[0].message, "finish_reason", False)
-        == "content_filter"
-    ):
+    return False, ""
+
+
+def check_refusal(llm_response):
+    refusal_reason = getattr(llm_response["choices"][0]["message"], "refusal", None)
+    if refusal_reason:
         return (
             True,
-            "Model's output included restricted content. Generation of JSON was halted and may be partial",
+            f"OpenAI safety system refused the request. Reason: {refusal_reason}",
         )
-    else:
-        return False, ""
+    return False, ""
+
+
+validation_checks = [
+    check_length_issue,
+    check_content_filter,
+    check_refusal,
+]
+
+
+def validate_llm_response(llm_response):
+    for check in validation_checks:
+        is_invalid, message = check(llm_response)
+        if is_invalid:
+            return True, message
+    return False, ""
 
 
 def get_llm_response(litellm_api_key, prepared_context):
@@ -84,7 +109,7 @@ def get_llm_response(litellm_api_key, prepared_context):
     while redo and retries < max_retries:
         try:
             llm_response = litellm_requests.completion_without_proxy(
-                prepared_context, model=LLM_MODEL_NAME
+                prepared_context, model=settings.LLM_MODEL_NAME
             )
             logger.debug(f"LLM Response: {llm_response}")
             redo, redo_reason = validate_llm_response(llm_response)
@@ -114,7 +139,9 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
 
-    logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {LLM_MODEL_NAME}")
+    logger.debug(
+        f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}"
+    )
 
     return get_llm_response(litellm_api_key, prepared_context)
 
