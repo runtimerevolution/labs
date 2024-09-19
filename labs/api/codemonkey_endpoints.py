@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from labs.api.types import CallLLMRequest, CodeMonkeyRequest, GithubModel
-from labs.config import LITELLM_API_KEY
+from labs.config.settings import LITELLM_API_KEY
 from labs.decorators import async_time_and_log_function
 from run import call_llm_with_context, run
 import logging

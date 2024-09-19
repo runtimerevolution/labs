@@ -4,7 +4,7 @@ import typer
 import logging
 from tqdm import tqdm
 
-from labs.config import MODELS_DIR, PROCESSED_DATA_DIR
+from labs.config.settings import MODELS_DIR, PROCESSED_DATA_DIR
 
 app = typer.Typer()
 

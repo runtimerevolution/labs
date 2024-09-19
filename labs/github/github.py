@@ -1,7 +1,7 @@
 import base64
 import requests
 from dataclasses import dataclass
-from labs.config import CLONE_DESTINATION_DIR
+from labs.config.settings import CLONE_DESTINATION_DIR
 import git
 import os
 import logging
