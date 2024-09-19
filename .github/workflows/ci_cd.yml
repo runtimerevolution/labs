@@ -2,7 +2,7 @@ name: CI/CD
 on:
   push:
     branches:
-      - github-actions
+      - '*'
 
 jobs:
   geral:
@@ -19,9 +19,6 @@ jobs:
 
       - name: Poetry Install
         uses: knowsuchagency/poetry-install@v2
-
-      - name: Setup Spacy
-        run: poetry run python labs/setup_spacy.py
 
       - name: Run pytest
         run: poetry run pytest
