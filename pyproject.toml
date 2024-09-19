@@ -31,22 +31,22 @@ pytest-postgresql = "^6.0.0"
 docker = "^7.1.0"
 fastapi = "^0.111.1"
 graphviz = "^0.20.3"
-pytest = "^8.3.2"
 rouge-score = "^0.1.2"
 pandas = "^2.2.2"
 langdetect = "^1.0.9"
-ruff = "^0.6.2"
-pre-commit = "^3.8.0"
 torch = "2.2.2" # Locked to this version because 
 psycopg2-binary = "^2.9.9"
 psycopg = {extras = ["binary"], version = "^3.2.2"}
 
 [tool.poetry.group.dev.dependencies]
+pre-commit = "^3.8.0"
+ruff = "^0.6.2"
 ipykernel = "^6.29.5"
 jupyterlab = "^4.2.4"
 vcrpy = "^6.0.1"
-pytest = "^8.3.1"
+pytest = "^8.3.2"
 pytest-mock = "^3.14.0"
+pytest-dotenv = "^0.5.2"
 
 [build-system]
 requires = ["poetry-core"]

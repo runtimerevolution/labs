@@ -1,6 +1,4 @@
-import time
 import random
-import docker
 import psycopg
 import pytest
 from src.config import settings
@@ -10,7 +8,6 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 from src.rag.embeddings import Embedding
 from src.vector.connect import create_db_connection
-from src.vector.queries import setup_db
 
 
 def is_postgres_available():
@@ -39,7 +36,7 @@ def database():
         database=settings.DATABASE_NAME,
         user=settings.DATABASE_USER,
         password=settings.DATABASE_PASS,
-        host="localhost",
+        host=settings.DATABASE_HOST,
         port=settings.DATABASE_PORT,
     )
 
@@ -58,7 +55,7 @@ def db_session_factory(db_engine):
     return scoped_session(sessionmaker(bind=db_engine))
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="module")
 def db_session(db_session_factory):
     """yields a SQLAlchemy connection which is rollbacked after the test"""
     session_ = db_session_factory()

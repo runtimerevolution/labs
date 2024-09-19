@@ -16,10 +16,8 @@ def db_config():
 
 def create_db_connection():
     params = db_config()
-    print("Creating connection", params)
 
     try:
-        print(params)
         conn = psycopg.connect(**params)
         return conn
     except (Exception, psycopg.Error) as error:

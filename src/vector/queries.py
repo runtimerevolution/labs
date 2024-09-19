@@ -1,4 +1,5 @@
 import psycopg2 as psycopg
+from sqlalchemy import Text, text
 
 from src.vector.connect import create_db_connection
 
@@ -47,10 +48,8 @@ def setup_db(connection, cursor):
     return True
 
 
-@db_connector()
-def select_embeddings(connection, cursor):
-    cursor.execute("SELECT * FROM embeddings;")
-    return cursor.fetchall()
+def select_embeddings(session):
+    return session.execute(text("SELECT * FROM embeddings;")).fetchall()
 
 
 @db_connector()
