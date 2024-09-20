@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from labs.api.types import CallLLMRequest, CodeMonkeyRequest, GithubModel
-from labs.config import LITELLM_API_KEY
+from labs.config import settings
 from labs.decorators import async_time_and_log_function
 from run import call_llm_with_context, run
 import logging
@@ -25,7 +25,7 @@ async def codemonkey_run(request: CodeMonkeyRequest):
 async def llm_with_context(github: GithubModel, params: CallLLMRequest):
     try:
         outputted_files = call_llm_with_context(
-            github, params.issue_summary, litellm_api_key=LITELLM_API_KEY
+            github, params.issue_summary, litellm_api_key=settings.LITELLM_API_KEY
         )
         return outputted_files
 

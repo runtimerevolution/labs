@@ -1,13 +1,12 @@
 from labs.api.types import CodeMonkeyRequest, GithubModel
-from labs.config.settings import (
-    GITHUB_ACCESS_TOKEN,
-    GITHUB_REPO,
-    GITHUB_OWNER,
-)
+from labs.config import settings
 from labs.decorators import time_and_log_function
 from labs.github.github import GithubRequests
-from labs.middleware import call_llm_with_context
+import logging
+from labs.middleware import call_llm_with_context, call_agent_to_apply_code_changes
 
+
+logger = logging.getLogger(__name__)
 
 gh_requests: GithubRequests = None
 
@@ -16,9 +15,9 @@ gh_requests: GithubRequests = None
 def setup():
     global gh_requests
     gh_requests = GithubRequests(
-        github_token=GITHUB_ACCESS_TOKEN,
-        repo_owner=GITHUB_OWNER,
-        repo_name=GITHUB_REPO,
+        github_token=settings.GITHUB_ACCESS_TOKEN,
+        repo_owner=settings.GITHUB_OWNER,
+        repo_name=settings.GITHUB_REPO,
     )
 
 
@@ -67,10 +66,16 @@ def run(request: CodeMonkeyRequest):
         repo_owner=request.repo_owner,
         repo_name=request.repo_name,
     )
-    response_output = call_llm_with_context(
+    success, llm_response = call_llm_with_context(
         github=github,
         issue_summary=issue["body"],
         litellm_api_key=request.litellm_api_key,
     )
+    if not success:
+        logger.error("Failed to get a response from LLM, aborting run.")
+        return
+
+    response_output = call_agent_to_apply_code_changes(llm_response)
+
     commit_changes(branch_name, response_output)
     create_pull_request(branch_name)

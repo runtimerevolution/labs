@@ -1,47 +1,13 @@
-from dataclasses import dataclass
-import yaml
 import logging
+
+from labs.litellm_service.request import PullRequest
+
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class Action:
-    step_number: int
-    action_type: str
-    path: str
-    content: str
-
-
-def clean_yaml_string(yaml_string):
-    # Remove the ```yaml at the beginning and ``` at the end if they exist
-    if yaml_string.startswith("```yaml"):
-        yaml_string = yaml_string[len("```yaml") :].strip()
-    if yaml_string.endswith("```"):
-        yaml_string = yaml_string[: -len("```")].strip()
-
-    return yaml_string
-
-
 def parse_llm_output(text_output):
-    # Load the YAML text
-    data = yaml.safe_load(clean_yaml_string(text_output))
-
-    # Create a list to store the steps
-    steps = []
-
-    # Extract and store the information in Step objects
-    for i, item in enumerate(data, start=1):
-        action = item.get("action")
-        path = item.get("args", {}).get("path")
-        content = item.get("args", {}).get("content")
-        steps.append(
-            Action(
-                step_number=i, action_type=action, path=path, content=content.strip()
-            )
-        )
-
-    return steps
+    return PullRequest.model_validate_json(text_output)
 
 
 def create_file(path, content):
