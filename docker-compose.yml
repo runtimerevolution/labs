@@ -26,7 +26,5 @@ services:
     volumes:
       - ./logs/:/var/log
       - ./promtail.yml:/etc/promtail/config.yml
-    env_file:
-      - .env
     entrypoint: >
       /bin/bash -c "/usr/bin/promtail -config.expand-env=true -config.file /etc/promtail/config.yml"
