@@ -26,9 +26,10 @@ class TestCallLlmWithContext:
         issue_summary = "Fix the bug in the authentication module"
         litellm_api_key = "fake_api_key"
 
-        result = call_llm_with_context(github, issue_summary, litellm_api_key)
+        success, result = call_llm_with_context(github, issue_summary, litellm_api_key)
 
-        assert result == ["file1"]
+        assert success
+        assert result == ("model", {"choices": [{"message": {"content": "response"}}]})
 
     # Ensure the GithubModel is instantiated correctly with the correct parameters
 
