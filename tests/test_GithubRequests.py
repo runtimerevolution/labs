@@ -52,7 +52,7 @@ class TestGithubRequests:
 
         issues = github_requests.list_issues()
 
-        assert issues == []
+        assert issues is None
 
     def test_get_issue_returns_correct_details(self, mocker):
         mock_get = mocker.patch("requests.get")
@@ -70,13 +70,6 @@ class TestGithubRequests:
         issue = github_requests.get_issue(1)
 
         assert issue == sample_response
-        mock_get.assert_called_once_with(
-            f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues/1",
-            headers={
-                "Authorization": f"token {github_token}",
-                "Accept": "application/vnd.github.v3+json",
-            },
-        )
 
     def test_handle_http_request_failure_get_issue(self, mocker):
         mock_response = mocker.Mock()

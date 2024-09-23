@@ -8,12 +8,11 @@ from labs.middleware import call_llm_with_context
 
 class TestCallLlmWithContext:
     # Successfully calls the LLM with the provided context and returns the expected output
-    @patch("labs.middleware.find_similar_embeddings")
+    @patch("labs.middleware.vectorize_and_find_similar")
     @patch.object(RequestLiteLLM, "completion_without_proxy")
-    @patch("labs.middleware.vectorize_to_db")
     @patch("labs.middleware.call_agent_to_apply_code_changes")
     def test_successful_llm_call_with_context(
-        self, mocked_agent, mocked_vectorized, mocked_completion, mocked_embeddings
+        self, mocked_agent, mocked_completion, mocked_embeddings
     ):
         # Mocking dependencies
         mocked_embeddings.return_value = [["file1", "/path/to/file1", "content1"]]
@@ -27,9 +26,10 @@ class TestCallLlmWithContext:
         issue_summary = "Fix the bug in the authentication module"
         litellm_api_key = "fake_api_key"
 
-        result = call_llm_with_context(github, issue_summary, litellm_api_key)
+        success, result = call_llm_with_context(github, issue_summary, litellm_api_key)
 
-        assert result == ["file1"]
+        assert success
+        assert result == ("model", {"choices": [{"message": {"content": "response"}}]})
 
     # Ensure the GithubModel is instantiated correctly with the correct parameters
 

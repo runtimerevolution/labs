@@ -4,9 +4,30 @@ on:
     branches:
       - '*'
 
+env:
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_HOST: localhost
+  POSTGRES_PORT: 5432
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+
 jobs:
-  geral:
+  run-tests:
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - name: Check out code
@@ -19,6 +40,10 @@ jobs:
 
       - name: Poetry Install
         uses: knowsuchagency/poetry-install@v2
+
+      - name: Create Tables
+        run: |
+          PGPASSWORD=${{env.POSTGRES_PASSWORD}} psql -U ${{env.POSTGRES_USER}} -d ${{env.POSTGRES_DB}} -h ${{env.POSTGRES_HOST}} -a -f ${{github.workspace}}/database_scripts/postgres.sql
 
       - name: Run pytest
         run: poetry run pytest
