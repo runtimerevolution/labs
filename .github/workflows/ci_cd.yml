@@ -28,8 +28,6 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-        volumes:
-          - ${{github.workspace}}/database_scripts:/docker-entrypoint-initdb.d
 
     steps:
       - name: Check out code
@@ -42,6 +40,10 @@ jobs:
 
       - name: Poetry Install
         uses: knowsuchagency/poetry-install@v2
+
+      - name: Create Tables
+        run: |
+          PGPASSWORD=${{env.POSTGRES_PASSWORD}} psql -U ${{env.POSTGRES_USER}} -d ${{env.POSTGRES_DB}} -a -f ${{github.workspace}}/database_scripts/postgres.sql
 
       - name: Run pytest
         run: poetry run pytest
