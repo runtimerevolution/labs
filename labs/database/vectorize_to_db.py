@@ -10,7 +10,7 @@ from labs.decorators import time_and_log_function
 import logging
 
 from labs.config import settings
-from labs.vector.queries import reembed_code
+from labs.database.queries import reembed_code
 
 
 logger = logging.getLogger(__name__)

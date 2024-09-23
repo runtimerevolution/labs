@@ -1,13 +1,13 @@
-from labs.vector.queries import select_embeddings
+from labs.database.queries import select_embeddings
 
 
-def test_embeddings_empty(db_session):
+def test_select_embeddings_empty(db_session):
     result = select_embeddings(db_session)
 
     assert result == []
 
 
-def test_embeddings_one(db_session, create_test_embedding):
+def test_select_embeddings_one(db_session, create_test_embedding):
     db_session.add_all(create_test_embedding)
     db_session.commit()
 
@@ -19,7 +19,7 @@ def test_embeddings_one(db_session, create_test_embedding):
     assert text, "text"
 
 
-def test_embeddings_multiple(db_session, create_test_embeddings):
+def test_select_embeddings_multiple(db_session, create_test_embeddings):
     db_session.add_all(create_test_embeddings)
     db_session.commit()
 

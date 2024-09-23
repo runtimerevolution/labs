@@ -1,11 +1,10 @@
 from litellm import embedding
 import psycopg
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from pgvector.sqlalchemy import Vector
 
-from labs.vector.connect import create_db_connection
+from labs.database.connect import create_db_connection
 import logging
 
 logger = logging.getLogger(__name__)
@@ -75,15 +74,3 @@ def find_similar_embeddings(query):
     #     .all()
     # )
     # return query
-
-
-def setup():
-    try:
-        engine = create_engine(
-            "postgresql+psycopg2://testuser:testpwd@db:5432/vectordb"
-        )
-        Session = sessionmaker(bind=engine)
-        session = Session()
-        return session
-    except Exception:
-        logger.exception("Error while creating the engine for the database.")

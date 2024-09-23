@@ -2,7 +2,7 @@ import psycopg2 as psycopg
 from sqlalchemy import text
 import logging
 
-from labs.vector.connect import create_db_connection
+from labs.database.connect import create_db_connection
 
 logger = logging.getLogger(__name__)
 
