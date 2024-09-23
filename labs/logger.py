@@ -33,12 +33,16 @@ def setup_logger():
     formatter = logging.Formatter(fmt=log_format, datefmt=LOG_FORMAT)
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
-
-    formatter = CustomJsonFormatter()
-    handler = RotatingFileHandler(
-        "logs/debug.log", maxBytes=DEFAULT_MAX_BYTES, backupCount=DEFAULT_BACKUP_COUNT
-    )
-    handler.setFormatter(formatter)
-
     logger.addHandler(stream_handler)
-    logger.addHandler(handler)
+
+    try:
+        formatter = CustomJsonFormatter()
+        handler = RotatingFileHandler(
+            "logs/debug.log",
+            maxBytes=DEFAULT_MAX_BYTES,
+            backupCount=DEFAULT_BACKUP_COUNT,
+        )
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+    except Exception:
+        pass
