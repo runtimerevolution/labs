@@ -26,6 +26,8 @@ pandas = "^2.2.2"
 langdetect = "^1.0.9"
 psycopg2-binary = "^2.9.9"
 psycopg = {extras = ["binary"], version = "^3.2.2"}
+sqlalchemy = "^2.0.35"
+langchain-community = "^0.3.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.8.0"

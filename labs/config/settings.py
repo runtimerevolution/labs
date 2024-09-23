@@ -25,24 +25,18 @@ GITHUB_REPO = os.environ.get("GITHUB_REPO")
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_API_BASE_URL = "https://api.github.com"
 
-TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", False))
+TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", "False"))
 
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
 
-
 CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "tmp/")
 LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "openai/gpt-4o")
-
-ACTIVELOOP_TOKEN = os.environ["ACTIVELOOP_TOKEN"]
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-
-
-ACTIVELOOP_TOKEN = os.environ.get("ACTIVELOOP_TOKEN")
 
 DATABASE_HOST = os.environ.get("DATABASE_HOST")
 DATABASE_USER = os.environ.get("DATABASE_USER")

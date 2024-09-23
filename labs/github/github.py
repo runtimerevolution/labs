@@ -41,7 +41,7 @@ class GithubRequests:
             logger.exception("Missing key in access data.")
         except Exception:
             logger.exception("An unexpected error occurred.")
-        return None
+        return None, 500
 
     def _post(self, url, headers={}, data={}):
         try:
