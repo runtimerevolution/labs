@@ -5,7 +5,7 @@ from labs.config import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-from labs.rag.embeddings import Embedding
+from labs.database.embeddings import Embedding
 
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
@@ -16,7 +16,8 @@ Base = declarative_base()
 @pytest.fixture(scope="function")
 def db_session():
     """yields a SQLAlchemy connection which is rollbacked after the test
-    https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites"""
+    https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
+    """
     connection = engine.connect()
     # begin a non-ORM transaction
     trans = connection.begin()

@@ -1,16 +1,14 @@
 from litellm import embedding
-import psycopg
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, select
 from pgvector.sqlalchemy import Vector
 
-from labs.database.connect import create_db_connection
+from labs.database.connect import Base, db_connector
 import logging
+
 
 logger = logging.getLogger(__name__)
 
 
-Base = declarative_base()
 N_DIM = 1536
 
 
@@ -29,8 +27,8 @@ def insert_embeddings(session, embeddings):
     session.commit()
 
 
-def find_similar_embeddings(query):
-    k = 5
+@db_connector()
+def find_similar_embeddings(connection, query):
     similarity_threshold = 0.7
 
     query = query.replace("\n", "")
@@ -38,39 +36,15 @@ def find_similar_embeddings(query):
     result = embedding(model="text-embedding-ada-002", input=[query])
     query_embedding = result.data[0]["embedding"]
 
-    query = f"""SELECT emb.id, emb.file_and_path, emb.text, (1 - (emb.embedding <=> '{query_embedding}')) AS similarity
-    FROM embeddings emb
-    WHERE (1 - (emb.embedding <=> '{query_embedding}')) > {similarity_threshold}
-    ORDER BY emb.embedding <=> '{query_embedding}'
-    LIMIT {k};"""
-
-    try:
-        connection = create_db_connection()
-        cursor = connection.cursor()
-    except Exception:
-        logger.exception("Error while creating a connection to the database.")
-
-    try:
-        cursor.execute(query)
-        return cursor.fetchall()
-    except (Exception, psycopg.Error):
-        logger.exception("Error while getting data from DB.")
-    finally:
-        if cursor:
-            cursor.close()
-        if connection:
-            connection.close()
-
-    # query = (
-    #     session.query(
-    #         Embedding,
-    #         Embedding.embedding.cosine_distance(query_embedding).label("distance"),
-    #     )
-    #     .filter(
-    #         Embedding.embedding.cosine_distance(query_embedding) < similarity_threshold
-    #     )
-    #     .order_by("distance")
-    #     .limit(k)
-    #     .all()
-    # )
-    # return query
+    query = (
+        select(
+            Embedding,
+            Embedding.embedding.cosine_distance(query_embedding).label("distance"),
+        )
+        .where(
+            Embedding.embedding.cosine_distance(query_embedding) < similarity_threshold
+        )
+        .order_by("distance")
+        .limit(10)
+    )
+    return connection.execute(query).fetchall()
