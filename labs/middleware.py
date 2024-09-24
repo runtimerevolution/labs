@@ -3,9 +3,9 @@ from labs.decorators import time_and_log_function
 import logging
 from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
-from labs.rag.embeddings import find_similar_embeddings
+from labs.database.embeddings import find_similar_embeddings
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
-from labs.vector.vectorize_to_db import vectorize_to_db
+from labs.database.vectorize_to_db import vectorize_to_db
 
 logger = logging.getLogger(__name__)
 
