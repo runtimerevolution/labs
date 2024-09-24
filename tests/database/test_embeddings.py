@@ -1,4 +1,4 @@
-from labs.database.queries import select_embeddings
+from labs.database.embeddings import select_embeddings
 
 
 def test_select_embeddings_empty(db_session):

@@ -4,6 +4,7 @@ from pgvector.sqlalchemy import Vector
 
 from labs.database.connect import Base, db_connector
 import logging
+from sqlalchemy import text, delete, insert
 
 
 logger = logging.getLogger(__name__)
@@ -18,6 +19,10 @@ class Embedding(Base):
     file_and_path = Column(String)
     text = Column(String)
     embedding = Column(Vector(N_DIM))
+
+
+def select_embeddings(session):
+    return session.execute(text("SELECT * FROM embeddings;")).fetchall()
 
 
 def insert_embeddings(session, embeddings):
@@ -48,3 +53,18 @@ def find_similar_embeddings(connection, query):
         .limit(10)
     )
     return connection.execute(query).fetchall()
+
+
+@db_connector()
+def reembed_code(connection, files_and_texts, embeddings):
+    query = delete(Embedding)
+    connection.execute(query)
+    for gen_text, embedding_obj in zip(files_and_texts, embeddings.data):
+        query = insert(Embedding).values(
+            embedding=embedding_obj["embedding"],
+            file_and_path=gen_text[0],
+            text=gen_text[1],
+        )
+        connection.execute(query)
+    connection.commit()
+    return True
