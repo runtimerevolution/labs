@@ -43,8 +43,8 @@ def commit_changes(branch_name, file_list):
 
 
 @time_and_log_function
-def create_pull_request(branch_name):
-    return gh_requests.create_pull_request(branch_name)
+def create_pull_request(branch_name, title):
+    return gh_requests.create_pull_request(branch_name, title=title)
 
 
 @time_and_log_function
@@ -77,4 +77,4 @@ def run(request: CodeMonkeyRequest):
     response_output = call_agent_to_apply_code_changes(llm_response)
 
     commit_changes(branch_name, response_output)
-    create_pull_request(branch_name)
+    create_pull_request(branch_name, issue["title"])
