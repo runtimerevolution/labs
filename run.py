@@ -1,5 +1,4 @@
 from labs.api.types import CodeMonkeyRequest, GithubModel
-from labs.config import settings
 from labs.decorators import time_and_log_function
 from labs.github.github import GithubRequests
 import logging
@@ -12,12 +11,12 @@ gh_requests: GithubRequests = None
 
 
 @time_and_log_function
-def setup():
+def setup(request: CodeMonkeyRequest):
     global gh_requests
     gh_requests = GithubRequests(
-        github_token=settings.GITHUB_ACCESS_TOKEN,
-        repo_owner=settings.GITHUB_OWNER,
-        repo_name=settings.GITHUB_REPO,
+        github_token=request.github_token,
+        repo_owner=request.repo_owner,
+        repo_name=request.repo_name,
     )
 
 
@@ -55,7 +54,7 @@ def change_issue_to_in_review():
 
 @time_and_log_function
 def run(request: CodeMonkeyRequest):
-    setup()
+    setup(request)
     issue = get_issue(request.issue_number)
     _, branch_name = create_branch(
         request.issue_number, issue["title"].replace(" ", "-")
