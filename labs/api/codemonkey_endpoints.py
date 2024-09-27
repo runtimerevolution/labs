@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from labs.api.types import CallLLMRequest, CodeMonkeyRequest, GithubModel
 from labs.config import settings
 from labs.decorators import async_time_and_log_function
-from run import call_llm_with_context, run
+from run import call_llm_with_context, Run
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ router = APIRouter()
 @async_time_and_log_function
 async def codemonkey_run(request: CodeMonkeyRequest):
     try:
-        return run(request=request)
+        return Run(request=request).run()
     except Exception as e:
         logger.exception("Internal server error")
         raise HTTPException(status_code=500, detail="Internal server error: " + str(e))

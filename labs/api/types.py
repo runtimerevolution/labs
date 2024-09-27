@@ -16,6 +16,7 @@ class CodeMonkeyRequest(BaseModel):
     issue_number: int
     user_name: Optional[str] = None
     litellm_api_key: str
+    original_branch: Optional[str] = None
 
 
 class ListIssuesRequest(BaseModel):
