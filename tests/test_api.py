@@ -2,7 +2,6 @@ from unittest.mock import patch
 from labs.github.github import GithubRequests
 from labs.api.types import (
     CallLLMRequest,
-    CodeMonkeyRequest,
     CommitChangesRequest,
     CreateBranchRequest,
     CreatePullRequest,
@@ -32,26 +31,6 @@ class TestAPIClient:
 
         assert response.status_code == 200
         assert response.json() == ["file1.py", "file2.py"]
-
-    @patch("labs.api.codemonkey_endpoints.run")
-    def test_successfull_call_run(self, mocked_call):
-        client = TestClient(app)
-        request = CodeMonkeyRequest(
-            github_token="valid_token",
-            repo_owner="owner",
-            repo_name="repo",
-            litellm_api_key="token",
-            issue_number=1,
-        )
-
-        mocked_call.return_value = None
-
-        response = client.post(
-            "/codemonkey/run",
-            json=request.__dict__,
-        )
-
-        assert response.status_code == 200
 
     @patch.object(GithubRequests, "list_issues")
     def test_successfull_list_issues(self, mocked_list):

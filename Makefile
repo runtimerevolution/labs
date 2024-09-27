@@ -2,7 +2,7 @@ PROJECT_NAME = labs
 PYTHON_VERSION = 3.11
 PYTHON_INTERPRETER = python
 ENV ?= local
-ENV_FILE = ./.env.$(ENV)
+ENV_FILE := .env.$(ENV)
 
 include $(ENV_FILE)
 export
