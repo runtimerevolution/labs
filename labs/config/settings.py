@@ -60,3 +60,6 @@ spacy_models = [
 ]
 
 SUMMARIZATION_MODEL = "facebook/bart-large-cnn"
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_BACKEND_URL = os.environ.get("CELERY_BACKEND_URL")

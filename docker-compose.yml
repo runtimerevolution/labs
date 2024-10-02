@@ -28,3 +28,35 @@ services:
       - ./promtail.yml:/etc/promtail/config.yml
     entrypoint: >
       /bin/bash -c "/usr/bin/promtail -config.expand-env=true -config.file /etc/promtail/config.yml"
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  flower:
+    image: mher/flower:latest
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  worker:
+    env_file: .env.local
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: celery -A labs worker --beat --scheduler redbeat.RedBeatScheduler --loglevel=INFO --concurrency=1
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_TASK_ALWAYS_EAGER=False
+      - DATABASE_URL=postgresql://postgres:postgres@labs-db:5432/postgres
+    depends_on:
+      - redis
+      - labs-db
+    volumes:
+      - .:/app

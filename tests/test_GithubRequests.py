@@ -20,8 +20,8 @@ class TestGithubRequests:
         github_token = "valid_token"
         repo_owner = "owner_username"
         repo_name = "repository_name"
-        user_name = "your_username"
-        github_requests = GithubRequests(github_token, repo_owner, repo_name, user_name)
+        username = "your_username"
+        github_requests = GithubRequests(github_token, repo_owner, repo_name, username)
 
         issues = github_requests.list_issues()
 
@@ -35,7 +35,7 @@ class TestGithubRequests:
             params={
                 "state": "open",
                 "per_page": 100,
-                "assignee": user_name,
+                "assignee": username,
             },
         )
 
@@ -64,8 +64,8 @@ class TestGithubRequests:
         github_token = "valid_token"
         repo_owner = "owner_username"
         repo_name = "repository_name"
-        user_name = "your_username"
-        github_requests = GithubRequests(github_token, repo_owner, repo_name, user_name)
+        username = "your_username"
+        github_requests = GithubRequests(github_token, repo_owner, repo_name, username)
 
         issue = github_requests.get_issue(1)
 

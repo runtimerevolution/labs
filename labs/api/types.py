@@ -3,10 +3,10 @@ from pydantic import BaseModel
 
 
 class GithubModel(BaseModel):
-    github_token: str
+    token: str
     repo_owner: str
     repo_name: str
-    user_name: Optional[str] = None
+    username: Optional[str] = None
 
 
 class CodeMonkeyRequest(BaseModel):
@@ -14,8 +14,7 @@ class CodeMonkeyRequest(BaseModel):
     repo_owner: str
     repo_name: str
     issue_number: int
-    user_name: Optional[str] = None
-    litellm_api_key: str
+    username: Optional[str] = None
     original_branch: Optional[str] = None
 
 

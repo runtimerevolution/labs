@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 class GithubRequests:
     """Class to handle Github API requests"""
 
-    def __init__(self, github_token, repo_owner, repo_name, user_name=None):
+    def __init__(self, github_token, repo_owner, repo_name, username=None):
         self.github_token = github_token
         self.repo_owner = repo_owner
         self.repo_name = repo_name
-        self.username = user_name
+        self.username = username
         self.github_api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
         self.directory_dir = (
             settings.CLONE_DESTINATION_DIR + f"{self.repo_owner}/{self.repo_name}"

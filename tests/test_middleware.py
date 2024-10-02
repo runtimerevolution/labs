@@ -24,9 +24,8 @@ class TestCallLlmWithContext:
 
         github = GithubModel(github_token="token", repo_owner="owner", repo_name="repo")
         issue_summary = "Fix the bug in the authentication module"
-        litellm_api_key = "fake_api_key"
 
-        success, result = call_llm_with_context(github, issue_summary, litellm_api_key)
+        success, result = call_llm_with_context(github, issue_summary)
 
         assert success
         assert result == ("model", {"choices": [{"message": {"content": "response"}}]})
@@ -36,10 +35,9 @@ class TestCallLlmWithContext:
     def test_empty_summary(self):
         github = GithubModel(github_token="token", repo_owner="owner", repo_name="repo")
         issue_summary = ""
-        litellm_api_key = "fake_api_key"
 
         with pytest.raises(Exception) as excinfo:
-            call_llm_with_context(github, issue_summary, litellm_api_key)
+            call_llm_with_context(github, issue_summary)
 
         assert "issue_summary cannot be empty" in str(excinfo.value)
         # Corrects the mocking of find_similar_embeddings attribute in the rag module

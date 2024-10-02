@@ -101,10 +101,10 @@ def validate_llm_response(llm_response):
     return False, ""
 
 
-def get_llm_response(litellm_api_key, prepared_context):
+def get_llm_response(prepared_context):
     retries, max_retries = 0, 5
     redo, redo_reason = True, None
-    litellm_requests = RequestLiteLLM(litellm_api_key)
+    litellm_requests = RequestLiteLLM()
 
     while redo and retries < max_retries:
         try:
@@ -128,7 +128,7 @@ def get_llm_response(litellm_api_key, prepared_context):
 
 
 @time_and_log_function
-def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
+def call_llm_with_context(github: GithubModel, issue_summary):
     if not issue_summary:
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
@@ -143,13 +143,12 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
         f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}"
     )
 
-    return get_llm_response(litellm_api_key, prepared_context)
+    return get_llm_response(prepared_context)
 
 
 @time_and_log_function
 def call_agent_to_apply_code_changes(llm_response):
-    response_string = llm_response[1].choices[0].message.content
-    pull_request = parse_llm_output(response_string)
+    pull_request = parse_llm_output(llm_response)
 
     files = []
     for step in pull_request.steps:
