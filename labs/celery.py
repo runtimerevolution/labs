@@ -159,9 +159,7 @@ def prepare_prompt_and_context_task(prefix: str):
 def get_llm_response_task(prefix: str):
     prepared_context = json.loads(redis_client.get(f"{prefix}_prepared_context"))
     llm_response = get_llm_response(prepared_context)
-    redis_client.set(
-        f"{prefix}_llm_response", llm_response[1][1].choices[0].message.content
-    )
+    redis_client.set(f"{prefix}_llm_response", llm_response[1][1].choices[0].message.content)
     return prefix
 
 
@@ -213,9 +211,7 @@ def run_task(
     original_branch: str,
 ):
     chain(
-        init_task.s(
-            token, repo_owner, repo_name, username, issue_number, original_branch
-        ),
+        init_task.s(token, repo_owner, repo_name, username, issue_number, original_branch),
         get_issue_task.s(),
         create_branch_task.s(),
         vectorize_to_database_task.s(),
