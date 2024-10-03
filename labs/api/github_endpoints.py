@@ -4,7 +4,7 @@ from labs.api.types import (
     ChangeIssueStatusRequest,
     CommitChangesRequest,
     CreateBranchRequest,
-    CreatePullRequest,
+    CreatePullRequestRequest,
     GithubModel,
     IssueRequest,
     ListIssuesRequest,
@@ -29,9 +29,7 @@ async def list_issues(request: GithubModel, params: ListIssuesRequest):
             repo_name=request.repo_name,
             username=request.username,
         )
-        return github_requests.list_issues(
-            assignee=params.assignee, state=params.state, per_page=params.per_page
-        )
+        return github_requests.list_issues(assignee=params.assignee, state=params.state, per_page=params.per_page)
     except Exception as e:
         logger.exception("Internal server error")
         raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
@@ -63,9 +61,7 @@ async def create_branch(request: GithubModel, params: CreateBranchRequest):
             repo_name=request.repo_name,
             username=request.username,
         )
-        return github_requests.create_branch(
-            branch_name=params.branch_name, original_branch=params.original_branch
-        )
+        return github_requests.create_branch(branch_name=params.branch_name, original_branch=params.original_branch)
     except Exception as e:
         logger.exception("Internal server error")
         raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
@@ -81,9 +77,7 @@ async def change_issue_status(request: GithubModel, params: ChangeIssueStatusReq
             repo_name=request.repo_name,
             username=request.username,
         )
-        return github_requests.change_issue_status(
-            issue_number=params.issue_number, state=params.state
-        )
+        return github_requests.change_issue_status(issue_number=params.issue_number, state=params.state)
     except Exception as e:
         logger.exception("Internal server error")
         raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
@@ -109,7 +103,7 @@ async def commit_changes(request: GithubModel, params: CommitChangesRequest):
 
 @router.post("/github/create-pull-request")
 @async_time_and_log_function
-async def create_pull_request(request: GithubModel, params: CreatePullRequest):
+async def create_pull_request(request: GithubModel, params: CreatePullRequestRequest):
     try:
         github_requests = GithubRequests(
             github_token=request.github_token,

@@ -19,6 +19,7 @@ openai.api_key = settings.OPENAI_API_KEY
 
 
 def clone_repository(repo_url, local_path):
+    logger.debug(f"Cloning repo from {repo_url}")
     subprocess.run(["git", "clone", repo_url, local_path])
 
 
@@ -36,9 +37,7 @@ def load_docs(root_dir, file_extensions=None):
     if os.path.isfile(gitignore_path):
         with open(gitignore_path, "r") as gitignore_file:
             gitignore = gitignore_file.read()
-        spec = pathspec.PathSpec.from_lines(
-            pathspec.patterns.GitWildMatchPattern, gitignore.splitlines()
-        )
+        spec = pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, gitignore.splitlines())
     else:
         spec = None
 
@@ -76,14 +75,7 @@ def split_docs(docs):
 
 
 @time_and_log_function
-def vectorize_to_db(repo_url, include_file_extensions, repo_destination):
-    """
-    Process a git repository by cloning it, filtering files, splitting documents,
-    creating embeddings, and storing everything in pgvector database.
-    """
-    logger.debug(f"Cloning repo from {repo_url}")
-    clone_repository(repo_url, repo_destination)
-
+def vectorize_to_db(include_file_extensions, repo_destination):
     logger.debug("Loading and splitting all documents into chunks.")
     docs = load_docs(repo_destination, include_file_extensions)
     texts = split_docs(docs)

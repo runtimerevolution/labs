@@ -5,7 +5,7 @@ from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
-from labs.database.vectorize_to_db import vectorize_to_db
+from labs.database.vectorize_to_db import clone_repository, vectorize_to_db
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,12 @@ def get_prompt(issue_summary):
 
 
 def vectorize_and_find_similar(repo_owner, repo_name, issue_summary):
+    repo_url = f"https://github.com/{repo_owner}/{repo_name}"
+    logger.debug(f"Cloning repo from {repo_url}")
+
     destination = settings.CLONE_DESTINATION_DIR + f"{repo_owner}/{repo_name}"
+    clone_repository(repo_url, destination)
+
     vectorize_to_db(f"https://github.com/{repo_owner}/{repo_name}", None, destination)
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
@@ -53,9 +58,7 @@ def prepare_context(context, prompt):
 
 
 def check_length_issue(llm_response):
-    finish_reason = getattr(
-        llm_response["choices"][0]["message"], "finish_reason", None
-    )
+    finish_reason = getattr(llm_response["choices"][0]["message"], "finish_reason", None)
     if finish_reason == "length":
         return (
             True,
@@ -65,9 +68,7 @@ def check_length_issue(llm_response):
 
 
 def check_content_filter(llm_response):
-    finish_reason = getattr(
-        llm_response["choices"][0]["message"], "finish_reason", None
-    )
+    finish_reason = getattr(llm_response["choices"][0]["message"], "finish_reason", None)
     if finish_reason == "content_filter":
         return (
             True,
@@ -108,9 +109,7 @@ def get_llm_response(prepared_context):
 
     while redo and retries < max_retries:
         try:
-            llm_response = litellm_requests.completion_without_proxy(
-                prepared_context, model=settings.LLM_MODEL_NAME
-            )
+            llm_response = litellm_requests.completion_without_proxy(prepared_context, model=settings.LLM_MODEL_NAME)
             logger.debug(f"LLM Response: {llm_response}")
             redo, redo_reason = validate_llm_response(llm_response)
         except Exception:
@@ -133,15 +132,11 @@ def call_llm_with_context(github: GithubModel, issue_summary):
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
 
-    context = vectorize_and_find_similar(
-        github.repo_owner, github.repo_name, issue_summary
-    )
+    context = vectorize_and_find_similar(github.repo_owner, github.repo_name, issue_summary)
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
 
-    logger.debug(
-        f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}"
-    )
+    logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}")
 
     return get_llm_response(prepared_context)
 

@@ -4,7 +4,7 @@ from labs.api.types import (
     CallLLMRequest,
     CommitChangesRequest,
     CreateBranchRequest,
-    CreatePullRequest,
+    CreatePullRequestRequest,
     GithubModel,
     IssueRequest,
     ListIssuesRequest,
@@ -17,9 +17,7 @@ class TestAPIClient:
     @patch("labs.api.codemonkey_endpoints.call_llm_with_context")
     def test_successfull_call_llm_with_context(self, mocked_call):
         client = TestClient(app)
-        github = GithubModel(
-            github_token="valid_token", repo_owner="owner", repo_name="repo"
-        )
+        github = GithubModel(github_token="valid_token", repo_owner="owner", repo_name="repo")
         params = CallLLMRequest(issue_summary="This is a test issue", token="token")
 
         mocked_call.return_value = ["file1.py", "file2.py"]
@@ -35,9 +33,7 @@ class TestAPIClient:
     @patch.object(GithubRequests, "list_issues")
     def test_successfull_list_issues(self, mocked_list):
         client = TestClient(app)
-        request = GithubModel(
-            github_token="valid_token", repo_owner="owner", repo_name="repo"
-        )
+        request = GithubModel(github_token="valid_token", repo_owner="owner", repo_name="repo")
         params = ListIssuesRequest()
         mocked_list.return_value = [
             {"id": 1, "title": "Issue 1", "state": "open"},
@@ -58,9 +54,7 @@ class TestAPIClient:
     @patch.object(GithubRequests, "get_issue")
     def test_successfull_get_issue(self, mocked_issue):
         client = TestClient(app)
-        request = GithubModel(
-            github_token="valid_token", repo_owner="owner", repo_name="repo"
-        )
+        request = GithubModel(github_token="valid_token", repo_owner="owner", repo_name="repo")
         params = IssueRequest(issue_number=1)
         mocked_issue.return_value = {"id": 1, "title": "Sample Issue", "state": "open"}
 
@@ -75,9 +69,7 @@ class TestAPIClient:
     @patch.object(GithubRequests, "create_branch")
     def test_successfull_create_branch(self, mocked_branch):
         client = TestClient(app)
-        request = GithubModel(
-            github_token="valid_token", repo_owner="owner", repo_name="repo"
-        )
+        request = GithubModel(github_token="valid_token", repo_owner="owner", repo_name="repo")
         params = CreateBranchRequest(branch_name="test_branch")
         mocked_branch.return_value = []
 
@@ -92,9 +84,7 @@ class TestAPIClient:
     @patch.object(GithubRequests, "commit_changes")
     def test_successfull_commit_changes(self, mocked_branch):
         client = TestClient(app)
-        request = GithubModel(
-            github_token="valid_token", repo_owner="owner", repo_name="repo"
-        )
+        request = GithubModel(github_token="valid_token", repo_owner="owner", repo_name="repo")
         params = CommitChangesRequest(
             branch_name="test_branch",
             message="Test message",
@@ -113,10 +103,8 @@ class TestAPIClient:
     @patch.object(GithubRequests, "create_pull_request")
     def test_successfull_create_pull_request(self, mocked_branch):
         client = TestClient(app)
-        request = GithubModel(
-            github_token="valid_token", repo_owner="owner", repo_name="repo"
-        )
-        params = CreatePullRequest(head="test_branch")
+        request = GithubModel(github_token="valid_token", repo_owner="owner", repo_name="repo")
+        params = CreatePullRequestRequest(head="test_branch")
         mocked_branch.return_value = []
 
         response = client.post(
@@ -130,9 +118,7 @@ class TestAPIClient:
     @patch.object(GithubRequests, "clone")
     def test_successfull_clone(self, mocked_branch):
         client = TestClient(app)
-        request = GithubModel(
-            github_token="valid_token", repo_owner="owner", repo_name="repo"
-        )
+        request = GithubModel(github_token="valid_token", repo_owner="owner", repo_name="repo")
 
         mocked_branch.return_value = []
 

@@ -3,13 +3,13 @@ from celery.signals import task_failure
 from kombu import Queue
 from redbeat import RedBeatSchedulerEntry, schedulers
 import redis
-from labs.api.types import CodeMonkeyRequest
+from labs.api.types import RunRequest
 from labs.config import settings
 import logging
 import json
 
 from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorize_to_db import vectorize_to_db
+from labs.database.vectorize_to_db import clone_repository, vectorize_to_db
 from labs.github.github import GithubRequests
 from labs.middleware import (
     call_agent_to_apply_code_changes,
@@ -93,112 +93,153 @@ def init_task(
 
 
 @app.task
-def get_issue_task(prefix: str):
-    request = CodeMonkeyRequest(
-        github_token=redis_client.get(f"{prefix}_token"),
-        repo_owner=redis_client.get(f"{prefix}_repo_owner"),
-        repo_name=redis_client.get(f"{prefix}_repo_name"),
-        username=redis_client.get(f"{prefix}_username"),
-        issue_number=redis_client.get(f"{prefix}_issue_number"),
+def get_issue_task(prefix="", token="", repo_owner="", repo_name="", issue_number="", username=""):
+    request = RunRequest(
+        github_token=redis_client.get(f"{prefix}_token") if prefix else token,
+        repo_owner=redis_client.get(f"{prefix}_repo_owner") if prefix else repo_owner,
+        repo_name=redis_client.get(f"{prefix}_repo_name") if prefix else repo_name,
+        username=redis_client.get(f"{prefix}_username") if prefix else username,
+        issue_number=redis_client.get(f"{prefix}_issue_number") if prefix else issue_number,
     )
     issue = Run(request).get_issue()
-    issue_title = issue["title"].replace(" ", "-")
-    redis_client.set(f"{prefix}_issue_title", issue_title, ex=300)
-    issue_body = issue["body"]
-    redis_client.set(f"{prefix}_issue_body", issue_body, ex=300)
-    return prefix
+
+    if prefix:
+        issue_title = issue["title"].replace(" ", "-")
+        issue_body = issue["body"]
+        redis_client.set(f"{prefix}_issue_title", issue_title, ex=300)
+        redis_client.set(f"{prefix}_issue_body", issue_body, ex=300)
+        return prefix
+    return issue
 
 
 @app.task
-def create_branch_task(prefix: str):
-    request = CodeMonkeyRequest(
-        github_token=redis_client.get(f"{prefix}_token"),
-        repo_owner=redis_client.get(f"{prefix}_repo_owner"),
-        repo_name=redis_client.get(f"{prefix}_repo_name"),
-        username=redis_client.get(f"{prefix}_username"),
-        issue_number=redis_client.get(f"{prefix}_issue_number"),
-        original_branch=redis_client.get(f"{prefix}_original_branch"),
+def create_branch_task(
+    prefix="", token="", repo_owner="", repo_name="", issue_number="", username="", original_branch="", issue_title=""
+):
+    request = RunRequest(
+        github_token=redis_client.get(f"{prefix}_token") if prefix else token,
+        repo_owner=redis_client.get(f"{prefix}_repo_owner") if prefix else repo_owner,
+        repo_name=redis_client.get(f"{prefix}_repo_name") if prefix else repo_name,
+        username=redis_client.get(f"{prefix}_username") if prefix else username,
+        issue_number=redis_client.get(f"{prefix}_issue_number") if prefix else issue_number,
+        original_branch=redis_client.get(f"{prefix}_original_branch") if prefix else original_branch,
     )
-    branch_name = Run(request).create_branch(redis_client.get("issue_title"))
-    redis_client.set(f"{prefix}_branch_name", branch_name, ex=300)
-    return prefix
+    branch_name = Run(request).create_branch(redis_client.get("issue_title") if prefix else issue_title)
+
+    if prefix:
+        redis_client.set(f"{prefix}_branch_name", branch_name, ex=300)
+        return prefix
+    return branch_name
 
 
 @app.task
-def vectorize_to_database_task(prefix: str):
-    repo_owner = redis_client.get(f"{prefix}_repo_owner")
-    repo_name = redis_client.get(f"{prefix}_repo_name")
-    destination = f"{settings.CLONE_DESTINATION_DIR}{repo_owner}/{repo_name}"
-    vectorize_to_db(f"https://github.com/{repo_owner}/{repo_name}", None, destination)
-    return prefix
+def clone_repo_task(prefix="", repo_owner="", repo_name=""):
+    repo_owner = redis_client.get(f"{prefix}_repo_owner") if prefix else repo_owner
+    repo_name = redis_client.get(f"{prefix}_repo_name") if prefix else repo_name
+    repo_destination = f"{settings.CLONE_DESTINATION_DIR}{repo_owner}/{repo_name}"
+    clone_repository(f"https://github.com/{repo_owner}/{repo_name}", repo_destination)
+
+    if prefix:
+        redis_client.set(f"{prefix}_repo_destination", repo_destination, ex=300)
+        return prefix
+    return True
 
 
 @app.task
-def find_similar_embeddings_task(prefix: str):
-    rows = find_similar_embeddings(redis_client.get(f"{prefix}_issue_body"))
+def vectorize_repo_to_database_task(prefix="", repo_destination=""):
+    repo_destination = redis_client.get(f"{prefix}_repo_destination") if prefix else repo_destination
+    vectorize_to_db(None, repo_destination)
+
+    if prefix:
+        return prefix
+    return True
+
+
+@app.task
+def find_similar_embeddings_task(prefix="", issue_body=""):
+    rows = find_similar_embeddings(redis_client.get(f"{prefix}_issue_body") if prefix else issue_body)
     similar_embeddings = [(row[0], row[1], row[2]) for row in rows]
-    json_similar_embeddings = json.dumps(similar_embeddings)
-    redis_client.set(f"{prefix}_similar_embeddings", json_similar_embeddings)
-    return prefix
+
+    if prefix:
+        redis_client.set(f"{prefix}_similar_embeddings", json.dumps(similar_embeddings))
+        return prefix
+    return similar_embeddings
 
 
 @app.task
-def prepare_prompt_and_context_task(prefix: str):
-    prompt = get_prompt(redis_client.get(f"{prefix}_issue_body"))
+def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings=[]):
+    prompt = get_prompt(redis_client.get(f"{prefix}_issue_body") if prefix else issue_body)
     redis_client.set(f"{prefix}_prompt", prompt)
 
-    similar_embeddings = json.loads(redis_client.get(f"{prefix}_similar_embeddings"))
-    prepared_context = prepare_context(similar_embeddings, prompt)
-    json_prepared_context = json.dumps(prepared_context)
-    redis_client.set(f"{prefix}_prepared_context", json_prepared_context)
+    embeddings = json.loads(redis_client.get(f"{prefix}_similar_embeddings") if prefix else embeddings)
+    prepared_context = prepare_context(embeddings, prompt)
 
-    return prefix
-
-
-@app.task
-def get_llm_response_task(prefix: str):
-    prepared_context = json.loads(redis_client.get(f"{prefix}_prepared_context"))
-    llm_response = get_llm_response(prepared_context)
-    redis_client.set(f"{prefix}_llm_response", llm_response[1][1].choices[0].message.content)
-    return prefix
+    if prefix:
+        redis_client.set(f"{prefix}_prepared_context", json.dumps(prepared_context))
+        return prefix
+    return prepared_context
 
 
 @app.task
-def apply_code_changes_task(prefix: str):
-    llm_response = redis_client.get(f"{prefix}_llm_response")
+def get_llm_response_task(prefix="", context={}):
+    context = json.loads(redis_client.get(f"{prefix}_prepared_context")) if prefix else context
+    llm_response = get_llm_response(context)
+
+    if prefix:
+        redis_client.set(f"{prefix}_llm_response", llm_response[1][1].choices[0].message.content)
+        return prefix
+    return llm_response
+
+
+@app.task
+def apply_code_changes_task(prefix="", llm_response=""):
+    llm_response = redis_client.get(f"{prefix}_llm_response") if prefix else llm_response
     files_modified = call_agent_to_apply_code_changes(llm_response)
-    redis_client.set(f"{prefix}_files_modified", json.dumps(files_modified))
-    return prefix
+
+    if prefix:
+        redis_client.set(f"{prefix}_files_modified", json.dumps(files_modified))
+        return prefix
+    return files_modified
 
 
 @app.task
-def commit_changes_task(prefix: str):
+def commit_changes_task(
+    prefix="", token="", repo_owner="", repo_name="", username="", branch_name="", files_modified=[]
+):
     github_request = GithubRequests(
-        github_token=redis_client.get(f"{prefix}_token"),
-        repo_owner=redis_client.get(f"{prefix}_repo_owner"),
-        repo_name=redis_client.get(f"{prefix}_repo_name"),
-        username=redis_client.get(f"{prefix}_username"),
+        github_token=redis_client.get(f"{prefix}_token") if prefix else token,
+        repo_owner=redis_client.get(f"{prefix}_repo_owner") if prefix else repo_owner,
+        repo_name=redis_client.get(f"{prefix}_repo_name") if prefix else repo_name,
+        username=redis_client.get(f"{prefix}_username") if prefix else username,
     )
 
-    branch_name = redis_client.get(f"{prefix}_branch_name")
-    files_modified = json.loads(redis_client.get(f"{prefix}_files_modified"))
-    github_request.commit_changes("fix", branch_name=branch_name, files=files_modified)
-    return prefix
+    branch_name = redis_client.get(f"{prefix}_branch_name") if prefix else branch_name
+    files_modified = json.loads(redis_client.get(f"{prefix}_files_modified")) if prefix else files_modified
+
+    if prefix:
+        github_request.commit_changes("fix", branch_name=branch_name, files=files_modified)
+        return prefix
+    return True
 
 
 @app.task
-def create_pull_request_task(prefix: str):
+def create_pull_request_task(
+    prefix="", token="", repo_owner="", repo_name="", username="", branch_name="", original_branch=""
+):
     github_request = GithubRequests(
-        github_token=redis_client.get(f"{prefix}_token"),
-        repo_owner=redis_client.get(f"{prefix}_repo_owner"),
-        repo_name=redis_client.get(f"{prefix}_repo_name"),
-        username=redis_client.get(f"{prefix}_username"),
+        github_token=redis_client.get(f"{prefix}_token") if prefix else token,
+        repo_owner=redis_client.get(f"{prefix}_repo_owner") if prefix else repo_owner,
+        repo_name=redis_client.get(f"{prefix}_repo_name") if prefix else repo_name,
+        username=redis_client.get(f"{prefix}_username") if prefix else username,
     )
 
-    branch_name = redis_client.get(f"{prefix}_branch_name")
-    original_branch = redis_client.get(f"{prefix}_original_branch")
-    github_request.create_pull_request(branch_name, base=original_branch)
-    return prefix
+    branch_name = redis_client.get(f"{prefix}_branch_name") if prefix else branch_name
+    original_branch = redis_client.get(f"{prefix}_original_branch") if prefix else original_branch
+
+    if prefix:
+        github_request.create_pull_request(branch_name, base=original_branch)
+        return prefix
+    return True
 
 
 @app.task
@@ -208,13 +249,14 @@ def run_task(
     repo_name: str,
     username: str,
     issue_number: int,
-    original_branch: str,
+    original_branch: str = "main",
 ):
     chain(
         init_task.s(token, repo_owner, repo_name, username, issue_number, original_branch),
         get_issue_task.s(),
         create_branch_task.s(),
-        vectorize_to_database_task.s(),
+        clone_repo_task.s(),
+        vectorize_repo_to_database_task.s(),
         find_similar_embeddings_task.s(),
         prepare_prompt_and_context_task.s(),
         get_llm_response_task.s(),
