@@ -4,7 +4,7 @@ import logging
 from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
-from labs.response_parser.parser import create_file, modify_file, parse_llm_output
+from labs.response_parser.parser import create_file, modify_file, parse_llm_output, is_valid_json
 from labs.database.vectorize_to_db import vectorize_to_db
 
 logger = logging.getLogger(__name__)
@@ -17,6 +17,9 @@ def get_prompt(issue_summary):
         You've been given the following task: {issue_summary}.
         Any imports will be at the beggining of the file.
         Add tests for the new functionalities, considering any existing test files.
+        The file paths provided are **absolute paths relative to the project root**, 
+        and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
+        Do not prepend or modify the paths.
         Please provide a json response in the following format: {{"steps": [...]}}
         Where steps is a list of objects where each object contains three fields:
         type, which is either 'create' to add a new file or 'modify' to edit an existing one;
@@ -86,10 +89,21 @@ def check_refusal(llm_response):
     return False, ""
 
 
+def check_invalid_json_response(llm_response):
+    response_string = llm_response["choices"][0]["message"]["content"]
+    if not is_valid_json(response_string):
+        return True, "Invalid JSON response."
+    else:
+        if not parse_llm_output(response_string):
+            return True, "Invalid JSON response."
+        return False, ""
+
+
 validation_checks = [
     check_length_issue,
     check_content_filter,
     check_refusal,
+    check_invalid_json_response,
 ]
 
 
