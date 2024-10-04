@@ -1,9 +1,10 @@
 import logging
 
-from labs.api.types import GithubModel, RunRequest
+from labs.database.vectorize_to_db import clone_repository
 from labs.decorators import time_and_log_function
 from labs.github.github import GithubRequests
 from labs.middleware import call_llm_with_context, call_agent_to_apply_code_changes
+from labs.config import settings
 
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,7 @@ def create_branch(token, repo_owner, repo_name, username, issue_number, issue_ti
 
 
 @time_and_log_function
-def change_issue_to_in_progress(self):
+def change_issue_to_in_progress():
     pass
 
 
@@ -41,62 +42,41 @@ def create_pull_request(token, repo_owner, repo_name, username, original_branch,
 
 
 @time_and_log_function
-def change_issue_to_in_review(self):
+def change_issue_to_in_review():
     pass
 
 
-class Run:
-    def __init__(self, request: RunRequest):
-        self.request = request
-        self.github_request = GithubRequests(
-            github_token=request.github_token,
-            repo_owner=request.repo_owner,
-            repo_name=request.repo_name,
-            username=request.username,
-        )
+@time_and_log_function
+def run_on_repo(token, repo_owner, repo_name, username, issue_number, original_branch="main"):
+    issue = get_issue(token, repo_owner, repo_name, username, issue_number)
+    issue_title = issue["title"].replace(" ", "-")
+    issue_summary = issue["body"]
 
-    @time_and_log_function
-    def get_issue(self):
-        return self.github_request.get_issue(self.request.issue_number)
+    branch_name = create_branch(token, repo_owner, repo_name, username, issue_number, issue_title, original_branch)
 
-    @time_and_log_function
-    def create_branch(self, issue_title):
-        branch_name = f"{self.request.issue_number}-{issue_title}"
-        self.github_request.create_branch(branch_name=branch_name, original_branch=self.request.original_branch)
-        return branch_name
+    repo_url = f"https://github.com/{repo_owner}/{repo_name}"
+    logger.debug(f"Cloning repo from {repo_url}")
 
-    @time_and_log_function
-    def change_issue_to_in_progress(self):
-        pass
+    repo_destination = settings.CLONE_DESTINATION_DIR + f"{repo_owner}/{repo_name}"
+    clone_repository(repo_url, repo_destination)
 
-    @time_and_log_function
-    def commit_changes(self, branch_name, file_list):
-        return self.github_request.commit_changes("fix", branch_name=branch_name, files=file_list)
+    success, llm_response = call_llm_with_context(repo_destination, issue_summary)
+    if not success:
+        logger.error("Failed to get a response from LLM, aborting run.")
+        return
 
-    @time_and_log_function
-    def create_pull_request(self, branch_name):
-        return self.github_request.create_pull_request(branch_name, base=self.request.original_branch)
+    response_output = call_agent_to_apply_code_changes(llm_response[1].choices[0].message.content)
 
-    @time_and_log_function
-    def change_issue_to_in_review(self):
-        pass
+    commit_changes(token, repo_owner, repo_name, username, branch_name, response_output)
+    create_pull_request(token, repo_owner, repo_name, username, branch_name)
 
-    @time_and_log_function
-    def run(self):
-        issue = self.get_issue()
-        branch_name = self.create_branch(issue["title"].replace(" ", "-"))
 
-        github = GithubModel(
-            token=self.request.github_token,
-            repo_owner=self.request.repo_owner,
-            repo_name=self.request.repo_name,
-        )
-        success, llm_response = call_llm_with_context(github=github, issue_summary=issue["body"])
-        if not success:
-            logger.error("Failed to get a response from LLM, aborting run.")
-            return
+@time_and_log_function
+def run_on_local_repo(repo_path, issue_text):
+    success, llm_response = call_llm_with_context(repo_path, issue_text)
+    if not success:
+        logger.error("Failed to get a response from LLM, aborting run.")
+        return
 
-        response_output = call_agent_to_apply_code_changes(llm_response[1].choices[0].message.content)
-
-        self.commit_changes(branch_name, response_output)
-        self.create_pull_request(branch_name)
+    response_output = call_agent_to_apply_code_changes(llm_response[1].choices[0].message.content)
+    return True, response_output

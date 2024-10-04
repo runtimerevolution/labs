@@ -9,13 +9,18 @@ class GithubModel(BaseModel):
     username: str
 
 
-class RunRequest(BaseModel):
+class RunOnRepoRequest(BaseModel):
     github_token: str
     repo_owner: str
     repo_name: str
     username: str
     issue_number: int
     original_branch: Optional[str] = "main"
+
+
+class RunOnLocalRepoRequest(BaseModel):
+    repo_path: str
+    issue_text: str
 
 
 class GetIssueRequest(BaseModel):
