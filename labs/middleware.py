@@ -4,7 +4,7 @@ from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
-from labs.database.vectorize_to_db import vectorize_to_db
+from labs.database.vectorize import vectorize_to_db
 
 logger = logging.getLogger(__name__)
 
@@ -23,13 +23,6 @@ def get_prompt(issue_summary):
         path, which is the absolute path of the file to create/modify;
         content, which is the content to write to the file.
     """
-
-
-def vectorize_and_find_similar(repo_destination, issue_summary):
-    vectorize_to_db(None, repo_destination)
-
-    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    return find_similar_embeddings(issue_summary)
 
 
 def prepare_context(context, prompt):
@@ -125,7 +118,10 @@ def call_llm_with_context(repo_destination, issue_summary):
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
 
-    context = vectorize_and_find_similar(repo_destination, issue_summary)
+    vectorize_to_db(None, repo_destination)
+    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
+    context = find_similar_embeddings(issue_summary)
+
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
 
