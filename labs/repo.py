@@ -3,6 +3,7 @@ import subprocess
 
 from labs.decorators import time_and_log_function
 from labs.github.github import GithubRequests
+from labs.response_parser.parser import create_file, modify_file, parse_llm_output
 
 
 logger = logging.getLogger(__name__)
@@ -47,3 +48,16 @@ def create_pull_request(token, repo_owner, repo_name, username, original_branch,
 @time_and_log_function
 def change_issue_to_in_review():
     pass
+
+
+@time_and_log_function
+def call_agent_to_apply_code_changes(llm_response):
+    pull_request = parse_llm_output(llm_response)
+
+    files = []
+    for step in pull_request.steps:
+        if step.type == "create":
+            files.append(create_file(step.path, step.content))
+        elif step.type == "modify":
+            files.append(modify_file(step.path, step.content))
+    return files

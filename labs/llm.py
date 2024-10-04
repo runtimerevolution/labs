@@ -3,7 +3,6 @@ import logging
 from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
-from labs.response_parser.parser import create_file, modify_file, parse_llm_output
 from labs.database.vectorize import vectorize_to_database
 
 logger = logging.getLogger(__name__)
@@ -128,16 +127,3 @@ def call_llm_with_context(repo_destination, issue_summary):
     logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}")
 
     return get_llm_response(prepared_context)
-
-
-@time_and_log_function
-def call_agent_to_apply_code_changes(llm_response):
-    pull_request = parse_llm_output(llm_response)
-
-    files = []
-    for step in pull_request.steps:
-        if step.type == "create":
-            files.append(create_file(step.path, step.content))
-        elif step.type == "modify":
-            files.append(modify_file(step.path, step.content))
-    return files
