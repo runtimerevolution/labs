@@ -3,7 +3,7 @@ import pytest
 
 from labs.api.types import GithubModel
 from labs.litellm_service.request import RequestLiteLLM
-from labs.middleware import call_llm_with_context
+from labs.middleware import call_llm_with_context, check_invalid_json_response
 
 
 class TestCallLlmWithContext:
@@ -18,7 +18,15 @@ class TestCallLlmWithContext:
         mocked_embeddings.return_value = [["file1", "/path/to/file1", "content1"]]
         mocked_completion.return_value = (
             "model",
-            {"choices": [{"message": {"content": "response"}}]},
+            {
+                "choices": [
+                    {
+                        "message": {
+                            "content": '{"steps": [{"type": "create", "path": "/path/to/file", "content": "file content"}]}'
+                        }
+                    }
+                ]
+            }
         )
         mocked_agent.return_value = ["file1"]
 
@@ -29,7 +37,15 @@ class TestCallLlmWithContext:
         success, result = call_llm_with_context(github, issue_summary, litellm_api_key)
 
         assert success
-        assert result == ("model", {"choices": [{"message": {"content": "response"}}]})
+        assert result == ("model", {
+                "choices": [
+                    {
+                        "message": {
+                            "content": '{"steps": [{"type": "create", "path": "/path/to/file", "content": "file content"}]}'
+                        }
+                    }
+                ]
+            })
 
     # Ensure the GithubModel is instantiated correctly with the correct parameters
 
@@ -43,3 +59,47 @@ class TestCallLlmWithContext:
 
         assert "issue_summary cannot be empty" in str(excinfo.value)
         # Corrects the mocking of find_similar_embeddings attribute in the rag module
+        
+        
+class TestCheckInvalidJsonResponse:
+    def test_valid_json_response(self):
+        llm_response = {
+            "choices": [
+                {
+                    "message": {
+                        "content": '{"steps": [{"type": "create", "path": "/path/to/file", "content": "file content"}]}'
+                    }
+                }
+            ]
+        }
+        is_invalid, message = check_invalid_json_response(llm_response)
+        assert not is_invalid
+        assert message == ""
+
+    def test_invalid_json_response(self):
+        llm_response = {
+            "choices": [
+                {
+                    "message": {
+                        "content": '{"steps": [{"type": "create", "path": "/path/to/file", "content": "file content"'
+                    }
+                }
+            ]
+        }
+        is_invalid, message = check_invalid_json_response(llm_response)
+        assert is_invalid
+        assert message == "Invalid JSON response."
+
+    def test_invalid_json_structure(self):
+        llm_response = {
+            "choices": [
+                {
+                    "message": {
+                        "content": '{"invalid_key": \invalid_value"}'
+                    }
+                }
+            ]
+        }
+        is_invalid, message = check_invalid_json_response(llm_response)
+        assert is_invalid
+        assert message == "Invalid JSON response."

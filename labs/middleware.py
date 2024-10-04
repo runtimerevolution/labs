@@ -109,6 +109,7 @@ validation_checks = [
 
 def validate_llm_response(llm_response):
     for check in validation_checks:
+        logger.debug(llm_response)
         is_invalid, message = check(llm_response[1])
         if is_invalid:
             return True, message
