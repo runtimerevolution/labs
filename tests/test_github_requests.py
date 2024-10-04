@@ -41,14 +41,10 @@ class TestGithubRequests:
 
     def test_list_issues_http_failure(self, mocker):
         mock_response = mocker.Mock()
-        mock_response.raise_for_status.side_effect = (
-            requests.exceptions.RequestException("HTTP Error")
-        )
+        mock_response.raise_for_status.side_effect = requests.exceptions.RequestException("HTTP Error")
         mocker.patch("requests.get", return_value=mock_response)
 
-        github_requests = GithubRequests(
-            github_token="fake_token", repo_owner="owner", repo_name="repo"
-        )
+        github_requests = GithubRequests(github_token="fake_token", repo_owner="owner", repo_name="repo")
 
         issues = github_requests.list_issues()
 
@@ -73,14 +69,10 @@ class TestGithubRequests:
 
     def test_handle_http_request_failure_get_issue(self, mocker):
         mock_response = mocker.Mock()
-        mock_response.raise_for_status.side_effect = (
-            requests.exceptions.RequestException("Mocked Request Exception")
-        )
+        mock_response.raise_for_status.side_effect = requests.exceptions.RequestException("Mocked Request Exception")
         mocker.patch("requests.get", return_value=mock_response)
 
-        github_requests = GithubRequests(
-            github_token="fake_token", repo_owner="owner", repo_name="repo"
-        )
+        github_requests = GithubRequests(github_token="fake_token", repo_owner="owner", repo_name="repo")
 
         issue = github_requests.get_issue(1)
 
@@ -91,9 +83,7 @@ class TestGithubRequests:
         mock_response.json.return_value = {"status": "closed"}
         mocker.patch("requests.patch", return_value=mock_response)
 
-        github_requests = GithubRequests(
-            github_token="fake_token", repo_owner="owner", repo_name="repo"
-        )
+        github_requests = GithubRequests(github_token="fake_token", repo_owner="owner", repo_name="repo")
 
         response = github_requests.change_issue_status(issue_number=1, state="closed")
 
@@ -131,16 +121,12 @@ class TestGithubRequests:
         mock_response_patch.json.return_value = {"sha": "fake_update_sha"}
         mocker.patch("requests.patch", return_value=mock_response_patch)
 
-        github_requests = GithubRequests(
-            github_token="fake_token", repo_owner="owner", repo_name="repo"
-        )
+        github_requests = GithubRequests(github_token="fake_token", repo_owner="owner", repo_name="repo")
 
         result = github_requests.commit_changes(
             message="Commit message",
             branch_name="new_branch",
-            files=[
-                f"{os.path.dirname(os.path.realpath(__file__))}/test_GithubRequests.py"
-            ],
+            files=[f"{os.path.dirname(os.path.realpath(__file__))}/test_github_requests.py"],
         )
 
         assert result == {"sha": "fake_update_sha"}
@@ -152,9 +138,7 @@ class TestGithubRequests:
         mock_response.raise_for_status.return_value = None
         mocker.patch("requests.post", return_value=mock_response)
 
-        github_requests = GithubRequests(
-            github_token="fake_token", repo_owner="owner", repo_name="repo"
-        )
+        github_requests = GithubRequests(github_token="fake_token", repo_owner="owner", repo_name="repo")
 
         pull_request = github_requests.create_pull_request(head="feature_branch")
 

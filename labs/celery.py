@@ -8,14 +8,15 @@ import logging
 import json
 
 from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorize_to_db import clone_repository, vectorize_to_db
+from labs.database.vectorize import vectorize_to_database
+from labs.repo import clone_repository
 from labs.middleware import (
     call_agent_to_apply_code_changes,
     get_llm_response,
     get_prompt,
     prepare_context,
 )
-from run import commit_changes, create_branch, create_pull_request, get_issue
+from labs.run import commit_changes, create_branch, create_pull_request, get_issue
 
 
 logger = logging.getLogger(__name__)
@@ -133,7 +134,7 @@ def clone_repo_task(prefix="", repo_owner="", repo_name=""):
 @app.task
 def vectorize_repo_to_database_task(prefix="", repo_destination=""):
     repo_destination = redis_client.get(f"{prefix}_repo_destination") if prefix else repo_destination
-    vectorize_to_db(None, repo_destination)
+    vectorize_to_database(None, repo_destination)
 
     if prefix:
         return prefix

@@ -1,6 +1,6 @@
 import logging
 
-from labs.database.vectorize_to_db import clone_repository
+from labs.repo import clone_repository
 from labs.decorators import time_and_log_function
 from labs.middleware import call_llm_with_context, call_agent_to_apply_code_changes
 from labs.config import settings

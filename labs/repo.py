@@ -1,10 +1,16 @@
 import logging
+import subprocess
 
 from labs.decorators import time_and_log_function
 from labs.github.github import GithubRequests
 
 
 logger = logging.getLogger(__name__)
+
+
+def clone_repository(repo_url, local_path):
+    logger.debug(f"Cloning repo from {repo_url}")
+    subprocess.run(["git", "clone", repo_url, local_path])
 
 
 @time_and_log_function

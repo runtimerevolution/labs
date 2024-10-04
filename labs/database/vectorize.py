@@ -2,7 +2,6 @@ from litellm import embedding
 import openai
 import os
 import pathspec
-import subprocess
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from labs.decorators import time_and_log_function
@@ -16,11 +15,6 @@ from labs.database.embeddings import reembed_code
 logger = logging.getLogger(__name__)
 
 openai.api_key = settings.OPENAI_API_KEY
-
-
-def clone_repository(repo_url, local_path):
-    logger.debug(f"Cloning repo from {repo_url}")
-    subprocess.run(["git", "clone", repo_url, local_path])
 
 
 def load_docs(root_dir, file_extensions=None):
@@ -75,7 +69,7 @@ def split_docs(docs):
 
 
 @time_and_log_function
-def vectorize_to_db(include_file_extensions, repo_destination):
+def vectorize_to_database(include_file_extensions, repo_destination):
     logger.debug("Loading and splitting all documents into chunks.")
     docs = load_docs(repo_destination, include_file_extensions)
     texts = split_docs(docs)
