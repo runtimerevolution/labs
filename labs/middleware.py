@@ -101,15 +101,19 @@ def validate_llm_response(llm_response):
     return False, ""
 
 
-def get_llm_response(litellm_api_key, prepared_context):
+def get_llm_response(litellm_api_key, prepared_context, model=None):
     retries, max_retries = 0, 5
     redo, redo_reason = True, None
     litellm_requests = RequestLiteLLM(litellm_api_key)
-
+    if not model:
+        model_to_use = settings.LLM_MODEL_NAME
+    else:
+        model_to_use = model
+        
     while redo and retries < max_retries:
         try:
             llm_response = litellm_requests.completion_without_proxy(
-                prepared_context, model=settings.LLM_MODEL_NAME
+                prepared_context, model=model_to_use
             )
             logger.debug(f"LLM Response: {llm_response}")
             redo, redo_reason = validate_llm_response(llm_response)
@@ -128,7 +132,7 @@ def get_llm_response(litellm_api_key, prepared_context):
 
 
 @time_and_log_function
-def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
+def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key, model=None):
     if not issue_summary:
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
@@ -143,7 +147,7 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
         f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}"
     )
 
-    return get_llm_response(litellm_api_key, prepared_context)
+    return get_llm_response(litellm_api_key, prepared_context, model)
 
 
 @time_and_log_function

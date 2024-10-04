@@ -68,6 +68,7 @@ class Run:
             github=github,
             issue_summary=issue["body"],
             litellm_api_key=self.request.litellm_api_key,
+            model=self.request.model
         )
         if not success:
             logger.error("Failed to get a response from LLM, aborting run.")
