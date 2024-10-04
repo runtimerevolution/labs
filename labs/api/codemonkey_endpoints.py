@@ -21,13 +21,13 @@ from labs.celery import (
     get_issue_task,
     get_llm_response_task,
     prepare_prompt_and_context_task,
+    run_on_local_repo_task,
     run_on_repo_task,
     vectorize_repo_to_database_task,
 )
 from labs.decorators import async_time_and_log_function
 import logging
 
-from run import run_on_local_repo
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +55,7 @@ async def run_on_repo_endpoint(request: RunOnRepoRequest):
 @async_time_and_log_function
 async def run_on_local_repo_endpoint(request: RunOnLocalRepoRequest):
     try:
-        run_on_local_repo(repo_path=request.repo_path, issue_text=request.issue_text)
+        run_on_local_repo_task(repo_path=request.repo_path, issue_text=request.issue_text)
     except Exception as ex:
         logger.exception("Internal server error")
         raise HTTPException(status_code=500, detail="Internal server error: " + str(ex))

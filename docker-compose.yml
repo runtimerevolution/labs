@@ -60,3 +60,4 @@ services:
       - labs-db
     volumes:
       - .:/app
+      - ${LOCAL_REPOS_PATH}:/local-repos/

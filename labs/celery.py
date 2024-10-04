@@ -260,6 +260,7 @@ def run_on_local_repo_task(repo_path, issue_text):
     data = {
         "repo_path": repo_path,
         "issue_text": issue_text,
+        "issue_body": issue_text,
         "repo_destination": repo_path,
     }
     chain(
