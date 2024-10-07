@@ -10,7 +10,7 @@ import json
 from labs.database.embeddings import find_similar_embeddings
 from labs.database.vectorize import vectorize_to_database
 from labs.repo import call_agent_to_apply_code_changes, clone_repository
-from labs.middleware import get_llm_response, get_prompt, prepare_context
+from labs.llm import get_llm_response, get_prompt, prepare_context
 from labs.run import commit_changes, create_branch, create_pull_request, get_issue
 
 
