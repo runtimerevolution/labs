@@ -19,21 +19,15 @@ class GithubRequests:
         self.repo_name = repo_name
         self.username = username
         self.github_api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
-        self.directory_dir = (
-            settings.CLONE_DESTINATION_DIR + f"{self.repo_owner}/{self.repo_name}"
-        )
+        self.directory_dir = f"{settings.CLONE_DESTINATION_DIR}{repo_owner}/{repo_name}"
 
     def _get(self, url, headers={}, params={}):
         try:
-            logger.debug(
-                f"Making GET request to {url} with headers {headers} and params {params}"
-            )
+            logger.debug(f"Making GET request to {url} with headers {headers} and params {params}")
             response = requests.get(url, headers=headers, params=params)
             response.raise_for_status()
             response_json = response.json()
-            logger.debug(
-                f"GET request to {url} successful with response {str(response_json)}"
-            )
+            logger.debug(f"GET request to {url} successful with response {str(response_json)}")
             return response_json, response.status_code
         except requests.exceptions.RequestException:
             logger.exception("HTTP Request failed.")
@@ -45,14 +39,10 @@ class GithubRequests:
 
     def _post(self, url, headers={}, data={}):
         try:
-            logger.debug(
-                f"Making POST request to {url} with headers {headers} and data {data}"
-            )
+            logger.debug(f"Making POST request to {url} with headers {headers} and data {data}")
             response = requests.post(url, headers=headers, json=data)
             response_json = response.json()
-            logger.debug(
-                f"POST request to {url} successful with response {str(response_json)}"
-            )
+            logger.debug(f"POST request to {url} successful with response {str(response_json)}")
             return response_json
         except Exception:
             logger.exception("An unexpected error occurred.")
@@ -60,14 +50,10 @@ class GithubRequests:
 
     def _patch(self, url, headers={}, data={}):
         try:
-            logger.debug(
-                f"Making PATCH request to {url} with headers {headers} and data {data}"
-            )
+            logger.debug(f"Making PATCH request to {url} with headers {headers} and data {data}")
             response = requests.patch(url, headers=headers, json=data)
             response_json = response.json()
-            logger.debug(
-                f"PATCH request to {url} successful with response {str(response_json)}"
-            )
+            logger.debug(f"PATCH request to {url} successful with response {str(response_json)}")
             return response_json
         except Exception:
             logger.exception("An unexpected error occurred.")
@@ -163,9 +149,7 @@ class GithubRequests:
             blob_response_json = self._post(blob_url, headers, blob_data)
 
             blob_sha = blob_response_json["sha"]
-            tree_items.append(
-                {"path": file_name, "mode": "100644", "type": "blob", "sha": blob_sha}
-            )
+            tree_items.append({"path": file_name, "mode": "100644", "type": "blob", "sha": blob_sha})
 
         # Step 5: Create a new tree with the updated files
         tree_data = {"base_tree": base_tree_sha, "tree": tree_items}
@@ -200,10 +184,7 @@ class GithubRequests:
         try:
             url = f"https://github.com/{self.repo_owner}/{self.repo_name}.git"
             branch = "main"
-            probe = (
-                settings.CLONE_DESTINATION_DIR
-                + f"{self.repo_owner}/{self.repo_name}/.git"
-            )
+            probe = settings.CLONE_DESTINATION_DIR + f"{self.repo_owner}/{self.repo_name}/.git"
             if not os.path.exists(probe):
                 git.Repo.clone_from(url, self.directory_dir, branch=branch)
             return self.directory_dir

@@ -105,7 +105,7 @@ def create_branch_task(
     original_branch = redis_client.get(f"{prefix}_original_branch") if prefix else original_branch
     issue_title = redis_client.get("issue_title") if prefix else issue_title
 
-    branch_name = create_branch(token, repo_owner, repo_name, username, issue_number, original_branch, issue_title)
+    branch_name = create_branch(token, repo_owner, repo_name, username, issue_number, issue_title, original_branch)
 
     if prefix:
         redis_client.set(f"{prefix}_branch_name", branch_name, ex=300)

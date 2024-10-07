@@ -27,7 +27,7 @@ def run_on_repo(token, repo_owner, repo_name, username, issue_number, original_b
     repo_url = f"https://github.com/{repo_owner}/{repo_name}"
     logger.debug(f"Cloning repo from {repo_url}")
 
-    repo_destination = settings.CLONE_DESTINATION_DIR + f"{repo_owner}/{repo_name}"
+    repo_destination = f"{settings.CLONE_DESTINATION_DIR}{repo_owner}/{repo_name}"
     clone_repository(repo_url, repo_destination)
 
     success, llm_response = call_llm_with_context(repo_destination, issue_summary)
