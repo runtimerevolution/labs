@@ -16,6 +16,8 @@ def db_connector():
     def decorator(original_function):
         def new_function(*args, **kwargs):
             if settings.TEST_ENVIRONMENT:
+                # This is necessary because when we're running tests, we are already using db_session.
+                # Which has the rollback feature.
                 return original_function(*args, **kwargs)
 
             connection = engine.connect()
