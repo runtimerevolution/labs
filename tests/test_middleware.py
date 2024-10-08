@@ -3,7 +3,7 @@ import pytest
 
 from labs.api.types import GithubModel
 from labs.litellm_service.request import RequestLiteLLM
-from labs.middleware import call_llm_with_context, check_invalid_json_response
+from labs.llm import call_llm_with_context, check_invalid_json_response
 
 
 class TestCallLlmWithContext:
@@ -11,9 +11,7 @@ class TestCallLlmWithContext:
     @patch("labs.middleware.vectorize_and_find_similar")
     @patch.object(RequestLiteLLM, "completion_without_proxy")
     @patch("labs.middleware.call_agent_to_apply_code_changes")
-    def test_successful_llm_call_with_context(
-        self, mocked_agent, mocked_completion, mocked_embeddings
-    ):
+    def test_successful_llm_call_with_context(self, mocked_agent, mocked_completion, mocked_embeddings):
         # Mocking dependencies
         mocked_embeddings.return_value = [["file1", "/path/to/file1", "content1"]]
         mocked_completion.return_value = (
@@ -26,7 +24,7 @@ class TestCallLlmWithContext:
                         }
                     }
                 ]
-            }
+            },
         )
         mocked_agent.return_value = ["file1"]
 
@@ -37,7 +35,9 @@ class TestCallLlmWithContext:
         success, result = call_llm_with_context(github, issue_summary, litellm_api_key)
 
         assert success
-        assert result == ("model", {
+        assert result == (
+            "model",
+            {
                 "choices": [
                     {
                         "message": {
@@ -45,7 +45,8 @@ class TestCallLlmWithContext:
                         }
                     }
                 ]
-            })
+            },
+        )
 
     # Ensure the GithubModel is instantiated correctly with the correct parameters
 
@@ -59,8 +60,8 @@ class TestCallLlmWithContext:
 
         assert "issue_summary cannot be empty" in str(excinfo.value)
         # Corrects the mocking of find_similar_embeddings attribute in the rag module
-        
-        
+
+
 class TestCheckInvalidJsonResponse:
     def test_valid_json_response(self):
         llm_response = {
@@ -91,15 +92,7 @@ class TestCheckInvalidJsonResponse:
         assert message == "Invalid JSON response."
 
     def test_invalid_json_structure(self):
-        llm_response = {
-            "choices": [
-                {
-                    "message": {
-                        "content": '{"invalid_key": \invalid_value"}'
-                    }
-                }
-            ]
-        }
+        llm_response = {"choices": [{"message": {"content": '{"invalid_key": \invalid_value"}'}}]}
         is_invalid, message = check_invalid_json_response(llm_response)
         assert is_invalid
         assert message == "Invalid JSON response."

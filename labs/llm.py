@@ -1,11 +1,10 @@
-from labs.api.types import GithubModel
 from labs.decorators import time_and_log_function
 import logging
 from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
-from labs.response_parser.parser import create_file, modify_file, parse_llm_output, is_valid_json
-from labs.database.vectorize_to_db import vectorize_to_db
+from labs.database.vectorize import vectorize_to_database
+from labs.response_parser.parser import is_valid_json, parse_llm_output
 
 logger = logging.getLogger(__name__)
 
@@ -29,14 +28,6 @@ def get_prompt(issue_summary):
     """
 
 
-def vectorize_and_find_similar(repo_owner, repo_name, issue_summary):
-    destination = settings.CLONE_DESTINATION_DIR + f"{repo_owner}/{repo_name}"
-    vectorize_to_db(f"https://github.com/{repo_owner}/{repo_name}", None, destination)
-
-    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    return find_similar_embeddings(issue_summary)
-
-
 def prepare_context(context, prompt):
     prepared_context = []
     for file in context:
@@ -56,9 +47,7 @@ def prepare_context(context, prompt):
 
 
 def check_length_issue(llm_response):
-    finish_reason = getattr(
-        llm_response["choices"][0]["message"], "finish_reason", None
-    )
+    finish_reason = getattr(llm_response["choices"][0]["message"], "finish_reason", None)
     if finish_reason == "length":
         return (
             True,
@@ -68,9 +57,7 @@ def check_length_issue(llm_response):
 
 
 def check_content_filter(llm_response):
-    finish_reason = getattr(
-        llm_response["choices"][0]["message"], "finish_reason", None
-    )
+    finish_reason = getattr(llm_response["choices"][0]["message"], "finish_reason", None)
     if finish_reason == "content_filter":
         return (
             True,
@@ -116,16 +103,14 @@ def validate_llm_response(llm_response):
     return False, ""
 
 
-def get_llm_response(litellm_api_key, prepared_context):
+def get_llm_response(prepared_context):
     retries, max_retries = 0, 5
     redo, redo_reason = True, None
-    litellm_requests = RequestLiteLLM(litellm_api_key)
+    litellm_requests = RequestLiteLLM()
 
     while redo and retries < max_retries:
         try:
-            llm_response = litellm_requests.completion_without_proxy(
-                prepared_context, model=settings.LLM_MODEL_NAME
-            )
+            llm_response = litellm_requests.completion_without_proxy(prepared_context, model=settings.LLM_MODEL_NAME)
             logger.debug(f"LLM Response: {llm_response}")
             redo, redo_reason = validate_llm_response(llm_response)
         except Exception:
@@ -143,33 +128,18 @@ def get_llm_response(litellm_api_key, prepared_context):
 
 
 @time_and_log_function
-def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key):
+def call_llm_with_context(repo_destination, issue_summary):
     if not issue_summary:
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
 
-    context = vectorize_and_find_similar(
-        github.repo_owner, github.repo_name, issue_summary
-    )
+    vectorize_to_database(None, repo_destination)
+    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
+    context = find_similar_embeddings(issue_summary)
+
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
 
-    logger.debug(
-        f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}"
-    )
+    logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}")
 
-    return get_llm_response(litellm_api_key, prepared_context)
-
-
-@time_and_log_function
-def call_agent_to_apply_code_changes(llm_response):
-    response_string = llm_response[1].choices[0].message.content
-    pull_request = parse_llm_output(response_string)
-
-    files = []
-    for step in pull_request.steps:
-        if step.type == "create":
-            files.append(create_file(step.path, step.content))
-        elif step.type == "modify":
-            files.append(modify_file(step.path, step.content))
-    return files
+    return get_llm_response(prepared_context)

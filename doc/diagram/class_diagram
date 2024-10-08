@@ -6,7 +6,7 @@ digraph {
 	}
 	subgraph "cluster_./labs/github/github.py" {
 		color=lightgrey label="./labs/github/github.py" style=filled
-		GithubRequests [label="{ GithubRequests | + __init__(self, github_token, repo_owner, repo_name, user_name)\l+ list_issues(self, assignee, state, per_page)\l+ get_issue(self, issue_number)\l+ create_branch(self, branch_name, original_branch)\l+ change_issue_status(self, issue_number, state)\l+ commit_changes(self, message, branch_name, files)\l+ create_pull_request(self, head, base, title, body)\l+ clone(self)\l }" shape=record]
+		GithubRequests [label="{ GithubRequests | + __init__(self, github_token, repo_owner, repo_name, username)\l+ list_issues(self, assignee, state, per_page)\l+ get_issue(self, issue_number)\l+ create_branch(self, branch_name, original_branch)\l+ change_issue_status(self, issue_number, state)\l+ commit_changes(self, message, branch_name, files)\l+ create_pull_request(self, head, base, title, body)\l+ clone(self)\l }" shape=record]
 	}
 	subgraph "cluster_./code_examples/calculator.py" {
 		color=lightgrey label="./code_examples/calculator.py" style=filled
