@@ -25,7 +25,7 @@ redis_client = redis.StrictRedis(host="redis", port=6379, db=0, decode_responses
 
 
 app = Celery(
-    name="tiktok_connector_worker",
+    name="labs_worker",
     # If you had tasks defined somewhere other than the name above, you could include them here.
     include=[],
     broker=settings.CELERY_BROKER_URL,
