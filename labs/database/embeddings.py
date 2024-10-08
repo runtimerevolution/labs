@@ -4,7 +4,7 @@ from pgvector.sqlalchemy import Vector
 
 from labs.database.connect import Base, db_connector
 import logging
-from sqlalchemy import text, delete, insert
+from sqlalchemy import delete, insert
 
 
 logger = logging.getLogger(__name__)
@@ -21,15 +21,10 @@ class Embedding(Base):
     embedding = Column(Vector(N_DIM))
 
 
-def select_embeddings(session):
-    return session.execute(text("SELECT * FROM embeddings;")).fetchall()
-
-
-def insert_embeddings(session, embeddings):
-    for emb in embeddings:
-        new_embedding = Embedding(embedding=emb)
-        session.add(new_embedding)
-    session.commit()
+@db_connector()
+def select_embeddings(connection):
+    query = select(Embedding)
+    return connection.execute(query).fetchall()
 
 
 @db_connector()
@@ -46,9 +41,7 @@ def find_similar_embeddings(connection, query):
             Embedding,
             Embedding.embedding.cosine_distance(query_embedding).label("distance"),
         )
-        .where(
-            Embedding.embedding.cosine_distance(query_embedding) < similarity_threshold
-        )
+        .where(Embedding.embedding.cosine_distance(query_embedding) < similarity_threshold)
         .order_by("distance")
         .limit(10)
     )

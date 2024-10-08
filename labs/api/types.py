@@ -1,22 +1,65 @@
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
 
 
 class GithubModel(BaseModel):
+    token: str
+    repo_owner: str
+    repo_name: str
+    username: str
+
+
+class RunOnRepoRequest(BaseModel):
     github_token: str
     repo_owner: str
     repo_name: str
-    user_name: Optional[str] = None
-
-
-class CodeMonkeyRequest(BaseModel):
-    github_token: str
-    repo_owner: str
-    repo_name: str
+    username: str
     issue_number: int
-    user_name: Optional[str] = None
-    litellm_api_key: str
-    original_branch: Optional[str] = None
+    original_branch: Optional[str] = "main"
+
+
+class RunOnLocalRepoRequest(BaseModel):
+    repo_path: str
+    issue_text: str
+
+
+class GetIssueRequest(BaseModel):
+    github_token: str
+    repo_owner: str
+    repo_name: str
+    username: str
+    issue_number: int
+
+
+class CreateBranchRequest(BaseModel):
+    github_token: str
+    repo_owner: str
+    repo_name: str
+    username: str
+    issue_number: int
+    original_branch: str
+    issue_title: str
+
+
+class VectorizeRepoToDatabaseRequest(BaseModel):
+    repo_destination: str
+
+
+class FindSimilarEmbeddingsRequest(BaseModel):
+    issue_body: str
+
+
+class PreparePromptAndContextRequest(BaseModel):
+    issue_body: str
+    embeddings: list
+
+
+class GetLLMResponseRequest(BaseModel):
+    context: dict
+
+
+class ApplyCodeChangesRequest(BaseModel):
+    llm_response: str
 
 
 class ListIssuesRequest(BaseModel):
@@ -30,22 +73,22 @@ class ChangeIssueStatusRequest(BaseModel):
     state: str
 
 
-class CreateBranchRequest(BaseModel):
-    branch_name: str
-    original_branch: str = "main"
-
-
 class CommitChangesRequest(BaseModel):
-    message: str
+    github_token: str
+    repo_owner: str
+    repo_name: str
+    username: str
     branch_name: str
-    files: List[str]
+    files: list
 
 
-class CreatePullRequest(BaseModel):
-    head: str
-    base: str = "main"
-    title: str = "New Pull Request"
-    body: str = ""
+class CreatePullRequestRequest(BaseModel):
+    github_token: str
+    repo_owner: str
+    repo_name: str
+    username: str
+    original_branch: str
+    branch_name: str
 
 
 class IssueRequest(BaseModel):

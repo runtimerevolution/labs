@@ -30,7 +30,7 @@ TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", "False"))
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
 
-CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "tmp/")
+CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "/tmp/")
 LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "openai/gpt-4o")
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -60,3 +60,9 @@ spacy_models = [
 ]
 
 SUMMARIZATION_MODEL = "facebook/bart-large-cnn"
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_BACKEND_URL = os.environ.get("CELERY_BACKEND_URL")
+
+REDIS_HOST = os.environ.get("REDIS_HOST")
+REDIS_PORT = os.environ.get("REDIS_PORT")

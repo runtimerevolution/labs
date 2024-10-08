@@ -29,14 +29,18 @@ format:
 	black --config pyproject.toml labs
 
 ## Teardown local database
-.PHONY: db_down
-db_down:
+.PHONY: down
+down:
 	docker compose --env-file=$(ENV_FILE) down
 
 ## Setup local database
-.PHONY: db_up
-db_up: db_down
+.PHONY: up
+up: down
 	docker compose --env-file=$(ENV_FILE) up -d
+
+.PHONY: shell
+shell:
+	ipython
 
 .PHONY: tests
 tests:
