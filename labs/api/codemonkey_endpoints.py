@@ -12,7 +12,7 @@ from labs.api.types import (
     RunOnLocalRepoRequest,
     VectorizeRepoToDatabaseRequest,
 )
-from labs.celery import (
+from labs.tasks import (
     apply_code_changes_task,
     commit_changes_task,
     create_branch_task,
