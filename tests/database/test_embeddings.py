@@ -51,7 +51,7 @@ def test_reembed_code(db_session):
         },
     )
 
-    reembed_code(db_session.bind, files_and_texts, embeddings)
+    reembed_code(db_session, files_and_texts, embeddings)
 
     result = select_embeddings(db_session)
     assert len(result) == 2
