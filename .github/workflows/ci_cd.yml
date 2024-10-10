@@ -5,7 +5,7 @@ on:
       - '*'
 
 env:
-  TEST_ENVIRONMENT: true
+  TEST_ENVIRONMENT: True
   POSTGRES_DB: postgres
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: postgres
