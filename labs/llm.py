@@ -19,7 +19,7 @@ def get_prompt(issue_summary):
         The file paths provided are **absolute paths relative to the project root**, 
         and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
         Do not prepend or modify the paths.
-        Please provide a json response in the following format: {{"steps": [...]}}
+        Please provide a json response in the following format: {{"name": "", "arguments": "", "steps": [...]}}
         Where steps is a list of objects where each object contains three fields:
         type, which is either 'create' to add a new file or 'modify' to edit an existing one;
         If the file is to be modified send the finished version of the entire file.
@@ -104,7 +104,7 @@ def validate_llm_response(llm_response):
 
 
 def get_llm_response(prepared_context):
-    retries, max_retries = 0, 5
+    retries, max_retries = 0, 1
     redo, redo_reason = True, None
     litellm_requests = RequestLiteLLM()
 
