@@ -4,7 +4,7 @@ from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
 from labs.database.vectorize import vectorize_to_database
-from labs.response_parser.parser import parse_llm_output
+from labs.response_parser.parser import parse_llm_output, is_valid_json
 
 logger = logging.getLogger(__name__)
 
@@ -78,9 +78,12 @@ def check_refusal(llm_response):
 
 def check_invalid_json_response(llm_response):
     response_string = llm_response["choices"][0]["message"]["content"]
-    if not parse_llm_output(response_string):
+    if not is_valid_json(response_string):
         return True, "Invalid JSON response."
-    return False, ""
+    else:
+        if not parse_llm_output(response_string):
+            return True, "Invalid JSON response."
+        return False, ""
 
 
 validation_checks = [

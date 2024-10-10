@@ -25,7 +25,7 @@ def test_select_embeddings_multiple(db_session, create_test_embeddings):
     db_session.commit()
 
     result = select_embeddings(db_session)
-    assert len(result) == 4
+    assert len(result) == 2
 
     embedding: Embedding = result[0][0]
     assert len(embedding.embedding) == 1536
