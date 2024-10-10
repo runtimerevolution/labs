@@ -64,11 +64,14 @@ class RequestLiteLLM:
         Where role can be "user", "assistant", "system".
         And content is the body of the message.
         """
+        base_url = settings.LOCAL_LLM_URL
+
         if model:
             return model, completion(
                 model=model,
                 messages=messages,
                 response_format={"type": "json_object"},
+                base_url=base_url,
             )
 
         for model in models:
@@ -77,6 +80,7 @@ class RequestLiteLLM:
                     model=model,
                     messages=messages,
                     response_format={"type": "json_object"},
+                    base_url=base_url,
                 )
                 return model, response
             except Exception:
