@@ -8,9 +8,9 @@ from labs.llm import call_llm_with_context, check_invalid_json_response
 
 class TestCallLlmWithContext:
     # Successfully calls the LLM with the provided context and returns the expected output
-    @patch("labs.middleware.vectorize_and_find_similar")
+    @patch("labs.database.embeddings")
     @patch.object(RequestLiteLLM, "completion_without_proxy")
-    @patch("labs.middleware.call_agent_to_apply_code_changes")
+    @patch("labs.repo.call_agent_to_apply_code_changes")
     def test_successful_llm_call_with_context(self, mocked_agent, mocked_completion, mocked_embeddings):
         # Mocking dependencies
         mocked_embeddings.return_value = [["file1", "/path/to/file1", "content1"]]
@@ -28,11 +28,10 @@ class TestCallLlmWithContext:
         )
         mocked_agent.return_value = ["file1"]
 
-        github = GithubModel(github_token="token", repo_owner="owner", repo_name="repo")
         issue_summary = "Fix the bug in the authentication module"
-        litellm_api_key = "fake_api_key"
+        repo_destination = "."
 
-        success, result = call_llm_with_context(github, issue_summary, litellm_api_key)
+        success, result = call_llm_with_context(repo_destination, issue_summary)
 
         assert success
         assert result == (
@@ -51,12 +50,12 @@ class TestCallLlmWithContext:
     # Ensure the GithubModel is instantiated correctly with the correct parameters
 
     def test_empty_summary(self):
-        github = GithubModel(github_token="token", repo_owner="owner", repo_name="repo")
         issue_summary = ""
-        litellm_api_key = "fake_api_key"
+        repo_destination = "repo_destination"
+        issue_summary = ""
 
         with pytest.raises(Exception) as excinfo:
-            call_llm_with_context(github, issue_summary, litellm_api_key)
+            call_llm_with_context(repo_destination, issue_summary)
 
         assert "issue_summary cannot be empty" in str(excinfo.value)
         # Corrects the mocking of find_similar_embeddings attribute in the rag module
@@ -74,6 +73,7 @@ class TestCheckInvalidJsonResponse:
             ]
         }
         is_invalid, message = check_invalid_json_response(llm_response)
+        print (is_invalid, message)
         assert not is_invalid
         assert message == ""
 
