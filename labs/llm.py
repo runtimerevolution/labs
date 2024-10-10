@@ -15,7 +15,7 @@ def get_prompt(issue_summary):
         You've been given the following task: {issue_summary}.
         Any imports will be at the beggining of the file.
         Add tests for the new functionalities, considering any existing test files.
-        Please provide a json response in the following format: {{"steps": [...]}}
+        Please provide a json response in the following format: {{"name": "", "arguments": "", "steps": [...]}}
         Where steps is a list of objects where each object contains three fields:
         type, which is either 'create' to add a new file or 'modify' to edit an existing one;
         If the file is to be modified send the finished version of the entire file.
@@ -88,7 +88,7 @@ def validate_llm_response(llm_response):
 
 
 def get_llm_response(prepared_context):
-    retries, max_retries = 0, 5
+    retries, max_retries = 0, 1
     redo, redo_reason = True, None
     litellm_requests = RequestLiteLLM()
 
