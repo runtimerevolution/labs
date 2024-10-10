@@ -37,8 +37,8 @@ def create_test_embedding():
     embedding_values = random.sample(range(1, 5000), 1536)
 
     embedding = Embedding(
-        file_and_path="file",
-        text="text",
+        file_and_path="file1",
+        text="text1",
         embedding=embedding_values,
     )
     return [embedding]
