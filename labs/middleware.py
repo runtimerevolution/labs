@@ -144,7 +144,7 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key, m
     prepared_context = prepare_context(context, prompt)
 
     logger.debug(
-        f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}"
+        f"Issue Summary: {issue_summary} - LLM Model: {model}"
     )
 
     return get_llm_response(litellm_api_key, prepared_context, model)

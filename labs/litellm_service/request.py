@@ -1,7 +1,9 @@
-from litellm import completion
+from litellm import completion, get_supported_openai_params
 import requests
+import logging
 from pydantic import BaseModel
 
+logger = logging.getLogger(__name__)
 
 class Step(BaseModel):
     type: str
@@ -64,11 +66,19 @@ class RequestLiteLLM:
         And content is the body of the message.
         """
         if model:
-            return model, completion(
-                model=model,
-                messages=messages,
-                response_format={"type": "json_object"},
-            )
+            logger.debug("MODEL: %s", model)
+            if self.__is_param_supported_by_model(model, "response_format"):
+                return model, completion(
+                    model=model,
+                    messages=messages,
+                    response_format={"type": "json_object"},
+                )
+            else:
+                logger.debug("Parameter response_format is not supported.")
+                return model, completion(
+                    model=model,
+                    messages=messages,
+                )
 
         for model in models:
             try:
@@ -81,3 +91,9 @@ class RequestLiteLLM:
             except Exception:
                 pass
         return model, None
+    
+    def __is_param_supported_by_model(self, model, param):
+        supported_params = get_supported_openai_params(model=model)
+        if param in supported_params:
+            return True
+        return False
