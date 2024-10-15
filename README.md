@@ -35,6 +35,6 @@ Here's the steps to setup the project locally:
 
 1. `poetry shell`
 2. `poetry install`
-3. `make db_up`
+3. `make up`
 4. `make api` or `ENV=local make api`
 5. `ENV=test make tests`

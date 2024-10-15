@@ -1,5 +1,5 @@
 import logging
-
+import json
 from labs.litellm_service.request import PullRequest
 
 
@@ -32,3 +32,11 @@ def modify_file(path, content):
     except Exception as e:
         logger.error(f"Error modifying file at {path}: {e}")
         return None
+
+
+def is_valid_json(text):
+    try:
+        json.loads(text)
+        return True
+    except ValueError:
+        return False

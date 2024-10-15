@@ -1,4 +1,5 @@
-from labs.database.embeddings import select_embeddings
+from labs.database.embeddings import Embedding, select_embeddings, reembed_code
+import random
 
 
 def test_select_embeddings_empty(db_session):
@@ -12,11 +13,11 @@ def test_select_embeddings_one(db_session, create_test_embedding):
     db_session.commit()
 
     result = select_embeddings(db_session)
-    id, embedding, file_and_path, text, _ = result[0]
-    assert id, 1
-    assert len(embedding), 1536
-    assert file_and_path, "file"
-    assert text, "text"
+
+    embedding: Embedding = result[0][0]
+    assert len(embedding.embedding) == 1536
+    assert embedding.file_and_path == "file1"
+    assert embedding.text == "text1"
 
 
 def test_select_embeddings_multiple(db_session, create_test_embeddings):
@@ -24,16 +25,43 @@ def test_select_embeddings_multiple(db_session, create_test_embeddings):
     db_session.commit()
 
     result = select_embeddings(db_session)
-    assert len(result), 2
+    assert len(result) == 2
 
-    id, embedding, file_and_path, text, _ = result[0]
-    assert id, 1
-    assert len(embedding), 1536
-    assert file_and_path, "file1"
-    assert text, "text1"
+    embedding: Embedding = result[0][0]
+    assert len(embedding.embedding) == 1536
+    assert embedding.file_and_path == "file1"
+    assert embedding.text == "text1"
 
-    id, embedding, file_and_path, text, _ = result[1]
-    assert id, 2
-    assert len(embedding), 1536
-    assert file_and_path, "file2"
-    assert text, "text2"
+    embedding: Embedding = result[1][0]
+    assert len(embedding.embedding) == 1536
+    assert embedding.file_and_path == "file2"
+    assert embedding.text == "text2"
+
+
+def test_reembed_code(db_session):
+    files_and_texts = [("file1", "text1"), ("file2", "text2")]
+    embeddings = type(
+        "obj",
+        (object,),
+        {
+            "data": [
+                {"embedding": random.sample(range(1, 5000), 1536)},
+                {"embedding": random.sample(range(1, 5000), 1536)},
+            ]
+        },
+    )
+
+    reembed_code(db_session, files_and_texts, embeddings)
+
+    result = select_embeddings(db_session)
+    assert len(result) == 2
+
+    embedding: Embedding = result[0][0]
+    assert len(embedding.embedding) == 1536
+    assert embedding.file_and_path == "file1"
+    assert embedding.text == "text1"
+
+    embedding: Embedding = result[1][0]
+    assert len(embedding.embedding) == 1536
+    assert embedding.file_and_path == "file2"
+    assert embedding.text == "text2"
