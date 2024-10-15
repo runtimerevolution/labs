@@ -2,6 +2,7 @@ from litellm import completion, get_supported_openai_params
 import requests
 import logging
 from pydantic import BaseModel
+from labs.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +26,8 @@ models = [
 
 
 class RequestLiteLLM:
-    def __init__(self, litellm_api_key):
-        self.api_key = litellm_api_key
+    def __init__(self):
+        self.api_key = settings.LITELLM_API_KEY
 
     def completion(self, messages, model="llm-model"):
         """

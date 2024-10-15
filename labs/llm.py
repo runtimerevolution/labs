@@ -1,11 +1,10 @@
-from labs.api.types import GithubModel
 from labs.decorators import time_and_log_function
 import logging
 from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
-from labs.response_parser.parser import create_file, modify_file, parse_llm_output
-from labs.database.vectorize_to_db import vectorize_to_db
+from labs.database.vectorize import vectorize_to_database
+from labs.response_parser.parser import parse_llm_output, is_valid_json
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +16,9 @@ def get_prompt(issue_summary):
         You've been given the following task: {issue_summary}.
         Any imports will be at the beggining of the file.
         Add tests for the new functionalities, considering any existing test files.
+        The file paths provided are **absolute paths relative to the project root**, 
+        and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
+        Do not prepend or modify the paths.
         Please provide a json response in the following format: {{"steps": [...]}}
         Where steps is a list of objects where each object contains three fields:
         type, which is either 'create' to add a new file or 'modify' to edit an existing one;
@@ -24,14 +26,6 @@ def get_prompt(issue_summary):
         path, which is the absolute path of the file to create/modify;
         content, which is the content to write to the file.
     """
-
-
-def vectorize_and_find_similar(repo_owner, repo_name, issue_summary):
-    destination = settings.CLONE_DESTINATION_DIR + f"{repo_owner}/{repo_name}"
-    vectorize_to_db(f"https://github.com/{repo_owner}/{repo_name}", None, destination)
-
-    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    return find_similar_embeddings(issue_summary)
 
 
 def prepare_context(context, prompt):
@@ -53,9 +47,7 @@ def prepare_context(context, prompt):
 
 
 def check_length_issue(llm_response):
-    finish_reason = getattr(
-        llm_response["choices"][0]["message"], "finish_reason", None
-    )
+    finish_reason = getattr(llm_response["choices"][0]["message"], "finish_reason", None)
     if finish_reason == "length":
         return (
             True,
@@ -65,9 +57,7 @@ def check_length_issue(llm_response):
 
 
 def check_content_filter(llm_response):
-    finish_reason = getattr(
-        llm_response["choices"][0]["message"], "finish_reason", None
-    )
+    finish_reason = getattr(llm_response["choices"][0]["message"], "finish_reason", None)
     if finish_reason == "content_filter":
         return (
             True,
@@ -86,25 +76,36 @@ def check_refusal(llm_response):
     return False, ""
 
 
+def check_invalid_json_response(llm_response):
+    response_string = llm_response["choices"][0]["message"]["content"]
+    if not is_valid_json(response_string):
+        return True, "Invalid JSON response."
+    else:
+        if not parse_llm_output(response_string):
+            return True, "Invalid JSON response."
+        return False, ""
+
+
 validation_checks = [
     check_length_issue,
     check_content_filter,
     check_refusal,
+    check_invalid_json_response,
 ]
 
 
 def validate_llm_response(llm_response):
     for check in validation_checks:
+        logger.debug(llm_response)
         is_invalid, message = check(llm_response[1])
         if is_invalid:
             return True, message
     return False, ""
 
-
-def get_llm_response(litellm_api_key, prepared_context, model=None):
+def get_llm_response(prepared_context, model=None):
     retries, max_retries = 0, 5
     redo, redo_reason = True, None
-    litellm_requests = RequestLiteLLM(litellm_api_key)
+    litellm_requests = RequestLiteLLM()
     if not model:
         model_to_use = settings.LLM_MODEL_NAME
     else:
@@ -132,14 +133,15 @@ def get_llm_response(litellm_api_key, prepared_context, model=None):
 
 
 @time_and_log_function
-def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key, model=None):
+def call_llm_with_context(repo_destination, issue_summary, model=None):
     if not issue_summary:
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
 
-    context = vectorize_and_find_similar(
-        github.repo_owner, github.repo_name, issue_summary
-    )
+    vectorize_to_database(None, repo_destination)
+    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
+    context = find_similar_embeddings(issue_summary)
+
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
 
@@ -147,18 +149,6 @@ def call_llm_with_context(github: GithubModel, issue_summary, litellm_api_key, m
         f"Issue Summary: {issue_summary} - LLM Model: {model}"
     )
 
-    return get_llm_response(litellm_api_key, prepared_context, model)
+    return get_llm_response(prepared_context, model)
 
 
-@time_and_log_function
-def call_agent_to_apply_code_changes(llm_response):
-    response_string = llm_response[1].choices[0].message.content
-    pull_request = parse_llm_output(response_string)
-
-    files = []
-    for step in pull_request.steps:
-        if step.type == "create":
-            files.append(create_file(step.path, step.content))
-        elif step.type == "modify":
-            files.append(modify_file(step.path, step.content))
-    return files
