@@ -1,11 +1,18 @@
 from django.db import models
+from django.utils import timezone
 
-class LLMSettings(models.Model):
-    model_name = models.TextField()  # Identifier for the LLM
-    api_key = models.TextField()  # API key for the LLM
-    response_format = models.TextField()  # Format of the response (e.g., JSON, text)
-    endpoint = models.URLField()  # API endpoint URL for the LLM
-    extra_params = models.JSONField(blank=True, null=True)  # Optional field for any extra parameters
+class LlmConfig(models.Model):
+    llm_model = models.TextField(blank=True, null=True) 
+    config_key = models.TextField(unique=True)
+    config_value = models.TextField(blank=True, null=True)
+    config_type = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.model_name
+        return f"{self.config_key}: {self.config_value}"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['config_key', 'llm_model'])
+        ]
