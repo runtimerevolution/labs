@@ -105,9 +105,9 @@ def validate_llm_response(llm_response):
 
 
 def get_llm_response(prepared_context):
-    retries, max_retries = 0, 2
+    retries, max_retries = 0, 5
     redo, redo_reason = True, None
-    litellm_requests = RequestLocalLLM() if settings.LITELLM_API_KEY else RequestLiteLLM()
+    litellm_requests = RequestLocalLLM() if settings.LOCAL_LLM else RequestLiteLLM()
 
     while redo and retries < max_retries:
         try:
