@@ -54,6 +54,14 @@ clean_tests:
 		rm -rf labs/test/vcr_cassettes; \
 	fi
 
+.PHONY: local_llm_up
+local_llm_up:
+	docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+
+.PHONY: local_llm_run
+local_llm_run: local_llm_up
+	docker exec ollama ollama run llama3.2
+
 #################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
