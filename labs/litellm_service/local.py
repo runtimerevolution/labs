@@ -1,9 +1,11 @@
 from ollama import Client
 
+from labs.config import settings
+
 
 class RequestLocalLLM:
     def __init__(self):
-        self.client = Client(host="http://localhost:11434")
+        self.client = Client(host=settings.LOCAL_LLM_HOST)
 
     def format_response(self, response):
         return {"choices": [response]}
