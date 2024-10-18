@@ -33,11 +33,7 @@ ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 # `builder-base` stage is used to build deps
 FROM python-base AS builder-base
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y \
-        # deps for installing poetry
-        curl \
-        # deps for building python deps
-        build-essential
+    && apt-get install --no-install-recommends -y curl build-essential
 
 # Install poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
@@ -48,29 +44,20 @@ WORKDIR $PYSETUP_PATH
 COPY poetry.lock pyproject.toml ./
 RUN poetry install --no-root --no-dev
 
-# # `development` image is used during development / testing
-# FROM python-base AS development
-# ENV FASTAPI_ENV=development
-# WORKDIR $PYSETUP_PATH
-
-# # copy in our built poetry + venv
-# COPY --from=builder-base $POETRY_HOME $POETRY_HOME
-# COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
-
-# # quicker install AS runtime deps are already installed
-# RUN poetry install
-
-# WORKDIR /app
-
-# EXPOSE 8000
-# CMD ["fastapi", "dev", "labs/api/main.py"]
 
 # `production` image
 FROM python-base AS production
 ENV FASTAPI_ENV=production
-COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
+# Install git since gitpython needs a git executable
+RUN apt-get update && apt-get install --no-install-recommends -y git
+
+# Copy our built venv
+COPY --from=builder-base $VENV_PATH $VENV_PATH
+
 # Copy the app into /app
 COPY /labs /app/labs/
 
 WORKDIR /app
+
 CMD ["fastapi", "run", "labs/api/main.py"]
