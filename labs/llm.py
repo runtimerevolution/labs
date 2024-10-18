@@ -3,7 +3,7 @@ import logging
 from labs.config import settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorize import vectorize_to_database
+from labs.database.vectorize.factory import VectorizeFactory, VectorizerType
 from labs.response_parser.parser import parse_llm_output, is_valid_json
 
 logger = logging.getLogger(__name__)
@@ -133,7 +133,7 @@ def call_llm_with_context(repo_destination, issue_summary):
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
 
-    vectorize_to_database(None, repo_destination)
+    VectorizeFactory(VectorizerType.CHUNK).vectorize_to_database(None, repo_destination)
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
     context = find_similar_embeddings(issue_summary)
 
