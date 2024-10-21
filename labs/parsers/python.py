@@ -237,10 +237,10 @@ def get_lines_code(file_path: str, start_line: int, end_line: int) -> str:
         str: The specified lines joined as a string, or an error message if the file is not found or is a directory.
     """
     if not os.path.exists(file_path):
-        return f"{file_path} FILE NOT FOUND"
+        raise FileNotFoundError(f"{file_path} not found")
 
     elif os.path.isdir(file_path):
-        return "IS A DIRECTORY"
+        raise IsADirectoryError(f"{file_path} is a directory")
 
     with open(file_path, "r") as f:
         lines = f.readlines()
