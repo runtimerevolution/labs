@@ -1,6 +1,6 @@
 from labs.decorators import time_and_log_function
 import logging
-from labs.config import settings
+from config import  configuration_variables as settings
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
 from labs.database.vectorize import vectorize_to_database

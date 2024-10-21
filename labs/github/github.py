@@ -1,7 +1,7 @@
 import base64
 import requests
 from dataclasses import dataclass
-from labs.config import settings
+from config import  configuration_variables as settings
 import git
 import os
 import logging

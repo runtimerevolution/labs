@@ -74,3 +74,6 @@ help:
 
 api:
 	fastapi dev labs/api/main.py  
+
+asgi_api:
+	poetry run uvicorn asgi_app:app --reload --port 8000

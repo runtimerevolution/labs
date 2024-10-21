@@ -3,7 +3,7 @@ from celery.signals import task_failure
 from kombu import Queue
 from redbeat import RedBeatSchedulerEntry, schedulers
 import redis
-from labs.config import settings
+from config import  configuration_variables as settings
 import logging
 
 
