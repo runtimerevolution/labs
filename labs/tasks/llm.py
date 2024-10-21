@@ -40,7 +40,7 @@ def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings=[]):
     prompt = get_prompt(redis_client.get(f"{prefix}_issue_body") if prefix else issue_body)
     redis_client.set(f"{prefix}_prompt", prompt)
 
-    embeddings = json.loads(redis_client.get(f"{prefix}_similar_embeddings") if prefix else embeddings)
+    embeddings = json.loads(redis_client.get(f"{prefix}_similar_embeddings")) if prefix else embeddings
     prepared_context = prepare_context(embeddings, prompt)
 
     if prefix:
