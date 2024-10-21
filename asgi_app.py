@@ -22,7 +22,7 @@ fastapi_app.include_router(github_endpoints.router)
 
 # ASGI application to route to Django or FastAPI
 async def app(scope, receive, send):
-    if scope["type"] == "http" and scope["path"].startswith("/django"):
+    if scope["type"] == "http" and scope["path"].startswith("/admin"):
         await django_app(scope, receive, send)
     else:
         await fastapi_app(scope, receive, send)
