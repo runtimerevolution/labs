@@ -1,6 +1,6 @@
 import random
 import pytest
-from labs.config import settings
+from config import configuration_variables as settings
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
