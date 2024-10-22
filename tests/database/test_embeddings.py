@@ -1,4 +1,7 @@
 from labs.database.embeddings import Embedding, select_embeddings, reembed_code
+from labs.database.vectorize.factory import VectorizeFactory, VectorizerType
+from labs.database.vectorize.python_vectorizer import PythonVectorizer
+from labs.database.vectorize.chunk_vectorizer import ChunkVectorizer
 import random
 
 
@@ -65,3 +68,8 @@ def test_reembed_code(db_session):
     assert len(embedding.embedding) == 1536
     assert embedding.file_and_path == "file2"
     assert embedding.text == "text2"
+
+
+def test_vectorize_factory_creator():
+    assert isinstance(VectorizeFactory(VectorizerType.PYTHON).vectorizer, PythonVectorizer)
+    assert isinstance(VectorizeFactory(VectorizerType.CHUNK).vectorizer, ChunkVectorizer)

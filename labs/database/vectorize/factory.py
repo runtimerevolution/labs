@@ -16,14 +16,18 @@ class VectorizeFactory(metaclass=ABCMeta):
 
     def __init__(self, vectorizer: VectorizerType | str = VectorizerType.CHUNK):
         if vectorizer == VectorizerType.CHUNK:
-            self.vectorizer = ChunkVectorizer()
+            self._vectorizer = ChunkVectorizer()
 
         elif vectorizer == VectorizerType.PYTHON:
-            self.vectorizer = PythonVectorizer()
+            self._vectorizer = PythonVectorizer()
 
         else:
             raise ValueError(f"Expected {VectorizerType} got {vectorizer}")
 
+    @property
+    def vectorizer(self):
+        return self._vectorizer
+
     @time_and_log_function
     def vectorize_to_database(self, include_file_extensions, repo_destination):
-        return self.vectorizer.vectorize_to_database(include_file_extensions, repo_destination)
+        return self._vectorizer.vectorize_to_database(include_file_extensions, repo_destination)
