@@ -1,6 +1,7 @@
 from labs.decorators import time_and_log_function
 import logging
 from labs.config import settings
+from labs.litellm_service.local import RequestLocalLLM
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
 from labs.database.vectorize.factory import VectorizeFactory, VectorizerType
@@ -106,7 +107,7 @@ def validate_llm_response(llm_response):
 def get_llm_response(prepared_context):
     retries, max_retries = 0, 5
     redo, redo_reason = True, None
-    litellm_requests = RequestLiteLLM()
+    litellm_requests = RequestLocalLLM() if settings.LOCAL_LLM else RequestLiteLLM()
 
     while redo and retries < max_retries:
         try:
