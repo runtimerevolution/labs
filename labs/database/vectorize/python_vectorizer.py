@@ -21,14 +21,15 @@ openai.api_key = settings.OPENAI_API_KEY
 
 
 class PythonVectorizer(Vectorizer):
-
     def prepare_doc_content(self, metadata, code_snippet):
         metadata = SimpleNamespace(**metadata)
 
-        result = (f"Source: {metadata.source}\n"
-                  f"Name: {metadata.name}\n"
-                  f"Start line: {metadata.start_line}\n"
-                  f"End line: {metadata.end_line}\n")
+        result = (
+            f"Source: {metadata.source}\n"
+            f"Name: {metadata.name}\n"
+            f"Start line: {metadata.start_line}\n"
+            f"End line: {metadata.end_line}\n"
+        )
 
         if hasattr(metadata, "parameters"):
             result += f"Parameters: {', '.join(metadata.parameters)}\n"
@@ -38,7 +39,6 @@ class PythonVectorizer(Vectorizer):
 
         result += f"\n\n{code_snippet}"
         return result
-
 
     def load_docs(self, root_dir, file_extensions=None):
         docs = []
@@ -83,8 +83,14 @@ class PythonVectorizer(Vectorizer):
                     func_ns = SimpleNamespace(**func)
 
                     function_snippet = get_lines_code(file_path, func_ns.start_line, func_ns.end_line)
-                    metadata = dict(source=file_path, name=func_ns.name, start_line=func_ns.start_line,
-                                    end_line=func_ns.end_line, parameters=func_ns.parameters, returns=func_ns.returns)
+                    metadata = dict(
+                        source=file_path,
+                        name=func_ns.name,
+                        start_line=func_ns.start_line,
+                        end_line=func_ns.end_line,
+                        parameters=func_ns.parameters,
+                        returns=func_ns.returns,
+                    )
 
                     doc_content = self.prepare_doc_content(metadata, function_snippet)
                     docs.append(Document(doc_content, metadata=metadata))
@@ -94,8 +100,9 @@ class PythonVectorizer(Vectorizer):
                     cls_ns = SimpleNamespace(**cls)
 
                     class_snippet = get_lines_code(file_path, cls_ns.start_line, cls_ns.end_line)
-                    metadata = dict(source=file_path, name=cls_ns.name, start_line=cls_ns.start_line,
-                                    end_line=cls_ns.end_line)
+                    metadata = dict(
+                        source=file_path, name=cls_ns.name, start_line=cls_ns.start_line, end_line=cls_ns.end_line
+                    )
 
                     doc_content = self.prepare_doc_content(metadata, class_snippet)
                     docs.append(Document(doc_content, metadata=metadata))
@@ -104,15 +111,19 @@ class PythonVectorizer(Vectorizer):
                         method_ns = SimpleNamespace(**method)
 
                         method_snippet = get_lines_code(file_path, method_ns.start_line, method_ns.end_line)
-                        metadata = dict(source=file_path, name=method_ns.name, start_line=method_ns.start_line,
-                                        end_line=method_ns.end_line, parameters=method_ns.parameters,
-                                        returns=method_ns.returns)
+                        metadata = dict(
+                            source=file_path,
+                            name=method_ns.name,
+                            start_line=method_ns.start_line,
+                            end_line=method_ns.end_line,
+                            parameters=method_ns.parameters,
+                            returns=method_ns.returns,
+                        )
 
                         doc_content = self.prepare_doc_content(metadata, method_snippet)
                         docs.append(Document(doc_content, metadata=metadata))
 
         return docs
-
 
     def vectorize_to_database(self, include_file_extensions, repo_destination):
         docs = self.load_docs(repo_destination, include_file_extensions)
@@ -124,4 +135,3 @@ class PythonVectorizer(Vectorizer):
 
             logger.debug("Storing embeddins...")
             reembed_code([(doc.metadata["source"], doc.page_content)], embeddings)
-

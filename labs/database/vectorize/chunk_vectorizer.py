@@ -19,7 +19,6 @@ openai.api_key = settings.OPENAI_API_KEY
 
 
 class ChunkVectorizer(Vectorizer):
-
     def load_docs(self, root_dir, file_extensions=None):
         """
         Load documents from the specified root directory.

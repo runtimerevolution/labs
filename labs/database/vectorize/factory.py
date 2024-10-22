@@ -13,7 +13,6 @@ class VectorizerType(Enum):
 
 
 class VectorizeFactory(metaclass=ABCMeta):
-
     def __init__(self, vectorizer: VectorizerType | str = VectorizerType.CHUNK):
         if vectorizer == VectorizerType.CHUNK:
             self._vectorizer = ChunkVectorizer()

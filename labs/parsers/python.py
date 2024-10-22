@@ -55,7 +55,6 @@ class PythonFileParser(ast.NodeVisitor):
         else:
             return "unknown"
 
-
     def visit_Import(self, node):
         self.imports.append(
             {
@@ -117,10 +116,7 @@ class PythonFileParser(ast.NodeVisitor):
             and isinstance(node.test.left, ast.Name)
             and node.test.left.id == "__name__"
             and any(isinstance(op, ast.Eq) for op in node.test.ops)
-            and any(
-                isinstance(cmp, ast.Str) and cmp.s == "__main__"
-                for cmp in node.test.comparators
-            )
+            and any(isinstance(cmp, ast.Str) and cmp.s == "__main__" for cmp in node.test.comparators)
         ):
             self.main_block = True
         self.generic_visit(node)
@@ -188,9 +184,7 @@ class PythonFileParser(ast.NodeVisitor):
         }
 
     def _simplify_value(self, value):
-        if isinstance(
-            value, (ast.Str, ast.Num, ast.Constant)
-        ):  # Python 3.8+ uses ast.Constant
+        if isinstance(value, (ast.Str, ast.Num, ast.Constant)):  # Python 3.8+ uses ast.Constant
             return value.value if hasattr(value, "value") else value.n
         elif isinstance(value, ast.NameConstant):
             return value.value

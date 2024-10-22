@@ -1,7 +1,6 @@
 import unittest
 
 import ast
-import os
 
 from labs.parsers.python import PythonFileParser, parse_python_file, get_lines_code
 from tempfile import NamedTemporaryFile
@@ -19,7 +18,6 @@ class DummyClass:
 
 
 class TestPythonFileParser(unittest.TestCase):
-
     def setUp(self):
         self.test_code = TEST_CODE
         self.parser = PythonFileParser("file.py")
@@ -47,7 +45,7 @@ class TestPythonFileParser(unittest.TestCase):
             temporary_python_file.seek(0)
 
             result = get_lines_code(temporary_python_file.name, 3, 5)
-            self.assertEqual(result, "\n".join([l.strip() for l in TEST_CODE.splitlines()][3:5]))
+            self.assertEqual(result, "\n".join([line.strip() for line in TEST_CODE.splitlines()][3:5]))
 
     def test_get_lines_code_file_not_exist(self):
         self.assertRaises(FileNotFoundError, get_lines_code, "file_not_exist.py", 3, 5)
@@ -63,14 +61,30 @@ class TestPythonFileParser(unittest.TestCase):
             result = parse_python_file(temporary_python_file.name)
 
             self.assertEqual(result["file_name"], temporary_python_file.name)
-            self.assertEqual(result["imports"], [{'module': 'os', 'alias': None, 'start_line': 1, 'end_line': 2}])
-            self.assertEqual(result["classes"], [
-                {'name': 'DummyClass', 'start_line': 6, 'end_line': 9, 'methods': [
-                    {'name': 'return_hi', 'start_line': 7, 'end_line': 9, 'parameters': ['self'],
-                     'returns': 'None'}]}])
-            self.assertEqual(result["functions"], [
-                {'name': 'sum_function', 'start_line': 3, 'end_line': 5, 'parameters': ['a', 'b'],
-                 'returns': 'int'}])
+            self.assertEqual(result["imports"], [{"module": "os", "alias": None, "start_line": 1, "end_line": 2}])
+            self.assertEqual(
+                result["classes"],
+                [
+                    {
+                        "name": "DummyClass",
+                        "start_line": 6,
+                        "end_line": 9,
+                        "methods": [
+                            {
+                                "name": "return_hi",
+                                "start_line": 7,
+                                "end_line": 9,
+                                "parameters": ["self"],
+                                "returns": "None",
+                            }
+                        ],
+                    }
+                ],
+            )
+            self.assertEqual(
+                result["functions"],
+                [{"name": "sum_function", "start_line": 3, "end_line": 5, "parameters": ["a", "b"], "returns": "int"}],
+            )
             self.assertEqual(result["constants"], [])
             self.assertEqual(result["global_statements"], [])
             self.assertEqual(result["comments"], [])
