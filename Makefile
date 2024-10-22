@@ -42,10 +42,6 @@ up: down
 shell:
 	ipython
 
-.PHONY: zsh
-zsh:
-	zsh
-
 .PHONY: tests
 tests:
 	pytest
