@@ -5,7 +5,7 @@ from labs.llm import call_llm_with_context
 
 
 class TestLocalLLM:
-    @patch("labs.llm.vectorize_to_database")
+    @patch("labs.database.vectorize.factory.VectorizeFactory.vectorize_to_database")
     @patch("labs.llm.find_similar_embeddings")
     @patch("labs.llm.settings.LOCAL_LLM", True)
     @skip("This is used locally with an Ollama instance running in docker")
@@ -17,7 +17,7 @@ class TestLocalLLM:
 
         assert success
 
-    @patch("labs.llm.vectorize_to_database")
+    @patch("labs.database.vectorize.factory.VectorizeFactory.vectorize_to_database")
     @patch("labs.llm.RequestLiteLLM")
     @patch("labs.llm.RequestLocalLLM")
     @patch("labs.llm.find_similar_embeddings")
