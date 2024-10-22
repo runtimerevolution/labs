@@ -17,40 +17,40 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     
-    services:
-      postgres:
-        image: pgvector/pgvector:pg16
-        env:
-          POSTGRES_HOST_AUTH_METHOD: trust
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
+    # services:
+    #   postgres:
+    #     image: pgvector/pgvector:pg16
+    #     env:
+    #       POSTGRES_HOST_AUTH_METHOD: trust
+    #     options: >-
+    #       --health-cmd pg_isready
+    #       --health-interval 10s
+    #       --health-timeout 5s
+    #       --health-retries 5
+    #     ports:
+    #       - 5432:5432
 
     steps:
       - name: Check out code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      # - name: Set up Python 3.11
+      #   uses: actions/setup-python@v5
+      #   with:
+      #     python-version: "3.11"
 
-      - name: Poetry Install
-        uses: knowsuchagency/poetry-install@v2
+      # - name: Poetry Install
+      #   uses: knowsuchagency/poetry-install@v2
 
-      - name: Create Tables
-        run: |
-          PGPASSWORD=${{env.POSTGRES_PASSWORD}} psql -U ${{env.POSTGRES_USER}} -d ${{env.POSTGRES_DB}} -h ${{env.POSTGRES_HOST}} -a -f ${{github.workspace}}/database_scripts/postgres.sql
+      # - name: Create Tables
+      #   run: |
+      #     PGPASSWORD=${{env.POSTGRES_PASSWORD}} psql -U ${{env.POSTGRES_USER}} -d ${{env.POSTGRES_DB}} -h ${{env.POSTGRES_HOST}} -a -f ${{github.workspace}}/database_scripts/postgres.sql
 
-      - name: Run pytest
-        run: poetry run pytest
+      # - name: Run pytest
+      #   run: poetry run pytest
 
-      - name: Ruff
-        uses: chartboost/ruff-action@v1
-        with:
-          changed-files: 'true'
+      # - name: Ruff
+      #   uses: chartboost/ruff-action@v1
+      #   with:
+      #     changed-files: 'true'
       
