@@ -51,4 +51,4 @@ During the course of the project, various approaches were taken regarding how em
 
 Although the results achieved are not as expected, since parts of the code are lost in the changes made by the LLM, the first method seems to yield results closer to the goal as fewer such losses occur.
 
-For more details on the implementation and the test results, refer to the Jupyter Notebook [here](!https://github.com/runtimerevolution/labs/blob/main/notebooks/embeddings.ipynb).
+For more details on the implementation and the test results, refer to the Jupyter Notebook [here](./notebooks/embeddings.ipynb).
