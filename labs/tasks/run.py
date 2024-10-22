@@ -12,7 +12,7 @@ from labs.tasks import (
     prepare_prompt_and_context_task,
     vectorize_repo_to_database_task,
 )
-from config import  configuration_variables as settings
+from config import configuration_variables as settings
 import logging
 from labs.celery import app
 

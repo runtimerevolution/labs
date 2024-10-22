@@ -2,7 +2,7 @@ import logging
 
 from labs.decorators import time_and_log_function
 from labs.llm import call_llm_with_context
-from config import  configuration_variables as settings
+from config import configuration_variables as settings
 from labs.repo import (
     commit_changes,
     create_branch,

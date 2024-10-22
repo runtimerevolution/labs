@@ -73,7 +73,13 @@ help:
 	@python -c "${PRINT_HELP_PYSCRIPT}" < $(MAKEFILE_LIST)
 
 api:
-	fastapi dev labs/api/main.py  
+	fastapi dev labs/api/main.py
+
+runserver:
+	poetry run python manage.py runserver
 
 asgi_api:
 	poetry run uvicorn asgi_app:app --reload --port 8000
+
+load_config:
+	python manage.py loaddata config.json

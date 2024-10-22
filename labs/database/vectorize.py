@@ -8,7 +8,7 @@ from labs.decorators import time_and_log_function
 
 import logging
 
-from config import  configuration_variables as settings
+from config import configuration_variables as settings
 from labs.database.embeddings import reembed_code
 
 

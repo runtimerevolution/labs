@@ -1,5 +1,5 @@
 import redis
-from config import  configuration_variables as settings
+from config import configuration_variables as settings
 import logging
 import json
 from labs.celery import app
