@@ -37,7 +37,7 @@ The following table consisely presents the results obtained where:
 | Embedding model                                                                               | LLM (Local/API) | Embeddins creation method | Response quality | Prompt   |
 |-----------------------------------------------------------------------------------------------|-----------------|---------------------------|------------------|----------|
 | [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API      | File chunks               | Poor             | Prompt 1 |
-| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models)                                                                        | OpenAI API      | Python code structure     | Poor             | Prompt 1 |
+| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API      | Python code structure     | Poor             | Prompt 1 |
 
 
 Below is the prompt used in the LLM for the test conducted:
