@@ -38,11 +38,11 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
-DATABASE_HOST = os.environ.get("DATABASE_HOST")
-DATABASE_USER = os.environ.get("DATABASE_USER")
-DATABASE_PASS = os.environ.get("DATABASE_PASS")
-DATABASE_NAME = os.environ.get("DATABASE_NAME")
-DATABASE_PORT = os.environ.get("DATABASE_PORT")
+DATABASE_NAME = os.environ.get("POSTGRES_DB")
+DATABASE_USER = os.environ.get("POSTGRES_USER")
+DATABASE_PASS = os.environ.get("POSTGRES_PASS")
+DATABASE_HOST = os.environ.get("POSTGRES_HOST")
+DATABASE_PORT = os.environ.get("POSTGRES_PORT")
 DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 print(f"{DATABASE_URL=}")
 
