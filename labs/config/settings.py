@@ -38,13 +38,12 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
-DATABASE_NAME = os.environ.get("POSTGRES_DB")
-DATABASE_USER = os.environ.get("POSTGRES_USER")
-DATABASE_PASS = os.environ.get("POSTGRES_PASS")
-DATABASE_HOST = os.environ.get("POSTGRES_HOST")
-DATABASE_PORT = os.environ.get("POSTGRES_PORT")
+DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
+DATABASE_PASS = os.environ.get("DATABASE_PASS", "postgres")
+DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
+DATABASE_PORT = os.environ.get("DATABASE_PORT", "5432")
+DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres")
 DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
-print(f"{DATABASE_URL=}")
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 CELERY_BACKEND_URL = os.environ.get("CELERY_BACKEND_URL")
