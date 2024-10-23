@@ -16,9 +16,9 @@ For more details on the implementation and the test results, refer to the Jupyte
 ### Test results
 
 The following table consisely presents the results obtained where:
-* **Embeddins model** indicates the model used to generate the embeddings;
-* **LLM** indicates the LLM used, which can be either a Local LLM or via an external API (like OpenAI);
-* **Embeddins creation method** indicates the method used to create embeddins, as previously described;
+* **Embeddins model**: indicates the model used to generate the embeddings;
+* **LLM**: indicates the LLM used, which can be either a Local LLM or via an external API (like OpenAI);
+* **Embeddins creation method**: indicates the method used to create embeddins, as previously described;
 * **Response quality**: indicates the quality of the LLM's response, which can be:
   * **Very poor**: The code contains critical issues such as syntax errors, missing imports or broken logic 
   that prevent it from running;
