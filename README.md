@@ -40,15 +40,7 @@ Here's the steps to setup the project locally:
 5. `ENV=test make tests`
 
 
-## Project details
+## Approaches, Tests Conducted and Results
 
-### Embeddings
-
-During the course of the project, various approaches were taken regarding how embeddings are generated, namely:
-
-* Splitting the files into predefined-sized chunks;
-* Splitting the files according to the structure of the Python code they contain.
-
-Although the results achieved are not as expected, since parts of the code are lost in the changes made by the LLM, the first method seems to yield results closer to the goal as fewer such losses occur.
-
-For more details on the implementation and the test results, refer to the Jupyter Notebook [here](./notebooks/embeddings.ipynb).
+For details on the approaches and tests conducted on issues encountered during development, 
+refer to the document [here](./doc/results.md)
