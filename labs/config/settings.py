@@ -46,15 +46,6 @@ DATABASE_PORT = os.environ.get("DATABASE_PORT")
 DATABASE_URL = os.environ.get("DATABASE_URL")
 DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 
-POLYGLOT_DIR = PROJ_ROOT / "labs" / "polyglot_data"
-
-spacy_models = [
-    {"language_code": "pt", "language_name": "portuguese", "model": "pt_core_news_lg"},
-    {"language_code": "en", "language_name": "english", "model": "en_core_web_md"},
-]
-
-SUMMARIZATION_MODEL = "facebook/bart-large-cnn"
-
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 CELERY_BACKEND_URL = os.environ.get("CELERY_BACKEND_URL")
 
