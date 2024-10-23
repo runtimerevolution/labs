@@ -13,6 +13,17 @@ services:
     volumes:
       - ./database_scripts:/docker-entrypoint-initdb.d
 
+  api:
+    env_file: .env.local
+    build: .
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    depends_on:
+      - labs-db
+
   litellm:
     image: ghcr.io/berriai/litellm:main-latest
     ports:
