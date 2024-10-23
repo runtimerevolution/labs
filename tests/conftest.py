@@ -1,3 +1,4 @@
+import logging
 import random
 import pytest
 from labs.config import settings
@@ -7,6 +8,9 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 from labs.database.embeddings import Embedding
 
+logger = logging.getLogger(__name__)
+
+logger.error(f"{settings.DATABASE_URL=}")
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
