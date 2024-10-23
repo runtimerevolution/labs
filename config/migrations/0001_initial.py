@@ -24,16 +24,16 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("llm_model", models.TextField(blank=True, null=True)),
-                ("config_key", models.TextField(unique=True)),
-                ("config_value", models.TextField(blank=True, null=True)),
-                ("config_type", models.TextField(blank=True, null=True)),
+                ("key", models.TextField(unique=True)),
+                ("value", models.TextField(blank=True, null=True)),
+                ("type", models.TextField(blank=True, null=True)),
                 ("created_at", models.DateTimeField(default=django.utils.timezone.now)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
             ],
             options={
                 "indexes": [
                     models.Index(
-                        fields=["config_key", "llm_model"],
+                        fields=["key", "llm_model"],
                         name="config_conf_config__4d9363_idx",
                     )
                 ],

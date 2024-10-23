@@ -89,5 +89,5 @@ runserver:
 asgi_api:
 	poetry run uvicorn asgi_app:app --reload --port 8000
 
-load_config:
-	python manage.py loaddata config.json
+load_fixtures:
+	python manage.py loaddata $(wildcard config/fixtures/*.json)
