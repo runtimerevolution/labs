@@ -8,9 +8,7 @@ def async_time_and_log_function(f):
     @wraps(f)
     async def wrapper(*args, **kwargs):
         logger = logging.getLogger(__name__)
-        logger.debug(
-            f"Running {f.__name__}{args} {kwargs} at {datetime.datetime.now()}."
-        )
+        logger.debug(f"Running {f.__name__}{args} {kwargs} at {datetime.datetime.now()}.")
 
         start_time = time.perf_counter()
 
@@ -31,9 +29,7 @@ def time_and_log_function(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         logger = logging.getLogger(__name__)
-        logger.debug(
-            f"Running {f.__name__}{args} {kwargs} at {datetime.datetime.now()}."
-        )
+        logger.debug(f"Running {f.__name__}{args} {kwargs} at {datetime.datetime.now()}.")
 
         start_time = time.perf_counter()
 
