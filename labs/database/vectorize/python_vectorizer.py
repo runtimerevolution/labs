@@ -9,7 +9,7 @@ import pathspec
 
 import logging
 
-from labs.config import settings
+from config import configuration_variables as settings
 from labs.database.embeddings import reembed_code
 
 from labs.parsers.python import get_lines_code, parse_python_file
