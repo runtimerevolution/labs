@@ -45,7 +45,7 @@ Below is the prompt used in the LLM for the test conducted:
 #### Prompt 1:
 > You're a diligent software engineer AI. You can't see, draw, or interact with a 
 > browser, but you can read and write files, and you can think. 
-> You've been given the following task: {issue_summary}. 
+> You've been given the following task: Add created_at and updated_at field to User model. 
 > Any imports will be at the beggining of the file. 
 > Add tests for the new functionalities, considering any existing test files. 
 > The file paths provided are **absolute paths relative to the project root**, 
