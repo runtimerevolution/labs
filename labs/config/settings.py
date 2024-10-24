@@ -38,28 +38,12 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
-DATABASE_HOST = os.environ.get("DATABASE_HOST")
-DATABASE_USER = os.environ.get("DATABASE_USER")
-DATABASE_PASS = os.environ.get("DATABASE_PASS")
-DATABASE_NAME = os.environ.get("DATABASE_NAME")
-DATABASE_PORT = os.environ.get("DATABASE_PORT")
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-DATABASE_TEST_HOST = os.environ.get("DATABASE_TEST_HOST")
-DATABASE_TEST_USER = os.environ.get("DATABASE_TEST_USER")
-DATABASE_TEST_PASS = os.environ.get("DATABASE_TEST_PASS")
-DATABASE_TEST_NAME = os.environ.get("DATABASE_TEST_NAME")
-DATABASE_TEST_PORT = os.environ.get("DATABASE_TEST_PORT")
-DATABASE_TEST_URL = os.environ.get("DATABASE_TEST_URL")
-
-POLYGLOT_DIR = PROJ_ROOT / "labs" / "polyglot_data"
-
-spacy_models = [
-    {"language_code": "pt", "language_name": "portuguese", "model": "pt_core_news_lg"},
-    {"language_code": "en", "language_name": "english", "model": "en_core_web_md"},
-]
-
-SUMMARIZATION_MODEL = "facebook/bart-large-cnn"
+DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
+DATABASE_PASS = os.environ.get("DATABASE_PASS", "postgres")
+DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
+DATABASE_PORT = os.environ.get("DATABASE_PORT", "5432")
+DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres")
+DATABASE_URL = f"postgresql://{DATABASE_USER}:{DATABASE_PASS}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 CELERY_BACKEND_URL = os.environ.get("CELERY_BACKEND_URL")

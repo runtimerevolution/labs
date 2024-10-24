@@ -173,5 +173,4 @@ cython_debug/
 #.idea/
 
 .vscode/
-polyglot_data/
 tmp/
