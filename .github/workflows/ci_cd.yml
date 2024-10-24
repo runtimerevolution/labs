@@ -8,12 +8,11 @@ on:
 
 env:
   TEST_ENVIRONMENT: "True"
-  POSTGRES_DB: postgres
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
-  POSTGRES_HOST: localhost
-  POSTGRES_PORT: 5432
-  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+  DATABASE_USER: postgres
+  DATABASE_PASS: postgres
+  DATABASE_HOST: localhost
+  DATABASE_PORT: 5432
+  DATABASE_NAME: postgres
 
 jobs:
   run-tests:
@@ -46,7 +45,7 @@ jobs:
 
       - name: Create Tables
         run: |
-          PGPASSWORD=${{env.POSTGRES_PASSWORD}} psql -U ${{env.POSTGRES_USER}} -d ${{env.POSTGRES_DB}} -h ${{env.POSTGRES_HOST}} -a -f ${{github.workspace}}/database_scripts/postgres.sql
+          PGPASSWORD=${{env.DATABASE_PASSWORD}} psql -U ${{env.DATABASE_USER}} -d ${{env.DATABASE_NAME}} -h ${{env.DATABASE_HOST}} -a -f ${{github.workspace}}/database_scripts/postgres.sql
 
       - name: Run pytest
         run: poetry run pytest
