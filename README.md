@@ -38,3 +38,9 @@ Here's the steps to setup the project locally:
 3. `make up`
 4. `make api` or `ENV=local make api`
 5. `ENV=test make tests`
+
+
+## Approaches, Tests Conducted and Results
+
+For details on the approaches and tests conducted on issues encountered during development, 
+refer to the document [here](./doc/results.md)

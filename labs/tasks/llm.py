@@ -4,7 +4,7 @@ import logging
 import json
 
 from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorize import vectorize_to_database
+from labs.database.vectorize.chunk_vectorizer import ChunkVectorizer
 from labs.llm import get_llm_response, get_prompt, prepare_context
 from labs.celery import app
 
@@ -17,7 +17,7 @@ redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_P
 @app.task
 def vectorize_repo_to_database_task(prefix="", repo_destination=""):
     repo_destination = redis_client.get(f"{prefix}_repo_destination") if prefix else repo_destination
-    vectorize_to_database(None, repo_destination)
+    ChunkVectorizer().vectorize_to_database(None, repo_destination)
 
     if prefix:
         return prefix
@@ -40,7 +40,7 @@ def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings=[]):
     prompt = get_prompt(redis_client.get(f"{prefix}_issue_body") if prefix else issue_body)
     redis_client.set(f"{prefix}_prompt", prompt)
 
-    embeddings = json.loads(redis_client.get(f"{prefix}_similar_embeddings") if prefix else embeddings)
+    embeddings = json.loads(redis_client.get(f"{prefix}_similar_embeddings")) if prefix else embeddings
     prepared_context = prepare_context(embeddings, prompt)
 
     if prefix:

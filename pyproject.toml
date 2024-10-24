@@ -47,6 +47,7 @@ pytest = "^8.3.2"
 pytest-mock = "^3.14.0"
 pytest-dotenv = "^0.5.2"
 ipython = "^8.27.0"
+jupyter = "^1.1.1"
 
 [build-system]
 requires = ["poetry-core"]
