@@ -1,3 +1,4 @@
+from typing import List, Tuple
 from litellm import embedding
 from sqlalchemy import Column, Integer, String, select
 from pgvector.sqlalchemy import Vector
@@ -42,7 +43,9 @@ def find_similar_embeddings(connection, query):
             Embedding,
             Embedding.embedding.cosine_distance(query_embedding).label("distance"),
         )
-        .where(Embedding.embedding.cosine_distance(query_embedding) < similarity_threshold)
+        .where(
+            Embedding.embedding.cosine_distance(query_embedding) < similarity_threshold
+        )
         .order_by("distance")
         .limit(10)
     )
@@ -50,11 +53,15 @@ def find_similar_embeddings(connection, query):
 
 
 @db_connector()
-def reembed_code(connection, files_and_texts, embeddings):
-    query = delete(Embedding)
+def reembed_code(
+    connection, files_and_texts: List[Tuple[str, str]], embeddings, repository: str
+):
+    query = delete(Embedding).where(Embedding.repository == repository)
     connection.execute(query)
+
     for gen_text, embedding_obj in zip(files_and_texts, embeddings.data):
         query = insert(Embedding).values(
+            repository=repository,
             embedding=embedding_obj["embedding"],
             file_and_path=gen_text[0],
             text=gen_text[1],
