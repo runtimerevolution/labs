@@ -16,14 +16,15 @@ N_DIM = 1536
 class Embedding(Base):
     __tablename__ = "embeddings"
     id = Column(Integer, primary_key=True, autoincrement=True)
+    repository = Column(String)
     file_and_path = Column(String)
     text = Column(String)
     embedding = Column(Vector(N_DIM))
 
 
 @db_connector()
-def select_embeddings(connection):
-    query = select(Embedding)
+def find_embeddings(connection, repository: str):
+    query = select(Embedding).where(Embedding.repository == repository)
     return connection.execute(query).fetchall()
 
 
