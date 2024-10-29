@@ -71,3 +71,8 @@ services:
     volumes:
       - .:/app
       - ${LOCAL_REPOS_PATH}:/local-repos/
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"

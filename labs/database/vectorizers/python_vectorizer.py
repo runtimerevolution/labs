@@ -2,7 +2,6 @@ from types import SimpleNamespace
 
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
-from litellm import embedding
 import openai
 import os
 import pathspec
@@ -13,7 +12,8 @@ from config import configuration_variables as settings
 from labs.database.embeddings import reembed_code
 
 from labs.parsers.python import get_lines_code, parse_python_file
-from labs.database.vectorize import Vectorizer
+from labs.database.vectorizers import Vectorizer
+from labs.database.embedders.litellm import LiteLLMEmbedder
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +131,7 @@ class PythonVectorizer(Vectorizer):
         logger.debug(f"Loading {len(docs)} documents...")
 
         for doc in docs:
-            embeddings = embedding(model="text-embedding-ada-002", input=doc)
+            embeddings = LiteLLMEmbedder(model="text-embedding-ada-002").create_embeddins(doc)
 
             logger.debug("Storing embeddins...")
             reembed_code([(doc.metadata["source"], doc.page_content)], embeddings)

@@ -4,7 +4,7 @@ from config import configuration_variables as settings
 from labs.litellm_service.local import RequestLocalLLM
 from labs.litellm_service.request import RequestLiteLLM
 from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorize.chunk_vectorizer import ChunkVectorizer
+from labs.database.vectorizers.chunk_vectorizer import ChunkVectorizer
 from labs.response_parser.parser import parse_llm_output, is_valid_json
 
 logger = logging.getLogger(__name__)
@@ -48,9 +48,7 @@ def prepare_context(context, prompt):
 
 
 def check_length_issue(llm_response):
-    finish_reason = getattr(
-        llm_response["choices"][0]["message"], "finish_reason", None
-    )
+    finish_reason = getattr(llm_response["choices"][0]["message"], "finish_reason", None)
     if finish_reason == "length":
         return (
             True,
@@ -60,9 +58,7 @@ def check_length_issue(llm_response):
 
 
 def check_content_filter(llm_response):
-    finish_reason = getattr(
-        llm_response["choices"][0]["message"], "finish_reason", None
-    )
+    finish_reason = getattr(llm_response["choices"][0]["message"], "finish_reason", None)
     if finish_reason == "content_filter":
         return (
             True,
@@ -115,9 +111,7 @@ def get_llm_response(prepared_context):
 
     while redo and retries < max_retries:
         try:
-            llm_response = litellm_requests.completion_without_proxy(
-                prepared_context, model=settings.LLM_MODEL_NAME
-            )
+            llm_response = litellm_requests.completion_without_proxy(prepared_context, model=settings.LLM_MODEL_NAME)
             logger.debug(f"LLM Response: {llm_response}")
             redo, redo_reason = validate_llm_response(llm_response)
         except Exception:
@@ -147,8 +141,6 @@ def call_llm_with_context(repo_destination, issue_summary):
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
 
-    logger.debug(
-        f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}"
-    )
+    logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}")
 
     return get_llm_response(prepared_context)

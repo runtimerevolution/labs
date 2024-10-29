@@ -1,11 +1,12 @@
-from litellm import embedding
 import openai
 import os
 import pathspec
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
+from litellm import embedding
 
-from labs.database.vectorize import Vectorizer
+from labs.database.vectorizers import Vectorizer
+
 
 import logging
 
@@ -65,7 +66,7 @@ class ChunkVectorizer(Vectorizer):
 
     def split_docs(self, docs):
         """Split the input documents into smaller chunks."""
-        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        text_splitter = CharacterTextSplitter(chunk_size=2000, chunk_overlap=0)
         return text_splitter.split_documents(docs)
 
     def vectorize_to_database(self, include_file_extensions, repo_destination):
@@ -76,7 +77,10 @@ class ChunkVectorizer(Vectorizer):
         texts = [file_and_text[1] for file_and_text in files_and_texts]
 
         logger.debug("Embedding all repo documents.")
-        embeddings = embedding(model="text-embedding-ada-002", input=texts)
+        # embeddings = embedding(model="text-embedding-ada-002", input=texts)
+
+        kw = dict(model="ollama/nomic-embed-text:latest", input=texts, api_base="http://ollama:11434")
+        embeddings = embedding(**kw)
 
         logger.debug("Storing all embeddings.")
         reembed_code(files_and_texts, embeddings)

@@ -14,9 +14,7 @@ DEFAULT_QUEUE_NAME = CELERY_QUEUE_PREFIX
 LOW_PRIORITY_QUEUE_NAME = f"{CELERY_QUEUE_PREFIX}-low"
 HIGH_PRIORITY_QUEUE_NAME = f"{CELERY_QUEUE_PREFIX}-high"
 
-redis_client = redis.StrictRedis(
-    host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True
-)
+redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 
 app = Celery(

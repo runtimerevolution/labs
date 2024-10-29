@@ -10,7 +10,7 @@ from sqlalchemy import delete, insert
 logger = logging.getLogger(__name__)
 
 
-N_DIM = 1536
+N_DIM = 768
 
 
 class Embedding(Base):
@@ -18,7 +18,7 @@ class Embedding(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     file_and_path = Column(String)
     text = Column(String)
-    embedding = Column(Vector(N_DIM))
+    embedding = Column(Vector())
 
 
 @db_connector()
@@ -33,7 +33,10 @@ def find_similar_embeddings(connection, query):
 
     query = query.replace("\n", "")
 
-    result = embedding(model="text-embedding-ada-002", input=[query])
+    kw = dict(model="ollama/nomic-embed-text:latest", input=[query], api_base="http://ollama:11434")
+    result = embedding(**kw)
+
+    # result = embedding(model="text-embedding-ada-002", input=[query])
     query_embedding = result.data[0]["embedding"]
 
     query = (

@@ -4,7 +4,7 @@ import logging
 import json
 
 from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorize.chunk_vectorizer import ChunkVectorizer
+from labs.database.vectorizers.chunk_vectorizer import ChunkVectorizer
 from labs.llm import get_llm_response, get_prompt, prepare_context
 from labs.celery import app
 

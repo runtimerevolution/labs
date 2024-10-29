@@ -17,9 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @time_and_log_function
-def run_on_repo(
-    token, repo_owner, repo_name, username, issue_number, original_branch="main"
-):
+def run_on_repo(token, repo_owner, repo_name, username, issue_number, original_branch="main"):
     issue = get_issue(token, repo_owner, repo_name, username, issue_number)
     issue_title = issue["title"].replace(" ", "-")
     issue_summary = issue["body"]
@@ -45,9 +43,7 @@ def run_on_repo(
         logger.error("Failed to get a response from LLM, aborting run.")
         return
 
-    response_output = call_agent_to_apply_code_changes(
-        llm_response[1].choices[0].message.content
-    )
+    response_output = call_agent_to_apply_code_changes(llm_response[1].choices[0].message.content)
 
     commit_changes(token, repo_owner, repo_name, username, branch_name, response_output)
     create_pull_request(token, repo_owner, repo_name, username, branch_name)
@@ -60,7 +56,5 @@ def run_on_local_repo(repo_path, issue_text):
         logger.error("Failed to get a response from LLM, aborting run.")
         return
 
-    response_output = call_agent_to_apply_code_changes(
-        llm_response[1].choices[0].message.content
-    )
+    response_output = call_agent_to_apply_code_changes(llm_response[1].choices[0].message.content)
     return True, response_output
