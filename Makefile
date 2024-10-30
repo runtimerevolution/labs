@@ -36,7 +36,7 @@ down:
 ## Start all the services
 .PHONY: up
 up: down
-	docker compose --env-file=$(ENV_FILE) up -d
+	docker compose --env-file=$(ENV_FILE) up --build -d
 
 ## Start a python shell
 .PHONY: shell

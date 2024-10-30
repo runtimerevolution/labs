@@ -56,7 +56,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y git
 COPY --from=builder-base $VENV_PATH $VENV_PATH
 
 # Copy the app into /app
-COPY /labs /app/labs/
+COPY . /app/
 
 WORKDIR /app
 

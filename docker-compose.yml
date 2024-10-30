@@ -24,11 +24,12 @@ services:
       - labs-db
 
   litellm:
+    env_file: .env.local
     image: ghcr.io/berriai/litellm:main-latest
     ports:
       - "4000:4000"
     volumes:
-      - ./labs/config/litellm.yaml:/app/config.yaml
+      - ./config/litellm.yaml:/app/config.yaml
     command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
 
   promtail:
