@@ -1,18 +1,15 @@
-import openai
-import os
-import pathspec
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
-from litellm import embedding
-
-from labs.database.vectorizers import Vectorizer
-
-
 import logging
+import os
+
+import openai
+import pathspec
+from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.document_loaders import TextLoader
 
 from config import configuration_variables as settings
-from labs.database.embeddings import reembed_code
-
+from labs.embeddings.base import Embedder
+from labs.embeddings.ollama import OllamaEmbedder
+from labs.embeddings.vectorizers.base import Vectorizer
 
 logger = logging.getLogger(__name__)
 
@@ -77,10 +74,9 @@ class ChunkVectorizer(Vectorizer):
         texts = [file_and_text[1] for file_and_text in files_and_texts]
 
         logger.debug("Embedding all repo documents.")
-        # embeddings = embedding(model="text-embedding-ada-002", input=texts)
 
-        kw = dict(model="ollama/nomic-embed-text:latest", input=texts, api_base="http://ollama:11434")
-        embeddings = embedding(**kw)
+        embedder = Embedder(OllamaEmbedder, model="nomic-embed-text:latest")
+        embeddings = embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")
-        reembed_code(files_and_texts, embeddings)
+        embedder.reembed_code(files_texts=files_and_texts, embeddins=embeddings)

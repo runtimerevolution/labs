@@ -1,12 +1,11 @@
 import random
+
 import pytest
-from config import configuration_variables as settings
-
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
 
-from labs.database.embeddings import Embedding
-
+from config import configuration_variables as settings
+from labs.database.models import EmbeddingModel
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
@@ -36,8 +35,8 @@ def db_session():
 def create_test_embedding():
     embedding_values = random.sample(range(1, 5000), 1536)
 
-    embedding = Embedding(
-        file_and_path="file",
+    embedding = EmbeddingModel(
+        file_path="file",
         text="text",
         embedding=embedding_values,
     )
@@ -47,14 +46,14 @@ def create_test_embedding():
 @pytest.fixture(scope="module")
 def create_test_embeddings():
     embedding_values1 = random.sample(range(1, 5000), 1536)
-    embedding1 = Embedding(
-        file_and_path="file1",
+    embedding1 = EmbeddingModel(
+        file_path="file1",
         text="text1",
         embedding=embedding_values1,
     )
     embedding_values2 = random.sample(range(1, 5000), 1536)
-    embedding2 = Embedding(
-        file_and_path="file2",
+    embedding2 = EmbeddingModel(
+        file_path="file2",
         text="text2",
         embedding=embedding_values2,
     )

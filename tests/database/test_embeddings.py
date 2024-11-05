@@ -1,5 +1,17 @@
-from labs.database.embeddings import Embedding, select_embeddings, reembed_code
 import random
+
+from sqlalchemy import select
+
+from labs.database.connect import db_connector
+from labs.database.models import EmbeddingModel
+from labs.embeddings.base import Embedder, Embeddings
+from labs.embeddings.openai import OpenAIEmbedder
+
+
+@db_connector()
+def select_embeddings(connection):
+    query = select(EmbeddingModel)
+    return connection.execute(query).fetchall()
 
 
 def test_select_embeddings_empty(db_session):
@@ -14,9 +26,9 @@ def test_select_embeddings_one(db_session, create_test_embedding):
 
     result = select_embeddings(db_session)
 
-    embedding: Embedding = result[0][0]
+    embedding: EmbeddingModel = result[0][0]
     assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file1"
+    assert embedding.file_path == "file1"
     assert embedding.text == "text1"
 
 
@@ -27,41 +39,34 @@ def test_select_embeddings_multiple(db_session, create_test_embeddings):
     result = select_embeddings(db_session)
     assert len(result) == 2
 
-    embedding: Embedding = result[0][0]
+    embedding: EmbeddingModel = result[0][0]
     assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file1"
+    assert embedding.file_path == "file1"
     assert embedding.text == "text1"
 
-    embedding: Embedding = result[1][0]
+    embedding: EmbeddingModel = result[1][0]
     assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file2"
+    assert embedding.file_path == "file2"
     assert embedding.text == "text2"
 
 
 def test_reembed_code(db_session):
-    files_and_texts = [("file1", "text1"), ("file2", "text2")]
-    embeddings = type(
-        "obj",
-        (object,),
-        {
-            "data": [
-                {"embedding": random.sample(range(1, 5000), 1536)},
-                {"embedding": random.sample(range(1, 5000), 1536)},
-            ]
-        },
+    files_texts = [("file1", "text1"), ("file2", "text2")]
+    embeddings = Embeddings(
+        model="model", embeddings=[random.sample(range(1, 5000), k=1536), random.sample(range(1, 5000), k=1536)]
     )
 
-    reembed_code(db_session, files_and_texts, embeddings)
+    Embedder(OpenAIEmbedder).reembed_code(connection=db_session, files_texts=files_texts, embeddins=embeddings)
 
     result = select_embeddings(db_session)
     assert len(result) == 2
 
-    embedding: Embedding = result[0][0]
+    embedding: EmbeddingModel = result[0][0]
     assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file1"
+    assert embedding.file_path == "file1"
     assert embedding.text == "text1"
 
-    embedding: Embedding = result[1][0]
+    embedding: EmbeddingModel = result[1][0]
     assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file2"
+    assert embedding.file_path == "file2"
     assert embedding.text == "text2"

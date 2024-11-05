@@ -1,11 +1,13 @@
-from labs.decorators import time_and_log_function
 import logging
+
 from config import configuration_variables as settings
+from labs.decorators import time_and_log_function
+from labs.embeddings.base import Embedder
+from labs.embeddings.ollama import OllamaEmbedder
+from labs.embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from labs.litellm_service.local import RequestLocalLLM
 from labs.litellm_service.request import RequestLiteLLM
-from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorizers.chunk_vectorizer import ChunkVectorizer
-from labs.response_parser.parser import parse_llm_output, is_valid_json
+from labs.response_parser.parser import is_valid_json, parse_llm_output
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +138,7 @@ def call_llm_with_context(repo_destination, issue_summary):
 
     ChunkVectorizer().vectorize_to_database(None, repo_destination)
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    context = find_similar_embeddings(issue_summary)
+    context = Embedder(OllamaEmbedder, model="nomic-embed-text:latest").retrieve_embeddings(issue_summary)
 
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)

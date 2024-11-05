@@ -1,19 +1,17 @@
+import logging
+import os
 from types import SimpleNamespace
 
+import openai
+import pathspec
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
-import openai
-import os
-import pathspec
-
-import logging
 
 from config import configuration_variables as settings
-from labs.database.embeddings import reembed_code
-
-from labs.parsers.python import get_lines_code, parse_python_file
-from labs.database.vectorizers import Vectorizer
 from labs.database.embedders.litellm import LiteLLMEmbedder
+from labs.database.models import reembed_code
+from labs.embeddings.vectorizers.base import Vectorizer
+from labs.parsers.python import get_lines_code, parse_python_file
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +129,7 @@ class PythonVectorizer(Vectorizer):
         logger.debug(f"Loading {len(docs)} documents...")
 
         for doc in docs:
-            embeddings = LiteLLMEmbedder(model="text-embedding-ada-002").create_embeddins(doc)
+            embeddings = LiteLLMEmbedder(model="nomic-embed-text:latest").create_embeddins(doc)
 
             logger.debug("Storing embeddins...")
             reembed_code([(doc.metadata["source"], doc.page_content)], embeddings)

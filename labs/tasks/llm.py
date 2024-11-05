@@ -1,13 +1,14 @@
-import redis
-from config import configuration_variables as settings
-import logging
 import json
+import logging
 
-from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorizers.chunk_vectorizer import ChunkVectorizer
-from labs.llm import get_llm_response, get_prompt, prepare_context
+import redis
+
+from config import configuration_variables as settings
 from labs.celery import app
-
+from labs.embeddings.base import Embedder
+from labs.embeddings.ollama import OllamaEmbedder
+from labs.embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
+from labs.llm import get_llm_response, get_prompt, prepare_context
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,9 @@ def vectorize_repo_to_database_task(prefix="", repo_destination=""):
 
 @app.task
 def find_similar_embeddings_task(prefix="", issue_body=""):
-    rows = find_similar_embeddings(redis_client.get(f"{prefix}_issue_body") if prefix else issue_body)
+    rows = Embedder(OllamaEmbedder, model="nomic-embed-text:latest").retrieve_embeddings(
+        redis_client.get(f"{prefix}_issue_body") if prefix else issue_body
+    )
     similar_embeddings = [(row[0], row[1], row[2]) for row in rows]
 
     if prefix:
