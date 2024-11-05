@@ -99,7 +99,10 @@ class PythonVectorizer(Vectorizer):
 
                     class_snippet = get_lines_code(file_path, cls_ns.start_line, cls_ns.end_line)
                     metadata = dict(
-                        source=file_path, name=cls_ns.name, start_line=cls_ns.start_line, end_line=cls_ns.end_line
+                        source=file_path,
+                        name=cls_ns.name,
+                        start_line=cls_ns.start_line,
+                        end_line=cls_ns.end_line,
                     )
 
                     doc_content = self.prepare_doc_content(metadata, class_snippet)
@@ -132,4 +135,8 @@ class PythonVectorizer(Vectorizer):
             embeddings = LiteLLMEmbedder(model="nomic-embed-text:latest").create_embeddins(doc)
 
             logger.debug("Storing embeddins...")
-            reembed_code([(doc.metadata["source"], doc.page_content)], embeddings)
+            reembed_code(
+                [(doc.metadata["source"], doc.page_content)],
+                embeddings,
+                repo_destination,
+            )  # type: ignore

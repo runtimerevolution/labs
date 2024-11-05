@@ -1,4 +1,4 @@
-import random
+from typing import List
 
 import pytest
 from sqlalchemy import create_engine
@@ -6,6 +6,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from config import configuration_variables as settings
 from labs.database.models import EmbeddingModel
+from tests.constants import MULTIPLE_EMBEDDINGS, SINGLE_EMBEDDING
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
@@ -33,28 +34,15 @@ def db_session():
 
 @pytest.fixture(scope="module")
 def create_test_embedding():
-    embedding_values = random.sample(range(1, 5000), 1536)
-
-    embedding = EmbeddingModel(
-        file_path="file",
-        text="text",
-        embedding=embedding_values,
-    )
+    embedding = EmbeddingModel(**SINGLE_EMBEDDING)
     return [embedding]
 
 
 @pytest.fixture(scope="module")
 def create_test_embeddings():
-    embedding_values1 = random.sample(range(1, 5000), 1536)
-    embedding1 = EmbeddingModel(
-        file_path="file1",
-        text="text1",
-        embedding=embedding_values1,
-    )
-    embedding_values2 = random.sample(range(1, 5000), 1536)
-    embedding2 = EmbeddingModel(
-        file_path="file2",
-        text="text2",
-        embedding=embedding_values2,
-    )
-    return [embedding1, embedding2]
+    embeddings: List[EmbeddingModel] = []
+
+    for embedding in MULTIPLE_EMBEDDINGS:
+        embeddings.append(EmbeddingModel(**embedding))
+
+    return embeddings

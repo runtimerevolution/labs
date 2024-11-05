@@ -41,8 +41,14 @@ class Embedder(ABC):
         return connection.execute(db_query).fetchall()
 
     @db_connector()
-    def reembed_code(self, connection: Connection, files_texts: Union[str, List[str]], embeddins: Any = None) -> None:
-        db_query = delete(EmbeddingModel)
+    def reembed_code(
+        self,
+        connection: Connection,
+        repository: str,
+        files_texts: Union[str, List[str]],
+        embeddins: Any = None,
+    ) -> None:
+        db_query = delete(EmbeddingModel).where(EmbeddingModel.repository == repository)
         connection.execute(db_query)
 
         if not embeddins:
@@ -50,6 +56,7 @@ class Embedder(ABC):
 
         for file_text, file_text_embedding in zip(files_texts, embeddins.embeddings):
             query = insert(EmbeddingModel).values(
+                repository=repository,
                 embedding=file_text_embedding,
                 file_path=file_text[0],
                 text=file_text[1],

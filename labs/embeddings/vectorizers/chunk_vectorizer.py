@@ -79,4 +79,4 @@ class ChunkVectorizer(Vectorizer):
         embeddings = embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")
-        embedder.reembed_code(files_texts=files_and_texts, embeddins=embeddings)
+        embedder.reembed_code(files_texts=files_and_texts, embeddins=embeddings, repository=repo_destination)  # type: ignore
