@@ -9,7 +9,7 @@ from labs.database.vectorize import Vectorizer
 
 import logging
 
-from labs.config import settings
+from config import configuration_variables as settings
 from labs.database.embeddings import reembed_code
 
 
