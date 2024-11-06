@@ -46,15 +46,15 @@ class Embedder(ABC):
         connection: Connection,
         repository: str,
         files_texts: Union[str, List[str]],
-        embeddins: Any = None,
+        embeddings: Any = None,
     ) -> None:
         db_query = delete(EmbeddingModel).where(EmbeddingModel.repository == repository)
         connection.execute(db_query)
 
-        if not embeddins:
-            embeddins = self.embed(prompt=files_texts)
+        if not embeddings:
+            embeddings = self.embed(prompt=files_texts)
 
-        for file_text, file_text_embedding in zip(files_texts, embeddins.embeddings):
+        for file_text, file_text_embedding in zip(files_texts, embeddings.embeddings):
             query = insert(EmbeddingModel).values(
                 repository=repository,
                 embedding=file_text_embedding,

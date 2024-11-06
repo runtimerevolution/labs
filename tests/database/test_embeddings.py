@@ -55,7 +55,7 @@ def test_reembed_code(db_session):
     )
 
     Embedder(OpenAIEmbedder).reembed_code(
-        connection=db_session, files_texts=files_texts, embeddins=embeddings, repository=REPO1
+        connection=db_session, files_texts=files_texts, embeddings=embeddings, repository=REPO1
     )
 
     result = find_embeddings(db_session, REPO1)
