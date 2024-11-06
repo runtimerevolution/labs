@@ -1,10 +1,11 @@
 # labs
 
-<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
-    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a>
+<img src="https://img.shields.io/badge/runtime_revolution-labs-blue" />
 
-Runtime Labs
+## Topics
+
+- [Architecture](docs/rag.md)
+- [R&D](docs/rd.md)
 
 ## Getting Started
 
@@ -38,9 +39,3 @@ Here's the steps to setup the project locally:
 3. `make up`
 4. `make api` or `ENV=local make api`
 5. `ENV=test make tests`
-
-
-## Approaches, Tests Conducted and Results
-
-For details on the approaches and tests conducted on issues encountered during development, 
-refer to the document [here](./doc/results.md)
