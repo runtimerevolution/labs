@@ -1,4 +1,12 @@
 services:
+  postgres:
+    container_name: postgres
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASS}
+      POSTGRES_DB: ${POSTGRES_DB}
+
   labs-db:
     container_name: labs-db
     image: pgvector/pgvector:pg16
@@ -22,14 +30,6 @@ services:
       - "8000:8000"
     depends_on:
       - labs-db
-
-  litellm:
-    image: ghcr.io/berriai/litellm:main-latest
-    ports:
-      - "4000:4000"
-    volumes:
-      - ./labs/config/litellm.yaml:/app/config.yaml
-    command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
 
   promtail:
     image: grafana/promtail:3.1.1

@@ -28,7 +28,9 @@ def extract_classes(file_path):
                             args.append(f"{arg.arg}: {arg.annotation.id}")
                         elif isinstance(arg.annotation, ast.Subscript):
                             if isinstance(arg.annotation.value, ast.Name):
-                                args.append(f"{arg.arg}: {arg.annotation.value.id}[{arg.annotation.slice.value.id}]")
+                                args.append(
+                                    f"{arg.arg}: {arg.annotation.value.id}[{arg.annotation.slice.value.id}]"
+                                )
                         else:
                             args.append(arg.arg)
                     method_signature = f"{visibility} {method_name}({', '.join(args)})"

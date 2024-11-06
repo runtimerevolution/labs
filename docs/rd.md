@@ -1,10 +1,10 @@
-# Project tests results
+# Research & Development
 
 This document aims to document some of the approaches tested and the discoveries made on various problems, 
 as well as the results achieved from the tests conducted.
 
 
-## Embeddins
+## Embeddings
 
 During the course of the project, various approaches were taken regarding how embeddings are generated, namely:
 

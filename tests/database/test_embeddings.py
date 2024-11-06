@@ -1,41 +1,39 @@
-from labs.database.embeddings import Embedding, select_embeddings, reembed_code
 import random
+from labs.database.embeddings import Embedding, find_embeddings, reembed_code
+from tests.constants import MULTIPLE_EMBEDDINGS, REPO1, SINGLE_EMBEDDING
 
 
-def test_select_embeddings_empty(db_session):
-    result = select_embeddings(db_session)
+def test_find_embeddings_no_match(db_session):
+    result = find_embeddings(db_session, "")
 
     assert result == []
 
 
-def test_select_embeddings_one(db_session, create_test_embedding):
+def test_find_embeddings_one_match(db_session, create_test_embedding):
     db_session.add_all(create_test_embedding)
     db_session.commit()
 
-    result = select_embeddings(db_session)
+    result = find_embeddings(db_session, REPO1)
+    assert result != []
 
     embedding: Embedding = result[0][0]
-    assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file1"
-    assert embedding.text == "text1"
+    assert embedding.file_and_path == SINGLE_EMBEDDING["file_and_path"]
+    assert embedding.text == SINGLE_EMBEDDING["text"]
+    assert embedding.embedding.size == len(SINGLE_EMBEDDING["embedding"])
 
 
-def test_select_embeddings_multiple(db_session, create_test_embeddings):
+def test_find_multiple_embeddings(db_session, create_test_embeddings):
     db_session.add_all(create_test_embeddings)
     db_session.commit()
 
-    result = select_embeddings(db_session)
+    result = find_embeddings(db_session, REPO1)
     assert len(result) == 2
 
-    embedding: Embedding = result[0][0]
-    assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file1"
-    assert embedding.text == "text1"
-
-    embedding: Embedding = result[1][0]
-    assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file2"
-    assert embedding.text == "text2"
+    for i in range(len(result)):
+        embedding: Embedding = result[i][0]
+        assert embedding.file_and_path == MULTIPLE_EMBEDDINGS[i]["file_and_path"]
+        assert embedding.text == MULTIPLE_EMBEDDINGS[i]["text"]
+        assert embedding.embedding.size == len(MULTIPLE_EMBEDDINGS[i]["embedding"])
 
 
 def test_reembed_code(db_session):
@@ -51,17 +49,13 @@ def test_reembed_code(db_session):
         },
     )
 
-    reembed_code(db_session, files_and_texts, embeddings)
+    reembed_code(db_session, files_and_texts, embeddings, REPO1)
 
-    result = select_embeddings(db_session)
+    result = find_embeddings(db_session, REPO1)
     assert len(result) == 2
 
-    embedding: Embedding = result[0][0]
-    assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file1"
-    assert embedding.text == "text1"
-
-    embedding: Embedding = result[1][0]
-    assert len(embedding.embedding) == 1536
-    assert embedding.file_and_path == "file2"
-    assert embedding.text == "text2"
+    for i in range(len(result)):
+        embedding: Embedding = result[i][0]
+        assert embedding.file_and_path == MULTIPLE_EMBEDDINGS[i]["file_and_path"]
+        assert embedding.text == MULTIPLE_EMBEDDINGS[i]["text"]
+        assert embedding.embedding.size == len(MULTIPLE_EMBEDDINGS[i]["embedding"])
