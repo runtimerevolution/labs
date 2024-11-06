@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 
 from labs.api.types import (
@@ -11,8 +13,6 @@ from labs.api.types import (
 )
 from labs.decorators import async_time_and_log_function
 from labs.github.github import GithubRequests
-import logging
-
 
 logger = logging.getLogger(__name__)
 

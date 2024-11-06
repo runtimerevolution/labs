@@ -1,4 +1,7 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
+
 from labs.api.types import (
     ApplyCodeChangesRequest,
     CommitChangesRequest,
@@ -8,10 +11,11 @@ from labs.api.types import (
     GetIssueRequest,
     GetLLMResponseRequest,
     PreparePromptAndContextRequest,
-    RunOnRepoRequest,
     RunOnLocalRepoRequest,
+    RunOnRepoRequest,
     VectorizeRepoToDatabaseRequest,
 )
+from labs.decorators import async_time_and_log_function
 from labs.tasks import (
     apply_code_changes_task,
     commit_changes_task,
@@ -25,9 +29,6 @@ from labs.tasks import (
     run_on_repo_task,
     vectorize_repo_to_database_task,
 )
-from labs.decorators import async_time_and_log_function
-import logging
-
 
 logger = logging.getLogger(__name__)
 
