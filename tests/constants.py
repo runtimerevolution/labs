@@ -10,7 +10,7 @@ REPO2 = "repo2"
 
 SINGLE_EMBEDDING = {
     "repository": REPO1,
-    "file_and_path": "file",
+    "file_path": "file",
     "text": "text",
     "embedding": embedding_values(),
 }
@@ -18,13 +18,13 @@ SINGLE_EMBEDDING = {
 MULTIPLE_EMBEDDINGS = [
     {
         "repository": REPO1,
-        "file_and_path": "file1",
+        "file_path": "file1",
         "text": "text1",
         "embedding": embedding_values(),
     },
     {
         "repository": REPO1,
-        "file_and_path": "file2",
+        "file_path": "file2",
         "text": "text2",
         "embedding": embedding_values(),
     },

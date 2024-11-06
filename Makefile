@@ -28,20 +28,22 @@ lint:
 format:
 	black --config pyproject.toml labs
 
-## Teardown local database
+## Stops and removes all the services
 .PHONY: down
 down:
 	docker compose --env-file=$(ENV_FILE) down
 
-## Setup local database
+## Start all the services
 .PHONY: up
 up: down
 	docker compose --env-file=$(ENV_FILE) up --build -d
 
+## Start a python shell
 .PHONY: shell
 shell:
 	ipython
 
+## Run project tests
 .PHONY: tests
 tests:
 	pytest
@@ -54,13 +56,11 @@ clean_tests:
 		rm -rf labs/test/vcr_cassettes; \
 	fi
 
-.PHONY: local_llm_up
-local_llm_up:
-	docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
+## Pull given model from ollama (use `make ollama model=<model name>`)
+.PHONY: ollama
+ollama:
+	docker compose exec ollama ollama pull $(model)
 
-.PHONY: local_llm_run
-local_llm_run: local_llm_up
-	docker exec ollama ollama run llama3.2
 
 #################################################################################
 # Self Documenting Commands                                                     #

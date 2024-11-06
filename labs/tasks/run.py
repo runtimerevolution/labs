@@ -1,5 +1,10 @@
-from celery import chain
+import logging
+
 import redis
+from celery import chain
+
+from config import configuration_variables as settings
+from labs.celery import app
 from labs.tasks import (
     apply_code_changes_task,
     clone_repo_task,
@@ -12,10 +17,6 @@ from labs.tasks import (
     prepare_prompt_and_context_task,
     vectorize_repo_to_database_task,
 )
-from config import configuration_variables as settings
-import logging
-from labs.celery import app
-
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_P
 def init_task(self, **kwargs):
     prefix = self.request.id
     for k, v in kwargs.items():
-        redis_client.set(f"{prefix}_{k}", v, ex=300)
+        redis_client.set(f"{prefix}_{k}", v, ex=3600)
     return prefix
 
 
