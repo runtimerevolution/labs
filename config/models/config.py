@@ -28,4 +28,4 @@ class Config(models.Model):
         return f"{self.key}: {self.value}"
 
     class Meta:
-        indexes = [models.Index(fields=["key", "llm_model"])]
+        indexes = [models.Index(fields=["llm_model", "key"])]

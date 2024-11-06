@@ -3,13 +3,10 @@ from pathlib import Path
 
 from labs.logger import setup_logger
 
-from .models import Config
-
 setup_logger()
 
-PROJ_ROOT = Path(__file__).resolve().parents[1]
 
-configs = Config.objects.all()
+PROJ_ROOT = Path(__file__).resolve().parents[1]
 
 DATA_DIR = PROJ_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
@@ -29,16 +26,16 @@ GITHUB_API_BASE_URL = "https://api.github.com"
 
 TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", "False"))
 
-LITELLM_MASTER_KEY = configs.get(key="LITELLM_MASTER_KEY") or os.environ.get("LITELLM_MASTER_KEY")
-LITELLM_API_KEY = configs.get(key="LITELLM_API_KEY") or os.environ.get("LITELLM_API_KEY")
+LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
+LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
 
 CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "/tmp/")
 LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "openai/gpt-4o")
 
-OPENAI_API_KEY = configs.get(key="OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY")
-GEMINI_API_KEY = configs.get(key="GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")
-COHERE_API_KEY = configs.get(key="COHERE_API_KEY") or os.environ.get("COHERE_API_KEY")
-GROQ_API_KEY = configs.get(key="GROQ_API_KEY") or os.environ.get("GROQ_API_KEY")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+COHERE_API_KEY = os.environ.get("COHERE_API_KEY")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
 DATABASE_PASS = os.environ.get("DATABASE_PASS", "postgres")
