@@ -37,5 +37,7 @@ Here's the steps to setup the project locally:
 1. `poetry shell`
 2. `poetry install`
 3. `make up`
-4. `make api` or `ENV=local make api`
-5. `ENV=test make tests`
+4. `make ollama model=nomic-embed-text:latest`
+5. `make ollama model=llama3.2:latest`
+6. `make api` or `ENV=local make api`
+7. `ENV=test make tests`
