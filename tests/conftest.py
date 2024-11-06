@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from config import configuration_variables as settings
-from labs.database.embeddings import Embedding
+from labs.database.models import EmbeddingModel
 from tests.constants import MULTIPLE_EMBEDDINGS, SINGLE_EMBEDDING
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
@@ -34,15 +34,15 @@ def db_session():
 
 @pytest.fixture(scope="module")
 def create_test_embedding():
-    embedding = Embedding(**SINGLE_EMBEDDING)
+    embedding = EmbeddingModel(**SINGLE_EMBEDDING)
     return [embedding]
 
 
 @pytest.fixture(scope="module")
 def create_test_embeddings():
-    embeddings: List[Embedding] = []
+    embeddings: List[EmbeddingModel] = []
 
     for embedding in MULTIPLE_EMBEDDINGS:
-        embeddings.append(Embedding(**embedding))
+        embeddings.append(EmbeddingModel(**embedding))
 
     return embeddings

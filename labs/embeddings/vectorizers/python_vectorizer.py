@@ -6,11 +6,11 @@ import openai
 import pathspec
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
-from litellm import embedding
 
 from config import configuration_variables as settings
-from labs.database.embeddings import reembed_code
-from labs.database.vectorize import Vectorizer
+from labs.embeddings.base import Embedder
+from labs.embeddings.openai import OpenAIEmbedder
+from labs.embeddings.vectorizers.base import Vectorizer
 from labs.parsers.python import get_lines_code, parse_python_file
 
 logger = logging.getLogger(__name__)
@@ -131,12 +131,13 @@ class PythonVectorizer(Vectorizer):
 
         logger.debug(f"Loading {len(docs)} documents...")
 
+        embedder = Embedder(OpenAIEmbedder)
         for doc in docs:
-            embeddings = embedding(model="text-embedding-ada-002", input=doc)
+            embeddings = embedder.embed(doc)
 
             logger.debug("Storing embeddins...")
-            reembed_code(
-                [(doc.metadata["source"], doc.page_content)],
-                embeddings,
-                repo_destination,
-            )  # type: ignore
+            embedder.reembed_code(
+                files_texts=[(doc.metadata["source"], doc.page_content)],
+                embeddings=embeddings,
+                repo_destination=repo_destination,
+            )

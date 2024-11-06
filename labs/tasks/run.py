@@ -27,7 +27,7 @@ redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_P
 def init_task(self, **kwargs):
     prefix = self.request.id
     for k, v in kwargs.items():
-        redis_client.set(f"{prefix}_{k}", v, ex=300)
+        redis_client.set(f"{prefix}_{k}", v, ex=3600)
     return prefix
 
 

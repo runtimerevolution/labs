@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS embeddings (
 id SERIAL PRIMARY KEY,
 repository text,
 embedding vector,
-file_and_path text,
+file_path text,
 text text,
 created_at timestamptz DEFAULT now()
 );

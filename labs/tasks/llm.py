@@ -5,8 +5,9 @@ import redis
 
 from config import configuration_variables as settings
 from labs.celery import app
-from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorize.chunk_vectorizer import ChunkVectorizer
+from labs.embeddings.base import Embedder
+from labs.embeddings.openai import OpenAIEmbedder
+from labs.embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from labs.llm import get_llm_response, get_prompt, prepare_context
 
 logger = logging.getLogger(__name__)
@@ -26,7 +27,9 @@ def vectorize_repo_to_database_task(prefix="", repo_destination=""):
 
 @app.task
 def find_similar_embeddings_task(prefix="", issue_body=""):
-    rows = find_similar_embeddings(redis_client.get(f"{prefix}_issue_body") if prefix else issue_body)
+    rows = Embedder(OpenAIEmbedder).retrieve_embeddings(
+        redis_client.get(f"{prefix}_issue_body") if prefix else issue_body
+    )
     similar_embeddings = [(row[0], row[1], row[2]) for row in rows]
 
     if prefix:
@@ -55,6 +58,7 @@ def get_llm_response_task(prefix="", context={}):
     llm_response = get_llm_response(context)
 
     if prefix:
-        redis_client.set(f"{prefix}_llm_response", llm_response[1][1].choices[0].message.content)
+        logger.debug(f"{llm_response=}")
+        redis_client.set(f"{prefix}_llm_response", llm_response[1][1]["choices"][0]["message"]["content"])
         return prefix
     return llm_response

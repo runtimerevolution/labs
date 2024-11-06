@@ -5,11 +5,11 @@ import openai
 import pathspec
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
-from litellm import embedding
 
 from config import configuration_variables as settings
-from labs.database.embeddings import reembed_code
-from labs.database.vectorize import Vectorizer
+from labs.embeddings.base import Embedder
+from labs.embeddings.openai import OpenAIEmbedder
+from labs.embeddings.vectorizers.base import Vectorizer
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ class ChunkVectorizer(Vectorizer):
 
     def split_docs(self, docs):
         """Split the input documents into smaller chunks."""
-        text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+        text_splitter = CharacterTextSplitter(chunk_size=2000, chunk_overlap=0)
         return text_splitter.split_documents(docs)
 
     def vectorize_to_database(self, include_file_extensions, repo_destination):
@@ -74,7 +74,9 @@ class ChunkVectorizer(Vectorizer):
         texts = [file_and_text[1] for file_and_text in files_and_texts]
 
         logger.debug("Embedding all repo documents.")
-        embeddings = embedding(model="text-embedding-ada-002", input=texts)
+
+        embedder = Embedder(OpenAIEmbedder)
+        embeddings = embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")
-        reembed_code(files_and_texts, embeddings, repo_destination)  # type: ignore
+        embedder.reembed_code(files_texts=files_and_texts, embeddings=embeddings, repository=repo_destination)  # type: ignore

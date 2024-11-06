@@ -1,0 +1,7 @@
+.venv
+.env.local
+.env.sample
+.gitignore
+.pre-commit-config.yaml
+.github
+.idea

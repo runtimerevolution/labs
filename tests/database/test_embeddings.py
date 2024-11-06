@@ -1,7 +1,18 @@
 import random
 
-from labs.database.embeddings import Embedding, find_embeddings, reembed_code
+from sqlalchemy import select
+
+from labs.database.connect import db_connector
+from labs.database.models import EmbeddingModel
+from labs.embeddings.base import Embedder, Embeddings
+from labs.embeddings.openai import OpenAIEmbedder
 from tests.constants import MULTIPLE_EMBEDDINGS, REPO1, SINGLE_EMBEDDING
+
+
+@db_connector()
+def find_embeddings(connection, repository: str):
+    query = select(EmbeddingModel).where(EmbeddingModel.repository == repository)
+    return connection.execute(query).fetchall()
 
 
 def test_find_embeddings_no_match(db_session):
@@ -17,8 +28,8 @@ def test_find_embeddings_one_match(db_session, create_test_embedding):
     result = find_embeddings(db_session, REPO1)
     assert result != []
 
-    embedding: Embedding = result[0][0]
-    assert embedding.file_and_path == SINGLE_EMBEDDING["file_and_path"]
+    embedding: EmbeddingModel = result[0][0]
+    assert embedding.file_path == SINGLE_EMBEDDING["file_path"]
     assert embedding.text == SINGLE_EMBEDDING["text"]
     assert embedding.embedding.size == len(SINGLE_EMBEDDING["embedding"])
 
@@ -31,32 +42,27 @@ def test_find_multiple_embeddings(db_session, create_test_embeddings):
     assert len(result) == 2
 
     for i in range(len(result)):
-        embedding: Embedding = result[i][0]
-        assert embedding.file_and_path == MULTIPLE_EMBEDDINGS[i]["file_and_path"]
+        embedding: EmbeddingModel = result[i][0]
+        assert embedding.file_path == MULTIPLE_EMBEDDINGS[i]["file_path"]
         assert embedding.text == MULTIPLE_EMBEDDINGS[i]["text"]
         assert embedding.embedding.size == len(MULTIPLE_EMBEDDINGS[i]["embedding"])
 
 
 def test_reembed_code(db_session):
-    files_and_texts = [("file1", "text1"), ("file2", "text2")]
-    embeddings = type(
-        "obj",
-        (object,),
-        {
-            "data": [
-                {"embedding": random.sample(range(1, 5000), 1536)},
-                {"embedding": random.sample(range(1, 5000), 1536)},
-            ]
-        },
+    files_texts = [("file1", "text1"), ("file2", "text2")]
+    embeddings = Embeddings(
+        model="model", embeddings=[random.sample(range(1, 5000), k=1536), random.sample(range(1, 5000), k=1536)]
     )
 
-    reembed_code(db_session, files_and_texts, embeddings, REPO1)
+    Embedder(OpenAIEmbedder).reembed_code(
+        connection=db_session, files_texts=files_texts, embeddings=embeddings, repository=REPO1
+    )
 
     result = find_embeddings(db_session, REPO1)
     assert len(result) == 2
 
     for i in range(len(result)):
-        embedding: Embedding = result[i][0]
-        assert embedding.file_and_path == MULTIPLE_EMBEDDINGS[i]["file_and_path"]
+        embedding: EmbeddingModel = result[i][0]
+        assert embedding.file_path == MULTIPLE_EMBEDDINGS[i]["file_path"]
         assert embedding.text == MULTIPLE_EMBEDDINGS[i]["text"]
         assert embedding.embedding.size == len(MULTIPLE_EMBEDDINGS[i]["embedding"])

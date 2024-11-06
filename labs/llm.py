@@ -1,9 +1,10 @@
 import logging
 
 from config import configuration_variables as settings
-from labs.database.embeddings import find_similar_embeddings
-from labs.database.vectorize.chunk_vectorizer import ChunkVectorizer
 from labs.decorators import time_and_log_function
+from labs.embeddings.base import Embedder
+from labs.embeddings.openai import OpenAIEmbedder
+from labs.embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from labs.litellm_service.local import RequestLocalLLM
 from labs.litellm_service.request import RequestLiteLLM
 from labs.response_parser.parser import is_valid_json, parse_llm_output
@@ -137,7 +138,7 @@ def call_llm_with_context(repo_destination, issue_summary):
 
     ChunkVectorizer().vectorize_to_database(None, repo_destination)
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    context = find_similar_embeddings(issue_summary)
+    context = Embedder(OpenAIEmbedder).retrieve_embeddings(issue_summary)
 
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
