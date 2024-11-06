@@ -16,23 +16,22 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-r2*6x16&hv(gkqb!*awu^eb4o^%90nje&ww!yy*uhn@u9s9%d3")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+DEBUG = eval(os.environ.get("DEBUG", "False"))
 
-ALLOWED_HOSTS = [s.strip() for s in os.environ.get("DJANGO_ALLOWED_HOSTS", []).split(",")]
-ALLOWED_HOSTS = [s.strip() for s in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")]
+ALLOWED_HOSTS = [s.strip() for s in os.environ.get("ALLOWED_HOSTS", "").split(",")]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "config",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -40,6 +39,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+CUSTOM_APPS = ["app"]
+
+INSTALLED_APPS.extend(CUSTOM_APPS)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 AVAILABLE_KEYS = [
     "LITELLM_MASTER_KEY",
@@ -17,11 +16,13 @@ AVAILABLE_KEYS = [
 
 
 class Config(models.Model):
-    llm_model = models.TextField(blank=True, null=True)
-    key = models.TextField(unique=True, choices=[(k, k) for k in sorted(AVAILABLE_KEYS)])
-    value = models.TextField(blank=True, null=True)
-    type = models.TextField(blank=True, null=True)
-    created_at = models.DateTimeField(default=timezone.now)
+    llm_model = models.CharField(max_length=255, blank=True, null=True, verbose_name="LLM Model")
+    key = models.CharField(
+        max_length=255, unique=True, choices=[(k, k) for k in sorted(AVAILABLE_KEYS)], verbose_name="Key"
+    )
+    value = models.CharField(max_length=255, blank=True, null=True, verbose_name="Value")
+    type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Type")
+    created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

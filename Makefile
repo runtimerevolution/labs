@@ -61,6 +61,9 @@ clean_tests:
 ollama:
 	docker compose exec ollama ollama pull $(model)
 
+.PHONY: zsh
+zsh:
+	zsh
 
 #################################################################################
 # Self Documenting Commands                                                     #
