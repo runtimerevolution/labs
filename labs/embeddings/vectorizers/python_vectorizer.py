@@ -8,8 +8,8 @@ from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 
 from config import configuration_variables as settings
-from labs.database.embedders.litellm import LiteLLMEmbedder
-from labs.database.models import reembed_code
+from labs.embeddings.base import Embedder
+from labs.embeddings.openai import OpenAIEmbedder
 from labs.embeddings.vectorizers.base import Vectorizer
 from labs.parsers.python import get_lines_code, parse_python_file
 
@@ -131,12 +131,13 @@ class PythonVectorizer(Vectorizer):
 
         logger.debug(f"Loading {len(docs)} documents...")
 
+        embedder = Embedder(OpenAIEmbedder)
         for doc in docs:
-            embeddings = LiteLLMEmbedder(model="nomic-embed-text:latest").create_embeddins(doc)
+            embeddings = embedder.embed(doc)
 
             logger.debug("Storing embeddins...")
-            reembed_code(
-                [(doc.metadata["source"], doc.page_content)],
-                embeddings,
-                repo_destination,
-            )  # type: ignore
+            embedder.reembed_code(
+                files_texts=[(doc.metadata["source"], doc.page_content)],
+                embeddings=embeddings,
+                repo_destination=repo_destination,
+            )
