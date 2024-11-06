@@ -5,7 +5,6 @@ from labs.decorators import time_and_log_function
 from labs.github.github import GithubRequests
 from labs.response_parser.parser import create_file, modify_file, parse_llm_output
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -42,9 +41,7 @@ def create_branch(
         username=username,
     )
     branch_name = f"{issue_number}-{issue_title}"
-    github_request.create_branch(
-        branch_name=branch_name, original_branch=original_branch
-    )
+    github_request.create_branch(branch_name=branch_name, original_branch=original_branch)
     return branch_name
 
 
@@ -61,15 +58,11 @@ def commit_changes(token, repo_owner, repo_name, username, branch_name, file_lis
         repo_name=repo_name,
         username=username,
     )
-    return github_request.commit_changes(
-        "fix", branch_name=branch_name, files=file_list
-    )
+    return github_request.commit_changes("fix", branch_name=branch_name, files=file_list)
 
 
 @time_and_log_function
-def create_pull_request(
-    token, repo_owner, repo_name, username, original_branch, branch_name
-):
+def create_pull_request(token, repo_owner, repo_name, username, original_branch, branch_name):
     github_request = GithubRequests(
         github_token=token,
         repo_owner=repo_owner,

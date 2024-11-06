@@ -1,4 +1,5 @@
 import random
+
 from labs.database.embeddings import Embedding, find_embeddings, reembed_code
 from tests.constants import MULTIPLE_EMBEDDINGS, REPO1, SINGLE_EMBEDDING
 

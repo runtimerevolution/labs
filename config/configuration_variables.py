@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from labs.logger import setup_logger
+
 from .models import Config
 
 setup_logger()

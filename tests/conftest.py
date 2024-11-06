@@ -1,13 +1,12 @@
 from typing import List
+
 import pytest
-from config import configuration_variables as settings
-
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import declarative_base, sessionmaker
 
+from config import configuration_variables as settings
 from labs.database.embeddings import Embedding
 from tests.constants import MULTIPLE_EMBEDDINGS, SINGLE_EMBEDDING
-
 
 engine = create_engine(settings.DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)

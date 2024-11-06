@@ -1,7 +1,9 @@
 import os
+
 import django
-from fastapi import FastAPI
 from django.core.asgi import get_asgi_application
+from fastapi import FastAPI
+
 from labs.api import codemonkey_endpoints, github_endpoints
 
 # Set the DJANGO_SETTINGS_MODULE environment variable to point to your Django project's settings
@@ -19,6 +21,7 @@ fastapi_app = FastAPI()
 # include codemonkey and github into fastapi
 fastapi_app.include_router(codemonkey_endpoints.router)
 fastapi_app.include_router(github_endpoints.router)
+
 
 # ASGI application to route to Django or FastAPI
 async def app(scope, receive, send):

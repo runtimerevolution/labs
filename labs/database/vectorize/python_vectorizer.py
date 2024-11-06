@@ -1,19 +1,17 @@
+import logging
+import os
 from types import SimpleNamespace
 
+import openai
+import pathspec
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 from litellm import embedding
-import openai
-import os
-import pathspec
-
-import logging
 
 from config import configuration_variables as settings
 from labs.database.embeddings import reembed_code
-
-from labs.parsers.python import get_lines_code, parse_python_file
 from labs.database.vectorize import Vectorizer
+from labs.parsers.python import get_lines_code, parse_python_file
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +45,7 @@ class PythonVectorizer(Vectorizer):
         if os.path.isfile(gitignore_path):
             with open(gitignore_path, "r") as gitignore_file:
                 gitignore = gitignore_file.read()
-            spec = pathspec.PathSpec.from_lines(
-                pathspec.patterns.GitWildMatchPattern, gitignore.splitlines()
-            )
+            spec = pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, gitignore.splitlines())
 
         else:
             spec = None
@@ -64,10 +60,7 @@ class PythonVectorizer(Vectorizer):
                 if spec and spec.match_file(file_path):
                     continue
 
-                if (
-                    file_extensions
-                    and os.path.splitext(file_path)[1] not in file_extensions
-                ):
+                if file_extensions and os.path.splitext(file_path)[1] not in file_extensions:
                     continue
 
                 # only python files
@@ -87,9 +80,7 @@ class PythonVectorizer(Vectorizer):
                 for func in python_file_structure.get("functions", []):
                     func_ns = SimpleNamespace(**func)
 
-                    function_snippet = get_lines_code(
-                        file_path, func_ns.start_line, func_ns.end_line
-                    )
+                    function_snippet = get_lines_code(file_path, func_ns.start_line, func_ns.end_line)
                     metadata = dict(
                         source=file_path,
                         name=func_ns.name,
@@ -106,9 +97,7 @@ class PythonVectorizer(Vectorizer):
                 for cls in python_file_structure.get("classes", []):
                     cls_ns = SimpleNamespace(**cls)
 
-                    class_snippet = get_lines_code(
-                        file_path, cls_ns.start_line, cls_ns.end_line
-                    )
+                    class_snippet = get_lines_code(file_path, cls_ns.start_line, cls_ns.end_line)
                     metadata = dict(
                         source=file_path,
                         name=cls_ns.name,
@@ -122,9 +111,7 @@ class PythonVectorizer(Vectorizer):
                     for method in cls.get("methods"):
                         method_ns = SimpleNamespace(**method)
 
-                        method_snippet = get_lines_code(
-                            file_path, method_ns.start_line, method_ns.end_line
-                        )
+                        method_snippet = get_lines_code(file_path, method_ns.start_line, method_ns.end_line)
                         metadata = dict(
                             source=file_path,
                             name=method_ns.name,

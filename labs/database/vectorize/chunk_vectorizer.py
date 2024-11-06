@@ -1,17 +1,15 @@
-from litellm import embedding
-import openai
-import os
-import pathspec
-from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import CharacterTextSplitter
-
-from labs.database.vectorize import Vectorizer
-
 import logging
+import os
+
+import openai
+import pathspec
+from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.document_loaders import TextLoader
+from litellm import embedding
 
 from config import configuration_variables as settings
 from labs.database.embeddings import reembed_code
-
+from labs.database.vectorize import Vectorizer
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +31,7 @@ class ChunkVectorizer(Vectorizer):
         if os.path.isfile(gitignore_path):
             with open(gitignore_path, "r") as gitignore_file:
                 gitignore = gitignore_file.read()
-            spec = pathspec.PathSpec.from_lines(
-                pathspec.patterns.GitWildMatchPattern, gitignore.splitlines()
-            )
+            spec = pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, gitignore.splitlines())
         else:
             spec = None
 
@@ -74,9 +70,7 @@ class ChunkVectorizer(Vectorizer):
         logger.debug("Loading and splitting all documents into chunks.")
         docs = self.load_docs(repo_destination, include_file_extensions)
         texts = self.split_docs(docs)
-        files_and_texts = [
-            (text.metadata["source"], text.page_content) for text in texts
-        ]
+        files_and_texts = [(text.metadata["source"], text.page_content) for text in texts]
         texts = [file_and_text[1] for file_and_text in files_and_texts]
 
         logger.debug("Embedding all repo documents.")

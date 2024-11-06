@@ -1,5 +1,5 @@
-from unittest.mock import patch
 from unittest import skip
+from unittest.mock import patch
 
 from labs.llm import call_llm_with_context
 

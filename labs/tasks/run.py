@@ -1,5 +1,10 @@
-from celery import chain
+import logging
+
 import redis
+from celery import chain
+
+from config import configuration_variables as settings
+from labs.celery import app
 from labs.tasks import (
     apply_code_changes_task,
     clone_repo_task,
@@ -12,10 +17,6 @@ from labs.tasks import (
     prepare_prompt_and_context_task,
     vectorize_repo_to_database_task,
 )
-from config import configuration_variables as settings
-import logging
-from labs.celery import app
-
 
 logger = logging.getLogger(__name__)
 

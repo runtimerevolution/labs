@@ -1,13 +1,13 @@
-import redis
-from config import configuration_variables as settings
-import logging
 import json
+import logging
 
+import redis
+
+from config import configuration_variables as settings
+from labs.celery import app
 from labs.database.embeddings import find_similar_embeddings
 from labs.database.vectorize.chunk_vectorizer import ChunkVectorizer
 from labs.llm import get_llm_response, get_prompt, prepare_context
-from labs.celery import app
-
 
 logger = logging.getLogger(__name__)
 
