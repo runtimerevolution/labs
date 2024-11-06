@@ -8,7 +8,7 @@ from langchain_community.document_loaders import TextLoader
 
 from config import configuration_variables as settings
 from labs.embeddings.base import Embedder
-from labs.embeddings.ollama import OllamaEmbedder
+from labs.embeddings.openai import OpenAIEmbedder
 from labs.embeddings.vectorizers.base import Vectorizer
 
 logger = logging.getLogger(__name__)
@@ -75,7 +75,7 @@ class ChunkVectorizer(Vectorizer):
 
         logger.debug("Embedding all repo documents.")
 
-        embedder = Embedder(OllamaEmbedder, model="nomic-embed-text:latest")
+        embedder = Embedder(OpenAIEmbedder)
         embeddings = embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")
