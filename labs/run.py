@@ -1,17 +1,16 @@
 import logging
 
+from config import configuration_variables as settings
 from labs.decorators import time_and_log_function
 from labs.llm import call_llm_with_context
-from config import configuration_variables as settings
 from labs.repo import (
+    call_agent_to_apply_code_changes,
+    clone_repository,
     commit_changes,
     create_branch,
     create_pull_request,
     get_issue,
-    call_agent_to_apply_code_changes,
-    clone_repository,
 )
-
 
 logger = logging.getLogger(__name__)
 

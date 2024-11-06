@@ -1,7 +1,9 @@
 import os
+
 import django
-from fastapi import FastAPI
 from django.core.asgi import get_asgi_application
+from fastapi import FastAPI
+
 from labs.api import codemonkey_endpoints, github_endpoints
 
 # Set the DJANGO_SETTINGS_MODULE environment variable to point to your Django project's settings

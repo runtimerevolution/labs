@@ -1,11 +1,12 @@
+import logging
+
+import redis
 from celery import Celery
 from celery.signals import task_failure
 from kombu import Queue
 from redbeat import RedBeatSchedulerEntry, schedulers
-import redis
-from config import configuration_variables as settings
-import logging
 
+from config import configuration_variables as settings
 
 logger = logging.getLogger(__name__)
 
