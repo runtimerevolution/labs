@@ -58,7 +58,6 @@ def get_llm_response_task(prefix="", context={}):
     llm_response = get_llm_response(context)
 
     if prefix:
-        logger.debug(f"{llm_response=}")
         redis_client.set(f"{prefix}_llm_response", llm_response[1][1]["choices"][0]["message"]["content"])
         return prefix
     return llm_response
