@@ -37,6 +37,10 @@ down:
 up: down
 	docker compose --env-file=$(ENV_FILE) up --build -d
 
+.PHONY: simple
+simple: down
+	docker compose --env-file=$(ENV_FILE) up labs-db -d
+
 ## Start a python shell
 .PHONY: shell
 shell:
@@ -83,10 +87,13 @@ api:
 	fastapi dev labs/api/main.py
 
 runserver:
-	poetry run python manage.py runserver
+	poetry run python labs/manage.py runserver
+
+migrate:
+	poetry run python labs/manage.py migrate
 
 asgi_api:
-	poetry run uvicorn asgi_app:app --reload --port 8000
+	cd labs && poetry run uvicorn asgi_app:app --reload --port 8000
 
 load_fixtures:
-	python manage.py loaddata $(wildcard config/fixtures/*.json)
+	python labs/manage.py loaddata $(wildcard config/fixtures/*.json)
