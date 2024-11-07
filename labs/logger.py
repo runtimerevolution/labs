@@ -1,8 +1,8 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from pythonjsonlogger import jsonlogger
 
+from pythonjsonlogger import jsonlogger
 
 DEFAULT_MAX_BYTES = 10000000
 DEFAULT_BACKUP_COUNT = 5
