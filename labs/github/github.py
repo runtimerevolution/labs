@@ -1,10 +1,12 @@
 import base64
-import requests
-from dataclasses import dataclass
-from config import configuration_variables as settings
-import git
-import os
 import logging
+import os
+from dataclasses import dataclass
+
+import git
+import requests
+
+from config import configuration_variables as settings
 
 logger = logging.getLogger(__name__)
 

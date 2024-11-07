@@ -1,8 +1,7 @@
-from fastapi import FastAPI
 import uvicorn
+from fastapi import FastAPI
 
 from labs.api import codemonkey_endpoints, github_endpoints
-
 
 app = FastAPI()
 

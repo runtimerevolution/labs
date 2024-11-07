@@ -16,12 +16,11 @@ clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 
-## Lint using flake8 and black (use `make format` to do formatting)
+## Lint and format using ruff
 .PHONY: lint
 lint:
-	flake8 labs
-	isort --check --diff --profile black labs
-	black --check --config pyproject.toml labs
+	ruff lint --fix --select I
+	ruff format
 
 ## Format source code with black
 .PHONY: format

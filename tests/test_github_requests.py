@@ -1,6 +1,6 @@
-import requests
-
 import os
+
+import requests
 
 from labs.github.github import GithubRequests
 

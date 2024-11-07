@@ -1,9 +1,8 @@
-import unittest
-
 import ast
-
-from labs.parsers.python import PythonFileParser, parse_python_file, get_lines_code
+import unittest
 from tempfile import NamedTemporaryFile
+
+from labs.parsers.python import PythonFileParser, get_lines_code, parse_python_file
 
 TEST_CODE = """
 import os
