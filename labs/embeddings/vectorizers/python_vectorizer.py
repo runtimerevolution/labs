@@ -7,7 +7,7 @@ import pathspec
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 
-from config import configuration_variables as settings
+import labs.config.configuration_variables as settings
 from labs.embeddings.base import Embedder
 from labs.embeddings.openai import OpenAIEmbedder
 from labs.embeddings.vectorizers.base import Vectorizer

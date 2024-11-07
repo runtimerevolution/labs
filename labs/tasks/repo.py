@@ -3,8 +3,8 @@ import logging
 
 import redis
 
-from config import configuration_variables as settings
-from config.celery import app
+import labs.config.configuration_variables as settings
+from labs.config.celery import app
 from labs.repo import call_agent_to_apply_code_changes, clone_repository
 from labs.run import commit_changes, create_branch, create_pull_request, get_issue
 
