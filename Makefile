@@ -89,8 +89,14 @@ api:
 runserver:
 	poetry run python labs/manage.py runserver
 
+migrations:
+	poetry run python labs/manage.py makemigrations
+
 migrate:
 	poetry run python labs/manage.py migrate
+
+createuser:
+	DJANGO_SUPERUSER_PASSWORD=admin poetry run python labs/manage.py createsuperuser --noinput --username=admin --email=a@b.com
 
 asgi_api:
 	cd labs && poetry run uvicorn asgi_app:app --reload --port 8000
