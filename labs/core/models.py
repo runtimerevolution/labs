@@ -16,17 +16,15 @@ AVAILABLE_KEYS = [
 
 
 class Config(models.Model):
-    llm_model = models.CharField(max_length=255, blank=True, null=True, verbose_name="LLM Model")
-    key = models.CharField(
-        max_length=255, unique=True, choices=[(k, k) for k in sorted(AVAILABLE_KEYS)], verbose_name="Key"
-    )
-    value = models.CharField(max_length=255, blank=True, null=True, verbose_name="Value")
+    llm_model = models.TextField(blank=True, null=True)
+    label = models.CharField(max_length=255, choices=[(k, k) for k in sorted(AVAILABLE_KEYS)], verbose_name="Label")
+    value = models.TextField(blank=True, null=True)
     type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Type")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.key}: {self.value}"
+        return f"{self.label}"
 
     class Meta:
-        indexes = [models.Index(fields=["llm_model", "key"])]
+        indexes = [models.Index(fields=["label", "llm_model"])]

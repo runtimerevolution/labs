@@ -51,7 +51,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: celery -A labs worker --beat --scheduler redbeat.RedBeatScheduler --loglevel=INFO --concurrency=1
+    command: celery -A labs.config worker --beat --scheduler redbeat.RedBeatScheduler --loglevel=INFO --concurrency=1
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0

@@ -3,8 +3,8 @@ import logging
 
 import redis
 
-from config import configuration_variables as settings
-from labs.celery import app
+import labs.config.configuration_variables as settings
+from labs.config.celery import app
 from labs.embeddings.base import Embedder
 from labs.embeddings.openai import OpenAIEmbedder
 from labs.embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
