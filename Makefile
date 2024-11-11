@@ -81,7 +81,6 @@ export PRINT_HELP_PYSCRIPT
 
 help:
 	@python -c "${PRINT_HELP_PYSCRIPT}" < $(MAKEFILE_LIST)
-
 api:
 	fastapi dev labs/api/main.py
 
@@ -97,17 +96,8 @@ migrate:
 createuser:
 	DJANGO_SUPERUSER_PASSWORD=admin poetry run python labs/manage.py createsuperuser --noinput --username=admin --email=a@b.com
 
-migrate:
-	poetry run python manage.py migrate
-
-makemigrations:
-	poetry run python manage.py makemigrations
-
-createuser:
-	DJANGO_SUPERUSER_PASSWORD=admin python manage.py createsuperuser --noinput --username=admin --email=a@b.com
-
 asgi_api:
-	cd labs && poetry run uvicorn asgi_app:app --reload --port 8000
+	cd labs && poetry run uvicorn config.asgi:application --reload --port 8000
 
 load_fixtures:
 	python labs/manage.py loaddata $(wildcard config/fixtures/*.json)
