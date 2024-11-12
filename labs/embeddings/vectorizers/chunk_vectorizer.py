@@ -1,15 +1,14 @@
 import logging
 import os
 
+import config.configuration_variables as settings
 import openai
 import pathspec
-from langchain.text_splitter import CharacterTextSplitter
-from langchain_community.document_loaders import TextLoader
-
-import config.configuration_variables as settings
 from embeddings.base import Embedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.base import Vectorizer
+from langchain.text_splitter import CharacterTextSplitter
+from langchain_community.document_loaders import TextLoader
 
 logger = logging.getLogger(__name__)
 

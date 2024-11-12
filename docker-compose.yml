@@ -13,8 +13,8 @@ services:
       - ./database_scripts:/docker-entrypoint-initdb.d
 
   api:
-    env_file: .env.docker
-    build: 
+    env_file: .env.local
+    build:
       context: .
       dockerfile: ./Dockerfile
     environment:
@@ -51,7 +51,7 @@ services:
       - redis
 
   worker:
-    env_file: .env.docker
+    env_file: .env.local
     build:
       context: .
       dockerfile: ./Dockerfile

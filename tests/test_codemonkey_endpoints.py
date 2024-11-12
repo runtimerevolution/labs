@@ -1,8 +1,7 @@
 from unittest.mock import patch
 
-from ninja.testing.client import TestClient
-
 from api.main import app
+from ninja.testing.client import TestClient
 
 client = TestClient(app)
 

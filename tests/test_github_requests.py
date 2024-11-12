@@ -1,7 +1,6 @@
 import os
 
 import requests
-
 from github.github import GithubRequests
 
 

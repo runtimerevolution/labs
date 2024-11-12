@@ -1,6 +1,5 @@
-from ollama import Client
-
 import config.configuration_variables as settings
+from ollama import Client
 
 
 class RequestLocalLLM:

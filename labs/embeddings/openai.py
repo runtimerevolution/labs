@@ -1,6 +1,5 @@
-from litellm import embedding
-
 from embeddings.base import Embedder, Embeddings
+from litellm import embedding
 
 
 class OpenAIEmbedder(Embedder):

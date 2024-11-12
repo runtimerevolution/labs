@@ -1,9 +1,5 @@
 import logging
 
-from django.http import HttpRequest
-from ninja import Router
-from ninja.errors import HttpError
-
 from api.schemas import (
     ApplyCodeChangesRequest,
     CommitChangesRequest,
@@ -18,6 +14,9 @@ from api.schemas import (
     VectorizeRepoToDatabaseRequest,
 )
 from decorators import async_time_and_log_function
+from django.http import HttpRequest
+from ninja import Router
+from ninja.errors import HttpError
 from tasks import (
     apply_code_changes_task,
     commit_changes_task,

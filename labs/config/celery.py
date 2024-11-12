@@ -1,12 +1,12 @@
 import logging
 import os
+
+import config.configuration_variables as settings
 import redis
 from celery import Celery
 from celery.signals import task_failure
 from kombu import Queue
 from redbeat import RedBeatSchedulerEntry, schedulers
-
-import config.configuration_variables as settings
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 

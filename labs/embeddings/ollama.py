@@ -1,7 +1,6 @@
-from ollama import Client
-
 from config.configuration_variables import LOCAL_LLM_HOST
 from embeddings.base import Embedder, Embeddings
+from ollama import Client
 
 
 class OllamaEmbedder(Embedder):

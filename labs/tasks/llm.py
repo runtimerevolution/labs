@@ -1,9 +1,8 @@
 import json
 import logging
 
-import redis
-
 import config.configuration_variables as settings
+import redis
 from config.celery import app
 from embeddings.base import Embedder
 from embeddings.openai import OpenAIEmbedder

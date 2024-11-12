@@ -1,9 +1,8 @@
 import logging
 
+import config.configuration_variables as settings
 import redis
 from celery import chain
-
-import config.configuration_variables as settings
 from config.celery import app
 from tasks import (
     apply_code_changes_task,

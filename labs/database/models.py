@@ -1,9 +1,8 @@
 import logging
 
+from database.connect import Base
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import Column, Integer, String
-
-from database.connect import Base
 
 logger = logging.getLogger(__name__)
 

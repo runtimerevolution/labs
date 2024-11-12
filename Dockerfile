@@ -47,7 +47,6 @@ RUN poetry install --no-root --no-dev
 
 # `production` image
 FROM python-base AS production
-ENV FASTAPI_ENV=production
 
 # Install git since gitpython needs a git executable
 RUN apt-get update && apt-get install --no-install-recommends -y git
