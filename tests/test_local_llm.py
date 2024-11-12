@@ -1,7 +1,7 @@
 from unittest import skip
 from unittest.mock import patch
 
-from llm import call_llm_with_context
+from labs.llm import call_llm_with_context
 
 
 class TestLocalLLM:

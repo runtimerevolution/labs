@@ -1,9 +1,10 @@
 from unittest.mock import patch
 
-from api.main import app
 from ninja.testing.client import TestClient
 
-client = TestClient(app)
+from labs.config.ninja import ninja_api
+
+client = TestClient(ninja_api)
 
 
 class TestCodemonkeyEndpoints:

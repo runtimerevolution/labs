@@ -2,7 +2,7 @@ import ast
 import unittest
 from tempfile import NamedTemporaryFile
 
-from parsers.python import PythonFileParser, get_lines_code, parse_python_file
+from labs.parsers.python import PythonFileParser, get_lines_code, parse_python_file
 
 TEST_CODE = """
 import os
