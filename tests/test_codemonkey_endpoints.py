@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from fastapi.testclient import TestClient
+from ninja.testing.client import TestClient
 
 from labs.api.main import app
 
@@ -12,7 +12,8 @@ class TestCodemonkeyEndpoints:
     def test_run_on_local_repo_endpoint(self, mock_task):
         mock_task.return_value = None
         response = client.post(
-            "/codemonkey/run_on_local_repo", json={"repo_path": "path/to/repo", "issue_text": "example issue text"}
+            "/codemonkey/run_on_local_repo",
+            json={"repo_path": "path/to/repo", "issue_text": "example issue text"},
         )
         assert response.status_code == 200
         mock_task.assert_called_once()
@@ -71,7 +72,10 @@ class TestCodemonkeyEndpoints:
     @patch("labs.api.codemonkey_endpoints.vectorize_repo_to_database_task")
     def test_vectorize_repo_to_database_endpoint(self, mock_task):
         mock_task.return_value = {}
-        response = client.post("/codemonkey/vectorize_repo_to_database", json={"repo_destination": "destination/path"})
+        response = client.post(
+            "/codemonkey/vectorize_repo_to_database",
+            json={"repo_destination": "destination/path"},
+        )
         assert response.status_code == 200
         mock_task.assert_called_once()
 
@@ -85,7 +89,10 @@ class TestCodemonkeyEndpoints:
     @patch("labs.api.codemonkey_endpoints.prepare_prompt_and_context_task")
     def test_prepare_prompt_and_context_endpoint(self, mock_task):
         mock_task.return_value = {}
-        response = client.post("/codemonkey/prepare_prompt_and_context", json={"issue_body": "body", "embeddings": []})
+        response = client.post(
+            "/codemonkey/prepare_prompt_and_context",
+            json={"issue_body": "body", "embeddings": []},
+        )
         assert response.status_code == 200
         mock_task.assert_called_once()
 

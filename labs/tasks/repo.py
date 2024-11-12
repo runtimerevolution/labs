@@ -34,7 +34,14 @@ def get_issue_task(prefix="", token="", repo_owner="", repo_name="", issue_numbe
 
 @app.task
 def create_branch_task(
-    prefix="", token="", repo_owner="", repo_name="", issue_number="", username="", original_branch="", issue_title=""
+    prefix="",
+    token="",
+    repo_owner="",
+    repo_name="",
+    issue_number="",
+    username="",
+    original_branch="",
+    issue_title="",
 ):
     token = redis_client.get(f"{prefix}_token") if prefix else token
     repo_owner = redis_client.get(f"{prefix}_repo_owner") if prefix else repo_owner
@@ -44,7 +51,15 @@ def create_branch_task(
     original_branch = redis_client.get(f"{prefix}_original_branch") if prefix else original_branch
     issue_title = redis_client.get("issue_title") if prefix else issue_title
 
-    branch_name = create_branch(token, repo_owner, repo_name, username, issue_number, issue_title, original_branch)
+    branch_name = create_branch(
+        token,
+        repo_owner,
+        repo_name,
+        username,
+        issue_number,
+        issue_title,
+        original_branch,
+    )
 
     if prefix:
         redis_client.set(f"{prefix}_branch_name", branch_name, ex=300)
@@ -78,15 +93,21 @@ def apply_code_changes_task(prefix="", llm_response=""):
 
 @app.task
 def commit_changes_task(
-    prefix="", token="", repo_owner="", repo_name="", username="", branch_name="", files_modified=[]
+    prefix="",
+    token="",
+    repo_owner="",
+    repo_name="",
+    username="",
+    branch_name="",
+    files_modified=[],
 ):
     commit_changes(
         token=redis_client.get(f"{prefix}_token") if prefix else token,
         repo_owner=redis_client.get(f"{prefix}_repo_owner") if prefix else repo_owner,
         repo_name=redis_client.get(f"{prefix}_repo_name") if prefix else repo_name,
         username=redis_client.get(f"{prefix}_username") if prefix else username,
-        branch_name=redis_client.get(f"{prefix}_branch_name") if prefix else branch_name,
-        file_list=json.loads(redis_client.get(f"{prefix}_files_modified")) if prefix else files_modified,
+        branch_name=(redis_client.get(f"{prefix}_branch_name") if prefix else branch_name),
+        file_list=(json.loads(redis_client.get(f"{prefix}_files_modified")) if prefix else files_modified),
     )
 
     if prefix:
@@ -96,15 +117,21 @@ def commit_changes_task(
 
 @app.task
 def create_pull_request_task(
-    prefix="", token="", repo_owner="", repo_name="", username="", branch_name="", original_branch=""
+    prefix="",
+    token="",
+    repo_owner="",
+    repo_name="",
+    username="",
+    branch_name="",
+    original_branch="",
 ):
     create_pull_request(
         token=redis_client.get(f"{prefix}_token") if prefix else token,
         repo_owner=redis_client.get(f"{prefix}_repo_owner") if prefix else repo_owner,
         repo_name=redis_client.get(f"{prefix}_repo_name") if prefix else repo_name,
         username=redis_client.get(f"{prefix}_username") if prefix else username,
-        original_branch=redis_client.get(f"{prefix}_original_branch") if prefix else original_branch,
-        branch_name=redis_client.get(f"{prefix}_branch_name") if prefix else branch_name,
+        original_branch=(redis_client.get(f"{prefix}_original_branch") if prefix else original_branch),
+        branch_name=(redis_client.get(f"{prefix}_branch_name") if prefix else branch_name),
     )
 
     if prefix:

@@ -51,11 +51,18 @@ def test_find_multiple_embeddings(db_session, create_test_embeddings):
 def test_reembed_code(db_session):
     files_texts = [("file1", "text1"), ("file2", "text2")]
     embeddings = Embeddings(
-        model="model", embeddings=[random.sample(range(1, 5000), k=1536), random.sample(range(1, 5000), k=1536)]
+        model="model",
+        embeddings=[
+            random.sample(range(1, 5000), k=1536),
+            random.sample(range(1, 5000), k=1536),
+        ],
     )
 
     Embedder(OpenAIEmbedder).reembed_code(
-        connection=db_session, files_texts=files_texts, embeddings=embeddings, repository=REPO1
+        connection=db_session,
+        files_texts=files_texts,
+        embeddings=embeddings,
+        repository=REPO1,
     )
 
     result = find_embeddings(db_session, REPO1)
