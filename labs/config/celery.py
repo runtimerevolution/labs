@@ -1,5 +1,5 @@
 import logging
-
+import os
 import redis
 from celery import Celery
 from celery.signals import task_failure
@@ -7,6 +7,8 @@ from kombu import Queue
 from redbeat import RedBeatSchedulerEntry, schedulers
 
 import config.configuration_variables as settings
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +19,8 @@ HIGH_PRIORITY_QUEUE_NAME = f"{CELERY_QUEUE_PREFIX}-high"
 
 redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
-
 app = Celery(
-    name="labs_worker",
+    "config",
     # If you had tasks defined somewhere other than the name above, you could include them here.
     include=[],
     broker=settings.CELERY_BROKER_URL,
@@ -44,7 +45,7 @@ app = Celery(
 # Add a redbeat prefix so that it doesn't mix with other connectors when on a shared cluster.
 app.conf.redbeat_key_prefix = CELERY_QUEUE_PREFIX
 
-app.autodiscover_tasks(["labs"])
+app.autodiscover_tasks(["tasks"])
 
 
 def get_scheduled_tasks_from_redis():
