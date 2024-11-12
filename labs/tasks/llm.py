@@ -3,12 +3,12 @@ import logging
 
 import redis
 
-import labs.config.configuration_variables as settings
-from labs.config.celery import app
-from labs.embeddings.base import Embedder
-from labs.embeddings.openai import OpenAIEmbedder
-from labs.embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
-from labs.llm import get_llm_response, get_prompt, prepare_context
+import config.configuration_variables as settings
+from config.celery import app
+from embeddings.base import Embedder
+from embeddings.openai import OpenAIEmbedder
+from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
+from llm import get_llm_response, get_prompt, prepare_context
 
 logger = logging.getLogger(__name__)
 

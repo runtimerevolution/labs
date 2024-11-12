@@ -6,7 +6,7 @@ from celery.signals import task_failure
 from kombu import Queue
 from redbeat import RedBeatSchedulerEntry, schedulers
 
-import labs.config.configuration_variables as settings
+import config.configuration_variables as settings
 
 logger = logging.getLogger(__name__)
 

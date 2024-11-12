@@ -7,11 +7,11 @@ import pathspec
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 
-import labs.config.configuration_variables as settings
-from labs.embeddings.base import Embedder
-from labs.embeddings.openai import OpenAIEmbedder
-from labs.embeddings.vectorizers.base import Vectorizer
-from labs.parsers.python import get_lines_code, parse_python_file
+import config.configuration_variables as settings
+from embeddings.base import Embedder
+from embeddings.openai import OpenAIEmbedder
+from embeddings.vectorizers.base import Vectorizer
+from parsers.python import get_lines_code, parse_python_file
 
 logger = logging.getLogger(__name__)
 

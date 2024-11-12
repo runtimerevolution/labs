@@ -3,7 +3,7 @@ import logging
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import Column, Integer, String
 
-from labs.database.connect import Base
+from database.connect import Base
 
 logger = logging.getLogger(__name__)
 

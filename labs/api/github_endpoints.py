@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from ninja import Router
 from ninja.errors import HttpError
 
-from labs.api.schemas import (
+from api.schemas import (
     ChangeIssueStatusRequest,
     CommitChangesRequest,
     CreateBranchRequest,
@@ -13,8 +13,8 @@ from labs.api.schemas import (
     IssueRequest,
     ListIssuesRequest,
 )
-from labs.decorators import async_time_and_log_function
-from labs.github.github import GithubRequests
+from decorators import async_time_and_log_function
+from github.github import GithubRequests
 
 logger = logging.getLogger(__name__)
 

@@ -56,8 +56,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y git
 COPY --from=builder-base $VENV_PATH $VENV_PATH
 
 # Copy the app into /app
-COPY . /app/
-
 WORKDIR /app
 
-CMD ["fastapi", "run", "labs/api/main.py"]
+COPY ./labs/ /app/
+
+CMD python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000

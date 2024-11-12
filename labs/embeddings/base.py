@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 
 from sqlalchemy import Connection, Row, delete, insert, select
 
-from labs.database.connect import db_connector
-from labs.database.models import EmbeddingModel
+from database.connect import db_connector
+from database.models import EmbeddingModel
 
 
 @dataclass

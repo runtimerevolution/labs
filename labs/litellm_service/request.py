@@ -1,7 +1,7 @@
 from litellm import completion
 from pydantic import BaseModel
 
-import labs.config.configuration_variables as settings
+import config.configuration_variables as settings
 
 
 class Step(BaseModel):

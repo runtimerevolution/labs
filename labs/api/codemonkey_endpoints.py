@@ -4,7 +4,7 @@ from django.http import HttpRequest
 from ninja import Router
 from ninja.errors import HttpError
 
-from labs.api.schemas import (
+from api.schemas import (
     ApplyCodeChangesRequest,
     CommitChangesRequest,
     CreateBranchRequest,
@@ -17,8 +17,8 @@ from labs.api.schemas import (
     RunOnRepoRequest,
     VectorizeRepoToDatabaseRequest,
 )
-from labs.decorators import async_time_and_log_function
-from labs.tasks import (
+from decorators import async_time_and_log_function
+from tasks import (
     apply_code_changes_task,
     commit_changes_task,
     create_branch_task,

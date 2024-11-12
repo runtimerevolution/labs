@@ -3,9 +3,9 @@ import logging
 import redis
 from celery import chain
 
-import labs.config.configuration_variables as settings
-from labs.config.celery import app
-from labs.tasks import (
+import config.configuration_variables as settings
+from config.celery import app
+from tasks import (
     apply_code_changes_task,
     clone_repo_task,
     commit_changes_task,

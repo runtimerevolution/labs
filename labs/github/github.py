@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import git
 import requests
 
-import labs.config.configuration_variables as settings
+import config.configuration_variables as settings
 
 logger = logging.getLogger(__name__)
 

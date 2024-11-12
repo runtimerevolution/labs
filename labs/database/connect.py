@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-import labs.config.configuration_variables as settings
+import config.configuration_variables as settings
 
 logger = logging.getLogger(__name__)
 
