@@ -1,5 +1,5 @@
 from django.db import models
-
+from pgvector.django import VectorField
 
 AVAILABLE_KEYS = [
     "LITELLM_MASTER_KEY",
@@ -25,7 +25,17 @@ class Config(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.label}"
+        return self.label
 
     class Meta:
         indexes = [models.Index(fields=["label", "llm_model"])]
+
+
+class Embedding(models.Model):
+    repository = models.CharField(max_length=255)
+    file_path = models.CharField(max_length=255)
+    text = models.TextField()
+    embedding = VectorField()
+
+    def __str__(self):
+        return self.file_path

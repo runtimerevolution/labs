@@ -1,8 +1,9 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from ninja import Router
+from ninja.errors import HttpError
 
-from labs.api.types import (
+from labs.api.schemas import (
     ChangeIssueStatusRequest,
     CommitChangesRequest,
     CreateBranchRequest,
@@ -16,7 +17,7 @@ from labs.github.github import GithubRequests
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+router = Router(tags=["github"])
 
 
 @router.post("/github/list-issues")
@@ -32,7 +33,7 @@ async def list_issues(request: GithubModel, params: ListIssuesRequest):
         return github_requests.list_issues(assignee=params.assignee, state=params.state, per_page=params.per_page)
     except Exception as e:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
+        raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
 @router.post("/github/get-issue")
@@ -48,7 +49,7 @@ async def get_issue(request: GithubModel, params: IssueRequest):
         return github_requests.get_issue(issue_number=params.issue_number)
     except Exception as e:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
+        raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
 @router.post("/github/create-branch")
@@ -64,7 +65,7 @@ async def create_branch(request: GithubModel, params: CreateBranchRequest):
         return github_requests.create_branch(branch_name=params.branch_name, original_branch=params.original_branch)
     except Exception as e:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
+        raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
 @router.post("/github/change-issue-status")
@@ -80,7 +81,7 @@ async def change_issue_status(request: GithubModel, params: ChangeIssueStatusReq
         return github_requests.change_issue_status(issue_number=params.issue_number, state=params.state)
     except Exception as e:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
+        raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
 @router.post("/github/commit-changes")
@@ -98,7 +99,7 @@ async def commit_changes(request: GithubModel, params: CommitChangesRequest):
         )
     except Exception as e:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
+        raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
 @router.post("/github/create-pull-request")
@@ -116,7 +117,7 @@ async def create_pull_request(request: GithubModel, params: CreatePullRequestReq
         )
     except Exception as e:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
+        raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
 @router.post("/github/clone")
@@ -132,4 +133,4 @@ async def clone_repo(request: GithubModel):
         return github_requests.clone()
     except Exception as e:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(e))
+        raise HttpError(status_code=500, message="Internal server error: " + str(e))

@@ -1,8 +1,10 @@
 import logging
 
-from fastapi import APIRouter, HTTPException
+from django.http import HttpRequest
+from ninja import Router
+from ninja.errors import HttpError
 
-from labs.api.types import (
+from labs.api.schemas import (
     ApplyCodeChangesRequest,
     CommitChangesRequest,
     CreateBranchRequest,
@@ -32,113 +34,119 @@ from labs.tasks import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter()
+router = Router(tags=["codemonkey"])
 
 
 @router.post("/codemonkey/run_on_repo")
 @async_time_and_log_function
-async def run_on_repo_endpoint(request: RunOnRepoRequest):
+async def run_on_repo_endpoint(request: HttpRequest, run_on_repo: RunOnRepoRequest):
     try:
         run_on_repo_task(
-            token=request.github_token,
-            repo_owner=request.repo_owner,
-            repo_name=request.repo_name,
-            issue_number=request.issue_number,
-            username=request.username,
-            original_branch=request.original_branch,
+            token=run_on_repo.github_token,
+            repo_owner=run_on_repo.repo_owner,
+            repo_name=run_on_repo.repo_name,
+            issue_number=run_on_repo.issue_number,
+            username=run_on_repo.username,
+            original_branch=run_on_repo.original_branch,
         )
     except Exception as ex:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(ex))
+        raise HttpError(status_code=500, message="Internal server error: " + str(ex))
 
 
 @router.post("/codemonkey/run_on_local_repo")
 @async_time_and_log_function
-async def run_on_local_repo_endpoint(request: RunOnLocalRepoRequest):
+async def run_on_local_repo_endpoint(request: HttpRequest, run_on_local_repo: RunOnLocalRepoRequest):
     try:
-        run_on_local_repo_task(repo_path=request.repo_path, issue_text=request.issue_text)
+        run_on_local_repo_task(repo_path=run_on_local_repo.repo_path, issue_text=run_on_local_repo.issue_text)
     except Exception as ex:
         logger.exception("Internal server error")
-        raise HTTPException(status_code=500, detail="Internal server error: " + str(ex))
+        raise HttpError(status_code=500, message="Internal server error: " + str(ex))
 
 
 @router.post("/codemonkey/get_issue")
 @async_time_and_log_function
-async def get_issue_endpoint(request: GetIssueRequest):
+async def get_issue_endpoint(request: HttpRequest, get_issue: GetIssueRequest):
     return get_issue_task(
-        token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        issue_number=request.issue_number,
-        username=request.username,
+        token=get_issue.github_token,
+        repo_owner=get_issue.repo_owner,
+        repo_name=get_issue.repo_name,
+        issue_number=get_issue.issue_number,
+        username=get_issue.username,
     )
 
 
 @router.post("/codemonkey/create_branch")
 @async_time_and_log_function
-async def create_branch_endpoint(request: CreateBranchRequest):
+async def create_branch_endpoint(request: HttpRequest, create_branch: CreateBranchRequest):
     return create_branch_task(
-        token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        issue_number=request.issue_number,
-        username=request.username,
-        original_branch=request.original_branch,
-        issue_title=request.issue_title,
+        token=create_branch.github_token,
+        repo_owner=create_branch.repo_owner,
+        repo_name=create_branch.repo_name,
+        issue_number=create_branch.issue_number,
+        username=create_branch.username,
+        original_branch=create_branch.original_branch,
+        issue_title=create_branch.issue_title,
     )
 
 
 @router.post("/codemonkey/vectorize_repo_to_database")
 @async_time_and_log_function
-async def vectorize_repo_to_database_endpoint(request: VectorizeRepoToDatabaseRequest):
-    return vectorize_repo_to_database_task(repo_destination=request.repo_destination)
+async def vectorize_repo_to_database_endpoint(
+    request: HttpRequest, vectorize_repo_to_database: VectorizeRepoToDatabaseRequest
+):
+    return vectorize_repo_to_database_task(repo_destination=vectorize_repo_to_database.repo_destination)
 
 
 @router.post("/codemonkey/find_similar_embeddings")
 @async_time_and_log_function
-async def find_similar_embeddings_endpoint(request: FindSimilarEmbeddingsRequest):
-    return find_similar_embeddings_task(issue_body=request.issue_body)
+async def find_similar_embeddings_endpoint(request: HttpRequest, find_similar_embeddings: FindSimilarEmbeddingsRequest):
+    return find_similar_embeddings_task(issue_body=find_similar_embeddings.issue_body)
 
 
 @router.post("/codemonkey/prepare_prompt_and_context")
 @async_time_and_log_function
-async def prepare_prompt_and_context_endpoint(request: PreparePromptAndContextRequest):
-    return prepare_prompt_and_context_task(issue_body=request.issue_body, embeddings=request.embeddings)
+async def prepare_prompt_and_context_endpoint(
+    request: HttpRequest, prepare_prompt_and_context: PreparePromptAndContextRequest
+):
+    return prepare_prompt_and_context_task(
+        issue_body=prepare_prompt_and_context.issue_body, embeddings=prepare_prompt_and_context.embeddings
+    )
 
 
 @router.post("/codemonkey/get_llm_response")
 @async_time_and_log_function
-async def get_llm_response_endpoint(request: GetLLMResponseRequest):
-    return get_llm_response_task(prepared_context=request.context)
+async def get_llm_response_endpoint(request: HttpRequest, get_llm_reponse: GetLLMResponseRequest):
+    return get_llm_response_task(prepared_context=get_llm_reponse.context)
 
 
 @router.post("/codemonkey/apply_code_changes")
 @async_time_and_log_function
-async def apply_code_changes_endpoint(request: ApplyCodeChangesRequest):
-    return apply_code_changes_task(llm_response=request.llm_response)
+async def apply_code_changes_endpoint(request: HttpRequest, apply_code_changes: ApplyCodeChangesRequest):
+    return apply_code_changes_task(llm_response=apply_code_changes.llm_response)
 
 
 @router.post("/codemonkey/commit_changes")
 @async_time_and_log_function
-async def commit_changes_endpoint(request: CommitChangesRequest):
+async def commit_changes_endpoint(request: HttpRequest, commit_changes: CommitChangesRequest):
     return commit_changes_task(
-        token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        username=request.username,
-        branch_name=request.branch_name,
-        files_modified=request.files,
+        token=commit_changes.github_token,
+        repo_owner=commit_changes.repo_owner,
+        repo_name=commit_changes.repo_name,
+        username=commit_changes.username,
+        branch_name=commit_changes.branch_name,
+        files_modified=commit_changes.files,
     )
 
 
 @router.post("/codemonkey/create_pull_request")
 @async_time_and_log_function
-async def create_pull_request_endpoint(request: CreatePullRequestRequest):
+async def create_pull_request_endpoint(request: HttpRequest, create_pull_request: CreatePullRequestRequest):
     return create_pull_request_task(
-        token=request.github_token,
-        repo_owner=request.repo_owner,
-        repo_name=request.repo_name,
-        username=request.username,
-        branch_name=request.branch_name,
-        original_branch=request.original_branch,
+        token=create_pull_request.github_token,
+        repo_owner=create_pull_request.repo_owner,
+        repo_name=create_pull_request.repo_name,
+        username=create_pull_request.username,
+        branch_name=create_pull_request.branch_name,
+        original_branch=create_pull_request.original_branch,
     )
