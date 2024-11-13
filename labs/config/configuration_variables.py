@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from labs.logger import setup_logger
+from logger import setup_logger
 
 setup_logger()
 

@@ -1,11 +1,10 @@
 from typing import List
 
+import config.configuration_variables as settings
 import pytest
+from database.models import EmbeddingModel
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-
-import labs.config.configuration_variables as settings
-from labs.database.models import EmbeddingModel
 from tests.constants import MULTIPLE_EMBEDDINGS, SINGLE_EMBEDDING
 
 engine = create_engine(settings.DATABASE_URL, echo=True)

@@ -1,14 +1,13 @@
 import json
 import logging
 
+import config.configuration_variables as settings
 import redis
-
-import labs.config.configuration_variables as settings
-from labs.config.celery import app
-from labs.embeddings.base import Embedder
-from labs.embeddings.openai import OpenAIEmbedder
-from labs.embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
-from labs.llm import get_llm_response, get_prompt, prepare_context
+from config.celery import app
+from embeddings.base import Embedder
+from embeddings.openai import OpenAIEmbedder
+from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
+from llm import get_llm_response, get_prompt, prepare_context
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +57,9 @@ def get_llm_response_task(prefix="", context={}):
     llm_response = get_llm_response(context)
 
     if prefix:
-        redis_client.set(f"{prefix}_llm_response", llm_response[1][1]["choices"][0]["message"]["content"])
+        redis_client.set(
+            f"{prefix}_llm_response",
+            llm_response[1][1]["choices"][0]["message"]["content"],
+        )
         return prefix
     return llm_response

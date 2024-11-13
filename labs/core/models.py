@@ -1,6 +1,5 @@
 from django.db import models
 
-
 AVAILABLE_KEYS = [
     "LITELLM_MASTER_KEY",
     "LITELLM_API_KEY",
@@ -25,7 +24,7 @@ class Config(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.label}"
+        return self.label
 
     class Meta:
         indexes = [models.Index(fields=["label", "llm_model"])]

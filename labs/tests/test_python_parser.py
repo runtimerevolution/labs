@@ -2,7 +2,7 @@ import ast
 import unittest
 from tempfile import NamedTemporaryFile
 
-from labs.parsers.python import PythonFileParser, get_lines_code, parse_python_file
+from parsers.python import PythonFileParser, get_lines_code, parse_python_file
 
 TEST_CODE = """
 import os
@@ -35,7 +35,10 @@ class TestPythonFileParser(unittest.TestCase):
         self.assertEqual(self.parser._get_return_type(ast.Constant(value=100)), "int")
         self.assertEqual(self.parser._get_return_type(ast.Constant(value="value")), "str")
         self.assertEqual(self.parser._get_return_type(ast.List(elts=[])), "list")
-        self.assertEqual(self.parser._get_return_type(ast.Dict(keys=[1, 2, 3], values=["a", "b", "c"])), "dict")
+        self.assertEqual(
+            self.parser._get_return_type(ast.Dict(keys=[1, 2, 3], values=["a", "b", "c"])),
+            "dict",
+        )
         self.assertEqual(self.parser._get_return_type(ast.Tuple(elts=["a", "b", "c"])), "tuple")
 
     def test_get_lines_code(self):
@@ -44,7 +47,10 @@ class TestPythonFileParser(unittest.TestCase):
             temporary_python_file.seek(0)
 
             result = get_lines_code(temporary_python_file.name, 3, 5)
-            self.assertEqual(result, "\n".join([line.strip() for line in TEST_CODE.splitlines()][3:5]))
+            self.assertEqual(
+                result,
+                "\n".join([line.strip() for line in TEST_CODE.splitlines()][3:5]),
+            )
 
     def test_get_lines_code_file_not_exist(self):
         self.assertRaises(FileNotFoundError, get_lines_code, "file_not_exist.py", 3, 5)
@@ -60,7 +66,10 @@ class TestPythonFileParser(unittest.TestCase):
             result = parse_python_file(temporary_python_file.name)
 
             self.assertEqual(result["file_name"], temporary_python_file.name)
-            self.assertEqual(result["imports"], [{"module": "os", "alias": None, "start_line": 1, "end_line": 2}])
+            self.assertEqual(
+                result["imports"],
+                [{"module": "os", "alias": None, "start_line": 1, "end_line": 2}],
+            )
             self.assertEqual(
                 result["classes"],
                 [
@@ -82,7 +91,15 @@ class TestPythonFileParser(unittest.TestCase):
             )
             self.assertEqual(
                 result["functions"],
-                [{"name": "sum_function", "start_line": 3, "end_line": 5, "parameters": ["a", "b"], "returns": "int"}],
+                [
+                    {
+                        "name": "sum_function",
+                        "start_line": 3,
+                        "end_line": 5,
+                        "parameters": ["a", "b"],
+                        "returns": "int",
+                    }
+                ],
             )
             self.assertEqual(result["constants"], [])
             self.assertEqual(result["global_statements"], [])

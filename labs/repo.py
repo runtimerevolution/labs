@@ -1,9 +1,9 @@
 import logging
 import subprocess
 
-from labs.decorators import time_and_log_function
-from labs.github.github import GithubRequests
-from labs.response_parser.parser import create_file, modify_file, parse_llm_output
+from decorators import time_and_log_function
+from github.github import GithubRequests
+from response_parser.parser import create_file, modify_file, parse_llm_output
 
 logger = logging.getLogger(__name__)
 

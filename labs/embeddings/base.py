@@ -2,10 +2,9 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Union
 
+from database.connect import db_connector
+from database.models import EmbeddingModel
 from sqlalchemy import Connection, Row, delete, insert, select
-
-from labs.database.connect import db_connector
-from labs.database.models import EmbeddingModel
 
 
 @dataclass
