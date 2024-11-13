@@ -49,7 +49,7 @@ shell:
 ## Run project tests
 .PHONY: tests
 tests:
-	pytest
+	pytest ./labs
 
 .PHONY: clean_tests
 clean_tests:
