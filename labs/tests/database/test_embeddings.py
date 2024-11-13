@@ -1,11 +1,10 @@
 import random
 
+from database.connect import db_connector
+from database.models import EmbeddingModel
+from embeddings.base import Embedder, Embeddings
+from embeddings.openai import OpenAIEmbedder
 from sqlalchemy import select
-
-from labs.database.connect import db_connector
-from labs.database.models import EmbeddingModel
-from labs.embeddings.base import Embedder, Embeddings
-from labs.embeddings.openai import OpenAIEmbedder
 from tests.constants import MULTIPLE_EMBEDDINGS, REPO1, SINGLE_EMBEDDING
 
 
