@@ -48,7 +48,7 @@ jobs:
           PGPASSWORD=${{env.DATABASE_PASSWORD}} psql -U ${{env.DATABASE_USER}} -d ${{env.DATABASE_NAME}} -h ${{env.DATABASE_HOST}} -a -f ${{github.workspace}}/database_scripts/postgres.sql
 
       - name: Run pytest
-        run: poetry run pytest
+        run: poetry run pytest ./labs
 
       - name: Ruff
         uses: chartboost/ruff-action@v1
