@@ -36,6 +36,11 @@ logger = logging.getLogger(__name__)
 router = Router(tags=["codemonkey"])
 
 
+@router.post("/sample", response={201: dict})
+async def sample_endpoint(request: HttpRequest):
+    return 201, {"message": request.body}
+
+
 @router.post("/codemonkey/run_on_repo")
 @async_time_and_log_function
 async def run_on_repo_endpoint(request: HttpRequest, run_on_repo: RunOnRepoRequest):
@@ -53,7 +58,7 @@ async def run_on_repo_endpoint(request: HttpRequest, run_on_repo: RunOnRepoReque
         raise HttpError(status_code=500, message="Internal server error: " + str(ex))
 
 
-@router.post("/codemonkey/run_on_local_repo")
+@router.post("/codemonkey/run_on_local_repo", response={200: None})
 @async_time_and_log_function
 async def run_on_local_repo_endpoint(request: HttpRequest, run_on_local_repo: RunOnLocalRepoRequest):
     try:
