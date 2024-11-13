@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 router = Router(tags=["github"])
 
 
-@router.post("/github/list-issues")
+@router.post("/list-issues")
 @async_time_and_log_function
 async def list_issues(request: HttpRequest, github: GithubModel, params: ListIssuesRequest):
     try:
@@ -36,7 +36,7 @@ async def list_issues(request: HttpRequest, github: GithubModel, params: ListIss
         raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
-@router.post("/github/get-issue")
+@router.post("/get-issue")
 @async_time_and_log_function
 async def get_issue(request: HttpRequest, github: GithubModel, params: IssueRequest):
     try:
@@ -52,7 +52,7 @@ async def get_issue(request: HttpRequest, github: GithubModel, params: IssueRequ
         raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
-@router.post("/github/create-branch")
+@router.post("/create-branch")
 @async_time_and_log_function
 async def create_branch(request: HttpRequest, github: GithubModel, params: CreateBranchRequest):
     try:
@@ -68,7 +68,7 @@ async def create_branch(request: HttpRequest, github: GithubModel, params: Creat
         raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
-@router.post("/github/change-issue-status")
+@router.post("/change-issue-status")
 @async_time_and_log_function
 async def change_issue_status(request: HttpRequest, github: GithubModel, params: ChangeIssueStatusRequest):
     try:
@@ -84,7 +84,7 @@ async def change_issue_status(request: HttpRequest, github: GithubModel, params:
         raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
-@router.post("/github/commit-changes")
+@router.post("/commit-changes")
 @async_time_and_log_function
 async def commit_changes(request: HttpRequest, github: GithubModel, params: CommitChangesRequest):
     try:
@@ -102,7 +102,7 @@ async def commit_changes(request: HttpRequest, github: GithubModel, params: Comm
         raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
-@router.post("/github/create-pull-request")
+@router.post("/create-pull-request")
 @async_time_and_log_function
 async def create_pull_request(request: HttpRequest, github: GithubModel, params: CreatePullRequestRequest):
     try:
@@ -120,7 +120,7 @@ async def create_pull_request(request: HttpRequest, github: GithubModel, params:
         raise HttpError(status_code=500, message="Internal server error: " + str(e))
 
 
-@router.post("/github/clone")
+@router.post("/clone")
 @async_time_and_log_function
 async def clone_repo(request: HttpRequest, github: GithubModel):
     try:

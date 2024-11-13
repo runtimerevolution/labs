@@ -36,12 +36,7 @@ logger = logging.getLogger(__name__)
 router = Router(tags=["codemonkey"])
 
 
-@router.post("/sample", response={201: dict})
-async def sample_endpoint(request: HttpRequest):
-    return 201, {"message": request.body}
-
-
-@router.post("/codemonkey/run_on_repo")
+@router.post("/run_on_repo")
 @async_time_and_log_function
 async def run_on_repo_endpoint(request: HttpRequest, run_on_repo: RunOnRepoRequest):
     try:
@@ -58,7 +53,7 @@ async def run_on_repo_endpoint(request: HttpRequest, run_on_repo: RunOnRepoReque
         raise HttpError(status_code=500, message="Internal server error: " + str(ex))
 
 
-@router.post("/codemonkey/run_on_local_repo", response={200: None})
+@router.post("/run_on_local_repo", response={200: None})
 @async_time_and_log_function
 async def run_on_local_repo_endpoint(request: HttpRequest, run_on_local_repo: RunOnLocalRepoRequest):
     try:
@@ -68,7 +63,7 @@ async def run_on_local_repo_endpoint(request: HttpRequest, run_on_local_repo: Ru
         raise HttpError(status_code=500, message="Internal server error: " + str(ex))
 
 
-@router.post("/codemonkey/get_issue")
+@router.post("/get_issue")
 @async_time_and_log_function
 async def get_issue_endpoint(request: HttpRequest, get_issue: GetIssueRequest):
     return get_issue_task(
@@ -80,7 +75,7 @@ async def get_issue_endpoint(request: HttpRequest, get_issue: GetIssueRequest):
     )
 
 
-@router.post("/codemonkey/create_branch")
+@router.post("/create_branch")
 @async_time_and_log_function
 async def create_branch_endpoint(request: HttpRequest, create_branch: CreateBranchRequest):
     return create_branch_task(
@@ -94,7 +89,7 @@ async def create_branch_endpoint(request: HttpRequest, create_branch: CreateBran
     )
 
 
-@router.post("/codemonkey/vectorize_repo_to_database")
+@router.post("/vectorize_repo_to_database")
 @async_time_and_log_function
 async def vectorize_repo_to_database_endpoint(
     request: HttpRequest, vectorize_repo_to_database: VectorizeRepoToDatabaseRequest
@@ -102,13 +97,13 @@ async def vectorize_repo_to_database_endpoint(
     return vectorize_repo_to_database_task(repo_destination=vectorize_repo_to_database.repo_destination)
 
 
-@router.post("/codemonkey/find_similar_embeddings")
+@router.post("/find_similar_embeddings")
 @async_time_and_log_function
 async def find_similar_embeddings_endpoint(request: HttpRequest, find_similar_embeddings: FindSimilarEmbeddingsRequest):
     return find_similar_embeddings_task(issue_body=find_similar_embeddings.issue_body)
 
 
-@router.post("/codemonkey/prepare_prompt_and_context")
+@router.post("/prepare_prompt_and_context")
 @async_time_and_log_function
 async def prepare_prompt_and_context_endpoint(
     request: HttpRequest, prepare_prompt_and_context: PreparePromptAndContextRequest
@@ -118,19 +113,19 @@ async def prepare_prompt_and_context_endpoint(
     )
 
 
-@router.post("/codemonkey/get_llm_response")
+@router.post("/get_llm_response")
 @async_time_and_log_function
 async def get_llm_response_endpoint(request: HttpRequest, get_llm_reponse: GetLLMResponseRequest):
     return get_llm_response_task(prepared_context=get_llm_reponse.context)
 
 
-@router.post("/codemonkey/apply_code_changes")
+@router.post("/apply_code_changes")
 @async_time_and_log_function
 async def apply_code_changes_endpoint(request: HttpRequest, apply_code_changes: ApplyCodeChangesRequest):
     return apply_code_changes_task(llm_response=apply_code_changes.llm_response)
 
 
-@router.post("/codemonkey/commit_changes")
+@router.post("/commit_changes")
 @async_time_and_log_function
 async def commit_changes_endpoint(request: HttpRequest, commit_changes: CommitChangesRequest):
     return commit_changes_task(
@@ -143,7 +138,7 @@ async def commit_changes_endpoint(request: HttpRequest, commit_changes: CommitCh
     )
 
 
-@router.post("/codemonkey/create_pull_request")
+@router.post("/create_pull_request")
 @async_time_and_log_function
 async def create_pull_request_endpoint(request: HttpRequest, create_pull_request: CreatePullRequestRequest):
     return create_pull_request_task(
