@@ -26,10 +26,12 @@ def vectorize_repo_to_database_task(prefix="", repo_destination=""):
 
 @app.task
 def find_similar_embeddings_task(prefix="", issue_body=""):
-    rows = Embedder(OpenAIEmbedder).retrieve_embeddings(
+    embeddings_results = Embedder(OpenAIEmbedder).retrieve_embeddings(
         redis_client.get(f"{prefix}_issue_body") if prefix else issue_body
     )
-    similar_embeddings = [(row[0], row[1], row[2]) for row in rows]
+    similar_embeddings = [
+        (embedding.repository, embedding.file_path, embedding.text) for embedding in embeddings_results
+    ]
 
     if prefix:
         redis_client.set(f"{prefix}_similar_embeddings", json.dumps(similar_embeddings))

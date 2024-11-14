@@ -13,7 +13,7 @@ from api.schemas import (
     RunOnRepoRequest,
     VectorizeRepoToDatabaseRequest,
 )
-from decorators import async_time_and_log_function
+from decorators import async_time_and_log_function, time_and_log_function
 from django.http import HttpRequest
 from ninja import Router
 from ninja.errors import HttpError

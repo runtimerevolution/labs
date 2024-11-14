@@ -2,7 +2,8 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Union
 
-from core.models import Embedding
+from embeddings.models import Embedding
+from pgvector.django import CosineDistance
 from sqlalchemy import Connection, Row, delete, insert, select
 
 
@@ -28,16 +29,9 @@ class Embedder(ABC):
         query = query.replace("\n", "")
         embedded_query = self.embed(prompt=query).embeddings[0]
 
-        cosine_distance = Embedding.embedding.cosine_distance(embedded_query).label("distance")
-        return Embedding.objects.filter(cosine_distance < cosine_distance).order_by("distance").limit(number_of_results)
-        # TODO: query
-        # db_query = (
-        #     select(EmbeddingModel, cosine_distance)
-        #     .where(cosine_distance < similarity_threshold)
-        #     .order_by("distance")
-        #     .limit(number_of_results)
-        # )
-        # return connection.execute(db_query).fetchall()
+        return Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query)).filter(
+            distance__lt=similarity_threshold
+        )[:number_of_results]
 
     def reembed_code(
         self,
@@ -46,9 +40,6 @@ class Embedder(ABC):
         embeddings: Any = None,
     ) -> None:
         Embedding.objects.filter(repository=repository).delete()
-        # TODO: query
-        # db_query = delete(EmbeddingModel).where(EmbeddingModel.repository == repository)
-        # connection.execute(db_query)
 
         if not embeddings:
             embeddings = self.embed(prompt=files_texts)
@@ -60,13 +51,3 @@ class Embedder(ABC):
                 file_path=file_text[0],
                 text=file_text[1],
             )
-
-            # TODO: query
-        #     query = insert(EmbeddingModel).values(
-        #         repository=repository,
-        #         embedding=file_text_embedding,
-        #         file_path=file_text[0],
-        #         text=file_text[1],
-        #     )
-        #     connection.execute(query)
-        # connection.commit()

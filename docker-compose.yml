@@ -9,8 +9,6 @@ services:
       - POSTGRES_DB=test
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASS}
-    volumes:
-      - ./database_scripts:/docker-entrypoint-initdb.d
 
   api:
     env_file: .env.local
