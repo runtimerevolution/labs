@@ -1,12 +1,11 @@
 import json
 import logging
 
+import config.configuration_variables as settings
 import redis
-
-import labs.config.configuration_variables as settings
-from labs.config.celery import app
-from labs.repo import call_agent_to_apply_code_changes, clone_repository
-from labs.run import commit_changes, create_branch, create_pull_request, get_issue
+from config.celery import app
+from repo import call_agent_to_apply_code_changes, clone_repository
+from run import commit_changes, create_branch, create_pull_request, get_issue
 
 logger = logging.getLogger(__name__)
 

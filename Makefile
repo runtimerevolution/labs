@@ -49,7 +49,7 @@ shell:
 ## Run project tests
 .PHONY: tests
 tests:
-	pytest
+	pytest ./labs
 
 .PHONY: clean_tests
 clean_tests:
@@ -63,6 +63,7 @@ clean_tests:
 .PHONY: ollama
 ollama:
 	docker compose exec ollama ollama pull $(model)
+
 
 #################################################################################
 # Self Documenting Commands                                                     #
@@ -81,8 +82,6 @@ export PRINT_HELP_PYSCRIPT
 
 help:
 	@python -c "${PRINT_HELP_PYSCRIPT}" < $(MAKEFILE_LIST)
-api:
-	fastapi dev labs/api/main.py
 
 runserver:
 	poetry run python labs/manage.py runserver
@@ -95,9 +94,6 @@ migrate:
 
 createuser:
 	DJANGO_SUPERUSER_PASSWORD=admin poetry run python labs/manage.py createsuperuser --noinput --username=admin --email=a@b.com
-
-asgi_api:
-	cd labs && poetry run uvicorn config.asgi:application --reload --port 8000
 
 load_fixtures:
 	python labs/manage.py loaddata $(wildcard config/fixtures/*.json)

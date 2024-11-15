@@ -1,8 +1,7 @@
 import os
 
 import requests
-
-from labs.github.github import GithubRequests
+from github.github import GithubRequests
 
 
 class TestGithubRequests:

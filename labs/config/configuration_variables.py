@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from labs.logger import setup_logger
+from logger import setup_logger
 
 setup_logger()
 
@@ -23,8 +23,6 @@ GITHUB_OWNER = os.environ.get("GITHUB_OWNER")
 GITHUB_REPO = os.environ.get("GITHUB_REPO")
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_API_BASE_URL = "https://api.github.com"
-
-TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", "False"))
 
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")

@@ -1,10 +1,10 @@
-from labs.tasks.llm import (
+from tasks.llm import (
     find_similar_embeddings_task,
     get_llm_response_task,
     prepare_prompt_and_context_task,
     vectorize_repo_to_database_task,
 )
-from labs.tasks.repo import (
+from tasks.repo import (
     apply_code_changes_task,
     clone_repo_task,
     commit_changes_task,
@@ -12,7 +12,7 @@ from labs.tasks.repo import (
     create_pull_request_task,
     get_issue_task,
 )
-from labs.tasks.run import init_task, run_on_local_repo_task, run_on_repo_task
+from tasks.run import init_task, run_on_local_repo_task, run_on_repo_task
 
 __all__ = [
     "vectorize_repo_to_database_task",

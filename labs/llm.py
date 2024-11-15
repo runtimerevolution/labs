@@ -1,13 +1,13 @@
 import logging
 
-import labs.config.configuration_variables as settings
-from labs.decorators import time_and_log_function
-from labs.embeddings.base import Embedder
-from labs.embeddings.openai import OpenAIEmbedder
-from labs.embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
-from labs.litellm_service.local import RequestLocalLLM
-from labs.litellm_service.request import RequestLiteLLM
-from labs.response_parser.parser import is_valid_json, parse_llm_output
+import config.configuration_variables as settings
+from decorators import time_and_log_function
+from embeddings.base import Embedder
+from embeddings.openai import OpenAIEmbedder
+from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
+from litellm_service.local import RequestLocalLLM
+from litellm_service.request import RequestLiteLLM
+from parsers.response_parser import is_valid_json, parse_llm_output
 
 logger = logging.getLogger(__name__)
 

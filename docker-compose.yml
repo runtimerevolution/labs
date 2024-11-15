@@ -9,19 +9,21 @@ services:
       - POSTGRES_DB=test
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASS}
-    volumes:
-      - ./database_scripts:/docker-entrypoint-initdb.d
 
   api:
     env_file: .env.local
-    build: .
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_RESULT_BD=redis://redis:6379/0
     ports:
       - "8000:8000"
     depends_on:
       - labs-db
+    volumes:
+      - ./labs/:/app/
 
   promtail:
     image: grafana/promtail:3.1.1
@@ -51,7 +53,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: celery -A labs.config worker --beat --scheduler redbeat.RedBeatScheduler --loglevel=INFO --concurrency=1
+    command: celery -A config worker --beat --scheduler redbeat.RedBeatScheduler --loglevel=INFO --concurrency=1
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -61,7 +63,7 @@ services:
       - redis
       - labs-db
     volumes:
-      - .:/app
+      - ./labs/:/app/
       - ${LOCAL_REPOS_PATH}:/local-repos/
 
   ollama:

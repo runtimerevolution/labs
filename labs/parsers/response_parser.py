@@ -1,7 +1,7 @@
 import json
 import logging
 
-from labs.litellm_service.request import PullRequest
+from litellm_service.request import PullRequest
 
 logger = logging.getLogger(__name__)
 

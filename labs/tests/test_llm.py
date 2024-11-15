@@ -1,6 +1,5 @@
 import pytest
-
-from labs.llm import call_llm_with_context, check_invalid_json_response
+from llm import call_llm_with_context, check_invalid_json_response
 
 
 class TestCallLlmWithContext:
