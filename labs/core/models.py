@@ -1,5 +1,4 @@
 from django.db import models
-from pgvector.django import VectorField
 
 AVAILABLE_KEYS = [
     "LITELLM_MASTER_KEY",
