@@ -13,7 +13,8 @@ from api.schemas import (
     RunOnRepoRequest,
     VectorizeRepoToDatabaseRequest,
 )
-from decorators import async_time_and_log_function, time_and_log_function
+from asgiref.sync import sync_to_async
+from decorators import async_time_and_log_function
 from django.http import HttpRequest
 from ninja import Router
 from ninja.errors import HttpError
@@ -94,13 +95,17 @@ async def create_branch_endpoint(request: HttpRequest, create_branch: CreateBran
 async def vectorize_repo_to_database_endpoint(
     request: HttpRequest, vectorize_repo_to_database: VectorizeRepoToDatabaseRequest
 ):
-    return vectorize_repo_to_database_task(repo_destination=vectorize_repo_to_database.repo_destination)
+    return await sync_to_async(vectorize_repo_to_database_task, thread_sensitive=True)(
+        repo_destination=vectorize_repo_to_database.repo_destination
+    )
 
 
 @router.post("/find_similar_embeddings")
 @async_time_and_log_function
 async def find_similar_embeddings_endpoint(request: HttpRequest, find_similar_embeddings: FindSimilarEmbeddingsRequest):
-    return find_similar_embeddings_task(issue_body=find_similar_embeddings.issue_body)
+    return await sync_to_async(find_similar_embeddings_task, thread_sensitive=True)(
+        issue_body=find_similar_embeddings.issue_body
+    )
 
 
 @router.post("/prepare_prompt_and_context")
@@ -108,7 +113,7 @@ async def find_similar_embeddings_endpoint(request: HttpRequest, find_similar_em
 async def prepare_prompt_and_context_endpoint(
     request: HttpRequest, prepare_prompt_and_context: PreparePromptAndContextRequest
 ):
-    return prepare_prompt_and_context_task(
+    return await sync_to_async(prepare_prompt_and_context_task, thread_sensitive=True)(
         issue_body=prepare_prompt_and_context.issue_body, embeddings=prepare_prompt_and_context.embeddings
     )
 
@@ -116,19 +121,21 @@ async def prepare_prompt_and_context_endpoint(
 @router.post("/get_llm_response")
 @async_time_and_log_function
 async def get_llm_response_endpoint(request: HttpRequest, get_llm_reponse: GetLLMResponseRequest):
-    return get_llm_response_task(prepared_context=get_llm_reponse.context)
+    return await sync_to_async(get_llm_response_task, thread_sensitive=True)(prepared_context=get_llm_reponse.context)
 
 
 @router.post("/apply_code_changes")
 @async_time_and_log_function
 async def apply_code_changes_endpoint(request: HttpRequest, apply_code_changes: ApplyCodeChangesRequest):
-    return apply_code_changes_task(llm_response=apply_code_changes.llm_response)
+    return await sync_to_async(apply_code_changes_task, thread_sensitive=True)(
+        llm_response=apply_code_changes.llm_response
+    )
 
 
 @router.post("/commit_changes")
 @async_time_and_log_function
 async def commit_changes_endpoint(request: HttpRequest, commit_changes: CommitChangesRequest):
-    return commit_changes_task(
+    return await sync_to_async(commit_changes_task, thread_sensitive=True)(
         token=commit_changes.github_token,
         repo_owner=commit_changes.repo_owner,
         repo_name=commit_changes.repo_name,
@@ -141,7 +148,7 @@ async def commit_changes_endpoint(request: HttpRequest, commit_changes: CommitCh
 @router.post("/create_pull_request")
 @async_time_and_log_function
 async def create_pull_request_endpoint(request: HttpRequest, create_pull_request: CreatePullRequestRequest):
-    return create_pull_request_task(
+    return await sync_to_async(create_pull_request_task, thread_sensitive=True)(
         token=create_pull_request.github_token,
         repo_owner=create_pull_request.repo_owner,
         repo_name=create_pull_request.repo_name,

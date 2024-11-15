@@ -3,7 +3,7 @@ import subprocess
 
 from decorators import time_and_log_function
 from github.github import GithubRequests
-from response_parser.parser import create_file, modify_file, parse_llm_output
+from parsers.response_parser import create_file, modify_file, parse_llm_output
 
 logger = logging.getLogger(__name__)
 

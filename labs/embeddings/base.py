@@ -1,10 +1,9 @@
 from abc import ABC
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Union
 
 from embeddings.models import Embedding
 from pgvector.django import CosineDistance
-from sqlalchemy import Connection, Row, delete, insert, select
 
 
 @dataclass
@@ -25,7 +24,7 @@ class Embedder(ABC):
 
     def retrieve_embeddings(
         self, query: str, similarity_threshold: int = 0.7, number_of_results: int = 10
-    ) -> Sequence[Row]:
+    ) -> List[Embeddings]:
         query = query.replace("\n", "")
         embedded_query = self.embed(prompt=query).embeddings[0]
 
