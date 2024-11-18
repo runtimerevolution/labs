@@ -34,11 +34,6 @@ class Variable(models.Model):
     @staticmethod
     def load_provider_keys(provider: str):
         variables = Variable.objects.filter(provider=provider)
-
-        # TODO: "Ollama"?
-        # if not variables.exists():
-        #     raise ValueError(f"No variables found for provider {provider}")
-
         for variable in variables:
             os.environ.setdefault(variable.name, variable.value)
 
@@ -50,7 +45,7 @@ class Config(models.Model):
     model_type = models.CharField(choices=[("EMBEDDING", "EMBEDDING"), ("LLM", "LLM")])
     provider = models.CharField(choices=Providers.choices())
     model_name = models.CharField(max_length=255)
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -74,6 +69,10 @@ class Config(models.Model):
         Variable.load_provider_keys(config.provider)
 
         return provider_model_class[config.provider][model_type], config.model_name
+
+    def save(self, *args, **kwargs):
+        Config.objects.filter(model_type=self.model_type, active=True).exclude(id=self.id).update(active=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.model_type} {self.provider} {self.model_name}"

@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                     models.CharField(choices=[("OPENAI", "OPENAI"), ("OLLAMA", "OLLAMA")]),
                 ),
                 ("model_name", models.CharField(max_length=255)),
-                ("active", models.BooleanField(default=False)),
+                ("active", models.BooleanField(default=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
             ],
