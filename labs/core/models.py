@@ -1,30 +1,82 @@
+import os
+from enum import Enum
+from typing import Literal, Tuple
+
 from django.db import models
+from embeddings.base import Embedder
+from embeddings.ollama import OllamaEmbedder
+from embeddings.openai import OpenAIEmbedder
+from litellm_service.ollama import OllamaRequester
+from litellm_service.openai import OpenAIRequester
 
-AVAILABLE_KEYS = [
-    "LITELLM_MASTER_KEY",
-    "LITELLM_API_KEY",
-    "HUGGINGFACE_API_KEY",
-    "OPENAI_API_KEY",
-    "GEMINI_API_KEY",
-    "COHERE_API_KEY",
-    "GROQ_API_KEY",
-    "ANTHROPIC_API_KEY",
-    "MISTRAL_API_KEY",
-    "ANYSCALE_API_KEY",
-    "ACTIVELOOP_TOKEN",
-]
+provider_model_class = {
+    "OPENAI": {"embedding": OpenAIEmbedder, "llm": OpenAIRequester},
+    "OLLAMA": {"embedding": OllamaEmbedder, "llm": OllamaRequester},
+}
 
 
-class Config(models.Model):
-    llm_model = models.TextField(blank=True, null=True)
-    label = models.CharField(max_length=255, choices=[(k, k) for k in sorted(AVAILABLE_KEYS)], verbose_name="Label")
-    value = models.TextField(blank=True, null=True)
-    type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Type")
+class Providers(Enum):
+    OPENAI = "OPENAI"
+    OLLAMA = "OLLAMA"
+
+    @classmethod
+    def choices(cls):
+        return [(prop.value, prop.name) for prop in cls]
+
+
+class Variable(models.Model):
+    provider = models.CharField(choices=Providers.choices())
+    name = models.CharField(max_length=255)
+    value = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @staticmethod
+    def load_provider_keys(provider: str):
+        variables = Variable.objects.filter(provider=provider)
+
+        # TODO: "Ollama"?
+        # if not variables.exists():
+        #     raise ValueError(f"No variables found for provider {provider}")
+
+        for variable in variables:
+            os.environ.setdefault(variable.name, variable.value)
+
     def __str__(self):
-        return self.label
+        return self.name
+
+
+class Config(models.Model):
+    model_type = models.CharField(choices=[("EMBEDDING", "EMBEDDING"), ("LLM", "LLM")])
+    provider = models.CharField(choices=Providers.choices())
+    model_name = models.CharField(max_length=255)
+    active = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_active_embedding_model() -> Tuple[Embedder, str]:
+        return Config._get_active_provider_model("embedding")
+
+    @staticmethod
+    def get_active_llm_model():
+        return Config._get_active_provider_model("llm")
+
+    @staticmethod
+    def _get_active_provider_model(model_type: Literal["embedding", "llm"]):
+        queryset = Config.objects.filter(model_type=model_type.upper(), active=True)
+        if not queryset.exists():
+            raise ValueError(f"No {model_type} model configured")
+
+        config = queryset.first()
+
+        # Load associated provider variables
+        Variable.load_provider_keys(config.provider)
+
+        return provider_model_class[config.provider][model_type], config.model_name
+
+    def __str__(self):
+        return f"{self.model_type} {self.provider} {self.model_name}"
 
     class Meta:
-        indexes = [models.Index(fields=["label", "llm_model"])]
+        indexes = [models.Index(fields=["provider", "model_name"])]

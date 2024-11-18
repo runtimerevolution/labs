@@ -1,4 +1,7 @@
+import os
 from abc import ABC, abstractmethod
+
+from core.models import Config
 
 
 class Vectorizer(ABC):

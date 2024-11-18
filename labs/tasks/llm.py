@@ -4,6 +4,7 @@ import logging
 import config.configuration_variables as settings
 import redis
 from config.celery import app
+from core.models import Config
 from embeddings.base import Embedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
@@ -26,7 +27,8 @@ def vectorize_repo_to_database_task(prefix="", repo_destination=""):
 
 @app.task
 def find_similar_embeddings_task(prefix="", issue_body=""):
-    embeddings_results = Embedder(OpenAIEmbedder).retrieve_embeddings(
+    embedder_class, *embeder_args = Config.get_active_embedding_model()
+    embeddings_results = Embedder(embedder_class, *embeder_args).retrieve_embeddings(
         redis_client.get(f"{prefix}_issue_body") if prefix else issue_body
     )
     similar_embeddings = [

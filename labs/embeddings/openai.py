@@ -1,13 +1,18 @@
+import os
+
+import openai
 from embeddings.base import Embedder, Embeddings
 from litellm import embedding
 
 
 class OpenAIEmbedder(Embedder):
-    def __init__(self, model="text-embedding-ada-002"):
-        self._model = model
+    def __init__(self, model):
+        self._model_name = model
+
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
 
     def embed(self, prompt, *args, **kwargs) -> Embeddings:
-        result = embedding(model=self._model, input=prompt, *args, **kwargs)
+        result = embedding(model=self._model_name, input=prompt, *args, **kwargs)
         return Embeddings(
             model=result.model,
             model_config=result.model_config,

@@ -1,9 +1,9 @@
 import logging
 import os
 
-import config.configuration_variables as settings
 import openai
 import pathspec
+from core.models import Config
 from embeddings.base import Embedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.base import Vectorizer
@@ -11,8 +11,6 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
 
 logger = logging.getLogger(__name__)
-
-openai.api_key = settings.OPENAI_API_KEY
 
 
 class ChunkVectorizer(Vectorizer):
@@ -74,7 +72,8 @@ class ChunkVectorizer(Vectorizer):
 
         logger.debug("Embedding all repo documents.")
 
-        embedder = Embedder(OpenAIEmbedder)
+        embedder_class, *embeder_args = Config.get_active_embedding_model()
+        embedder = Embedder(embedder_class, *embeder_args)
         embeddings = embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")

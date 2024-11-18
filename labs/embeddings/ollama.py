@@ -5,10 +5,10 @@ from ollama import Client
 
 class OllamaEmbedder(Embedder):
     def __init__(self, model):
-        self._model = model
+        self._model_name = model
 
         self._client = Client(LOCAL_LLM_HOST)
 
     def embed(self, prompt, *args, **kwargs) -> Embeddings:
-        result = self._client.embed(self._model, prompt, *args, **kwargs)
+        result = self._client.embed(self._model_name, prompt, *args, **kwargs)
         return Embeddings(model=result["model"], embeddings=result["embeddings"])

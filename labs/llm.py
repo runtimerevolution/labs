@@ -1,12 +1,12 @@
 import logging
 
 import config.configuration_variables as settings
+from core.models import Config
 from decorators import time_and_log_function
 from embeddings.base import Embedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
-from litellm_service.local import RequestLocalLLM
-from litellm_service.request import RequestLiteLLM
+from litellm_service.llm_requester import Requester
 from parsers.response_parser import is_valid_json, parse_llm_output
 
 logger = logging.getLogger(__name__)
@@ -107,13 +107,15 @@ def validate_llm_response(llm_response):
 
 
 def get_llm_response(prepared_context):
+    llm_requester, *llm_requester_args = Config.get_active_llm_model()
+
     retries, max_retries = 0, 5
     redo, redo_reason = True, None
-    litellm_requests = RequestLocalLLM() if settings.LOCAL_LLM else RequestLiteLLM()
+    requester = Requester(llm_requester, *llm_requester_args)
 
     while redo and retries < max_retries:
         try:
-            llm_response = litellm_requests.completion_without_proxy(prepared_context, model=settings.LLM_MODEL_NAME)
+            llm_response = requester.completion_without_proxy(prepared_context)
             logger.debug(f"LLM Response: {llm_response}")
             redo, redo_reason = validate_llm_response(llm_response)
         except Exception:
