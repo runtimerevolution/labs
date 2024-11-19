@@ -17,6 +17,7 @@ class TestLocalLLM:
 
         assert success
 
+    @patch("llm.validate_llm_response")
     @patch("embeddings.vectorizers.chunk_vectorizer.ChunkVectorizer.vectorize_to_database")
     @patch("litellm_service.ollama.OllamaRequester.completion_without_proxy")
     @patch("embeddings.base.Embedder.retrieve_embeddings")
@@ -26,10 +27,12 @@ class TestLocalLLM:
         mocked_context,
         mocked_local_llm,
         mocked_vectorize_to_database,
-        create_test_embedding_config,
+        mocked_validate_llm_reponse,
         create_test_llm_config,
+        create_test_embedding_config,
     ):
         mocked_context.return_value = [["file1", "/path/to/file1", "content"]]
+        mocked_validate_llm_reponse.return_value = False, ""
         repo_destination = "repo"
         issue_summary = "Fix the bug in the authentication module"
         call_llm_with_context(repo_destination, issue_summary)
