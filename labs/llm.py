@@ -147,6 +147,6 @@ def call_llm_with_context(repo_destination, issue_summary):
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
 
-    logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {settings.LLM_MODEL_NAME}")
+    logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {embeder_args[0]}")
 
     return get_llm_response(prepared_context)

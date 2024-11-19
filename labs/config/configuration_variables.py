@@ -25,7 +25,6 @@ GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_API_BASE_URL = "https://api.github.com"
 
 CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "/tmp/")
-LLM_MODEL_NAME = os.getenv("LLM_MODEL_NAME", "openai/gpt-4o")
 
 DATABASE_USER = os.environ.get("DATABASE_USER", "postgres")
 DATABASE_PASS = os.environ.get("DATABASE_PASS", "postgres")
