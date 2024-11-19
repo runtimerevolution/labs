@@ -24,8 +24,6 @@ GITHUB_REPO = os.environ.get("GITHUB_REPO")
 GITHUB_USERNAME = os.environ.get("GITHUB_USERNAME")
 GITHUB_API_BASE_URL = "https://api.github.com"
 
-TEST_ENVIRONMENT = eval(os.environ.get("TEST_ENVIRONMENT", "False"))
-
 LITELLM_MASTER_KEY = os.environ.get("LITELLM_MASTER_KEY")
 LITELLM_API_KEY = os.environ.get("LITELLM_API_KEY")
 
