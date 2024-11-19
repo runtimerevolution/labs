@@ -5,7 +5,7 @@ import config.configuration_variables as settings
 import redis
 from config.celery import app
 from core.models import Config
-from embeddings.base import Embedder
+from embeddings.embedder import Embedder
 from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from llm import get_llm_response, get_prompt, prepare_context
 

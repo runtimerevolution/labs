@@ -3,7 +3,7 @@ import os
 
 import pathspec
 from core.models import Config
-from embeddings.base import Embedder
+from embeddings.embedder import Embedder
 from embeddings.vectorizers.base import Vectorizer
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
