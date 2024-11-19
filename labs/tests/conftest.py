@@ -3,12 +3,14 @@ from typing import List
 import pytest
 from core.models import Config
 from embeddings.models import Embedding
-from tests.constants import MULTIPLE_EMBEDDINGS, SINGLE_EMBEDDING
-
-OPENAI_LLM_MODEL_NAME = "gpt-4o"
-OPENAI_EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
-OLLAMA_LLM_MODEL_NAME = "llama3.2:latest"
-OLLAMA_EMBEDDING_MODEL_NAME = "nomic-embed-text:latest"
+from tests.constants import (
+    MULTIPLE_EMBEDDINGS,
+    OLLAMA_EMBEDDING_MODEL_NAME,
+    OLLAMA_LLM_MODEL_NAME,
+    OPENAI_EMBEDDING_MODEL_NAME,
+    OPENAI_LLM_MODEL_NAME,
+    SINGLE_EMBEDDING,
+)
 
 
 @pytest.fixture

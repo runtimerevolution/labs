@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Literal, Tuple
 
 from django.db import models
-from embeddings.base import Embedder
+from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
 from litellm_service.ollama import OllamaRequester
