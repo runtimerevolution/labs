@@ -2,7 +2,7 @@ import logging
 
 import config.configuration_variables as settings
 from decorators import time_and_log_function
-from embeddings.base import Embedder
+from embeddings.embedder import Embedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from litellm_service.local import RequestLocalLLM

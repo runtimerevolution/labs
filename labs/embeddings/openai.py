@@ -1,4 +1,4 @@
-from embeddings.base import Embedder, Embeddings
+from embeddings.embedder import Embedder, Embeddings
 from litellm import embedding
 
 

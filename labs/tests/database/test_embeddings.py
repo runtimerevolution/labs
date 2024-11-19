@@ -1,7 +1,7 @@
 import random
 
 import pytest
-from embeddings.base import Embedder, Embeddings
+from embeddings.embedder import Embedder, Embeddings
 from embeddings.models import Embedding
 from embeddings.openai import OpenAIEmbedder
 from tests.constants import MULTIPLE_EMBEDDINGS, REPO1, SINGLE_EMBEDDING

@@ -4,7 +4,6 @@ from llm import call_llm_with_context, check_invalid_json_response
 
 class TestCallLlmWithContext:
     def test_empty_summary(self):
-        issue_summary = ""
         repo_destination = "repo_destination"
         issue_summary = ""
 
