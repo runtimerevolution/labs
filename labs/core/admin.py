@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import Config, Variable
+from .models import Model, Variable, VectorizerModel
 
 
-@admin.register(Config)
-class ConfigAdmin(admin.ModelAdmin):
+@admin.register(Model)
+class ModelAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "model_type",
@@ -34,3 +34,18 @@ class VariableAdmin(admin.ModelAdmin):
     list_editable = ("provider", "name", "value")
     list_filter = ("provider", "name")
     search_fields = ("provider", "name")
+
+
+@admin.register(VectorizerModel)
+class VectorizerModel(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "vectorizer_type",
+        "active",
+        "created_at",
+        "updated_at",
+    )
+    list_display_links = ("id",)
+    list_editable = ("vectorizer_type", "active")
+    list_filter = ("vectorizer_type",)
+    search_fields = ("vectorizer_type",)

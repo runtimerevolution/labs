@@ -2,8 +2,6 @@ import logging
 import os
 
 import pathspec
-from core.models import Config
-from embeddings.embedder import Embedder
 from embeddings.vectorizers.base import Vectorizer
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
@@ -12,6 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class ChunkVectorizer(Vectorizer):
+    def __init__(self):
+        # Override the Vectorizer class init
+        ...
+
     def load_docs(self, root_dir, file_extensions=None):
         """
         Load documents from the specified root directory.
@@ -61,7 +63,7 @@ class ChunkVectorizer(Vectorizer):
         text_splitter = CharacterTextSplitter(chunk_size=2000, chunk_overlap=0)
         return text_splitter.split_documents(docs)
 
-    def vectorize_to_database(self, include_file_extensions, repo_destination):
+    def vectorize_to_database(self, include_file_extensions, repo_destination, *args, **kwargs):
         logger.debug("Loading and splitting all documents into chunks.")
         docs = self.load_docs(repo_destination, include_file_extensions)
         texts = self.split_docs(docs)
@@ -70,9 +72,7 @@ class ChunkVectorizer(Vectorizer):
 
         logger.debug("Embedding all repo documents.")
 
-        embedder_class, *embeder_args = Config.get_active_embedding_model()
-        embedder = Embedder(embedder_class, *embeder_args)
-        embeddings = embedder.embed(prompt=texts)
+        embeddings = self.embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")
-        embedder.reembed_code(files_texts=files_and_texts, embeddings=embeddings, repository=repo_destination)  # type: ignore
+        self.embedder.reembed_code(files_texts=files_and_texts, embeddings=embeddings, repository=repo_destination)  # type: ignore

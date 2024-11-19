@@ -1,9 +1,9 @@
 import logging
 
-import config.configuration_variables as settings
-from core.models import Config
+from core.models import Model, VectorizerModel
 from decorators import time_and_log_function
 from embeddings.embedder import Embedder
+from embeddings.vectorizers.base import Vectorizer
 from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from litellm_service.llm_requester import Requester
 from parsers.response_parser import is_valid_json, parse_llm_output
@@ -106,7 +106,7 @@ def validate_llm_response(llm_response):
 
 
 def get_llm_response(prepared_context):
-    llm_requester, *llm_requester_args = Config.get_active_llm_model()
+    llm_requester, *llm_requester_args = Model.get_active_llm_model()
 
     retries, max_retries = 0, 5
     redo, redo_reason = True, None
@@ -137,10 +137,11 @@ def call_llm_with_context(repo_destination, issue_summary):
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
 
-    ChunkVectorizer().vectorize_to_database(None, repo_destination)
+    vectorizer = VectorizerModel.get_active_vectorizer()
+    Vectorizer(vectorizer).vectorize_to_database(None, repo_destination)
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    embedder_class, *embeder_args = Config.get_active_embedding_model()
+    embedder_class, *embeder_args = Model.get_active_embedding_model()
     embedder = Embedder(embedder_class, *embeder_args)
     context = embedder.retrieve_embeddings(issue_summary)
 

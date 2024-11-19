@@ -6,6 +6,10 @@ from django.db import models
 from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
+from embeddings.vectorizers.base import Vectorizer
+from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
+from embeddings.vectorizers.python_vectorizer import PythonVectorizer
+from litellm_service.llm_requester import Requester
 from litellm_service.ollama import OllamaRequester
 from litellm_service.openai import OpenAIRequester
 
@@ -14,18 +18,38 @@ provider_model_class = {
     "OLLAMA": {"embedding": OllamaEmbedder, "llm": OllamaRequester},
 }
 
+vectorizer_model_class = {"CHUNK_VECTORIZER": ChunkVectorizer, "PYTHON_VECTORIZER": PythonVectorizer}
 
-class Providers(Enum):
-    OPENAI = "OPENAI"
-    OLLAMA = "OLLAMA"
+
+class ModelTypeEnum(Enum):
+    EMBEDDING = "Embedding"
+    LLM = "LLM"
 
     @classmethod
     def choices(cls):
-        return [(prop.value, prop.name) for prop in cls]
+        return [(prop.name, prop.value) for prop in cls]
+
+
+class ProviderEnum(Enum):
+    OPENAI = "OpenAI"
+    OLLAMA = "Ollama"
+
+    @classmethod
+    def choices(cls):
+        return [(prop.name, prop.value) for prop in cls]
+
+
+class VectorizerEnum(Enum):
+    CHUNK_VECTORIZER = "File chunks"
+    PYTHON_VECTORIZER = "Python structured"
+
+    @classmethod
+    def choices(cls):
+        return [(prop.name, prop.value) for prop in cls]
 
 
 class Variable(models.Model):
-    provider = models.CharField(choices=Providers.choices())
+    provider = models.CharField(choices=ProviderEnum.choices())
     name = models.CharField(max_length=255)
     value = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -41,9 +65,9 @@ class Variable(models.Model):
         return self.name
 
 
-class Config(models.Model):
-    model_type = models.CharField(choices=[("EMBEDDING", "EMBEDDING"), ("LLM", "LLM")])
-    provider = models.CharField(choices=Providers.choices())
+class Model(models.Model):
+    model_type = models.CharField(choices=ModelTypeEnum.choices())
+    provider = models.CharField(choices=ProviderEnum.choices())
     model_name = models.CharField(max_length=255)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -51,27 +75,27 @@ class Config(models.Model):
 
     @staticmethod
     def get_active_embedding_model() -> Tuple[Embedder, str]:
-        return Config._get_active_provider_model("embedding")
+        return Model._get_active_provider_model("embedding")
 
     @staticmethod
-    def get_active_llm_model():
-        return Config._get_active_provider_model("llm")
+    def get_active_llm_model() -> Tuple[Requester, str]:
+        return Model._get_active_provider_model("llm")
 
     @staticmethod
-    def _get_active_provider_model(model_type: Literal["embedding", "llm"]):
-        queryset = Config.objects.filter(model_type=model_type.upper(), active=True)
+    def _get_active_provider_model(model_type: Literal["embedding", "llm", "vectorizer"]):
+        queryset = Model.objects.filter(model_type=model_type.upper(), active=True)
         if not queryset.exists():
             raise ValueError(f"No {model_type} model configured")
 
-        config = queryset.first()
+        model = queryset.first()
 
         # Load associated provider variables
-        Variable.load_provider_keys(config.provider)
+        Variable.load_provider_keys(model.provider)
 
-        return provider_model_class[config.provider][model_type], config.model_name
+        return provider_model_class[model.provider][model_type], model.model_name
 
     def save(self, *args, **kwargs):
-        Config.objects.filter(model_type=self.model_type, active=True).exclude(id=self.id).update(active=False)
+        Model.objects.filter(model_type=self.model_type, active=True).exclude(id=self.id).update(active=False)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -79,3 +103,27 @@ class Config(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=["provider", "model_name"])]
+
+
+class VectorizerModel(models.Model):
+    vectorizer_type = models.CharField(choices=VectorizerEnum.choices())
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_active_vectorizer() -> Vectorizer:
+        queryset = VectorizerModel.objects.filter(active=True)
+        if not queryset.exists():
+            raise ValueError(f"No vectorizer configured")
+
+        vectorizer_model = queryset.first()
+        return vectorizer_model_class[vectorizer_model.vectorizer_type]
+
+    def save(self, *args, **kwargs):
+        VectorizerModel.objects.filter(active=True).exclude(id=self.id).update(active=False)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Vectorizer"
+        verbose_name_plural = "Vectorizers"

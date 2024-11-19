@@ -2,7 +2,7 @@ from unittest import skip
 from unittest.mock import patch
 
 import pytest
-from core.models import Config
+from core.models import Model
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
 from litellm_service.ollama import OllamaRequester
@@ -101,28 +101,28 @@ class TestLocalLLM:
 class TestLLMRequester:
     @pytest.mark.django_db
     def test_openai_llm_requester(self, create_test_openai_llm_config):
-        requester, model_name = Config.get_active_llm_model()
+        requester, model_name = Model.get_active_llm_model()
 
         assert issubclass(requester, OpenAIRequester)
         assert model_name == OPENAI_LLM_MODEL_NAME
 
     @pytest.mark.django_db
     def test_openai_embedder(self, create_test_openai_embedding_config):
-        embedder, model_name = Config.get_active_embedding_model()
+        embedder, model_name = Model.get_active_embedding_model()
 
         assert issubclass(embedder, OpenAIEmbedder)
         assert model_name == OPENAI_EMBEDDING_MODEL_NAME
 
     @pytest.mark.django_db
     def test_ollama_llm_requester(self, create_test_ollama_llm_config):
-        requester, model_name = Config.get_active_llm_model()
+        requester, model_name = Model.get_active_llm_model()
 
         assert issubclass(requester, OllamaRequester)
         assert model_name == OLLAMA_LLM_MODEL_NAME
 
     @pytest.mark.django_db
     def test_ollama_embedder(self, create_test_ollama_embedding_config):
-        embedder, model_name = Config.get_active_embedding_model()
+        embedder, model_name = Model.get_active_embedding_model()
 
         assert issubclass(embedder, OllamaEmbedder)
         assert model_name == OLLAMA_EMBEDDING_MODEL_NAME

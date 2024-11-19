@@ -2,11 +2,7 @@ import logging
 import os
 from types import SimpleNamespace
 
-import config.configuration_variables as settings
-import openai
 import pathspec
-from embeddings.embedder import Embedder
-from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.base import Vectorizer
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
@@ -14,10 +10,12 @@ from parsers.python import get_lines_code, parse_python_file
 
 logger = logging.getLogger(__name__)
 
-openai.api_key = settings.OPENAI_API_KEY
-
 
 class PythonVectorizer(Vectorizer):
+    def __init__(self):
+        # Override the Vectorizer class init
+        ...
+
     def prepare_doc_content(self, metadata, code_snippet):
         metadata = SimpleNamespace(**metadata)
 
@@ -125,18 +123,17 @@ class PythonVectorizer(Vectorizer):
 
         return docs
 
-    def vectorize_to_database(self, include_file_extensions, repo_destination):
+    def vectorize_to_database(self, include_file_extensions, repo_destination, *args, **kwargs):
         docs = self.load_docs(repo_destination, include_file_extensions)
 
         logger.debug(f"Loading {len(docs)} documents...")
 
-        embedder = Embedder(OpenAIEmbedder)
         for doc in docs:
-            embeddings = embedder.embed(doc)
+            embeddings = self.embedder.embed(prompt=doc)
 
             logger.debug("Storing embeddins...")
-            embedder.reembed_code(
+            self.embedder.reembed_code(
                 files_texts=[(doc.metadata["source"], doc.page_content)],
                 embeddings=embeddings,
-                repo_destination=repo_destination,
+                repository=repo_destination,
             )

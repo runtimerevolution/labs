@@ -4,9 +4,9 @@ import logging
 import config.configuration_variables as settings
 import redis
 from config.celery import app
-from core.models import Config
+from core.models import Model, VectorizerModel
 from embeddings.embedder import Embedder
-from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
+from embeddings.vectorizers.base import Vectorizer
 from llm import get_llm_response, get_prompt, prepare_context
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,9 @@ redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_P
 @app.task
 def vectorize_repo_to_database_task(prefix="", repo_destination=""):
     repo_destination = redis_client.get(f"{prefix}_repo_destination") if prefix else repo_destination
-    ChunkVectorizer().vectorize_to_database(None, repo_destination)
+
+    vectorizer = VectorizerModel.get_active_vectorizer()
+    Vectorizer(vectorizer).vectorize_to_database(None, repo_destination)
 
     if prefix:
         return prefix
@@ -26,7 +28,7 @@ def vectorize_repo_to_database_task(prefix="", repo_destination=""):
 
 @app.task
 def find_similar_embeddings_task(prefix="", issue_body=""):
-    embedder_class, *embeder_args = Config.get_active_embedding_model()
+    embedder_class, *embeder_args = Model.get_active_embedding_model()
     embeddings_results = Embedder(embedder_class, *embeder_args).retrieve_embeddings(
         redis_client.get(f"{prefix}_issue_body") if prefix else issue_body
     )
