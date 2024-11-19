@@ -1,6 +1,7 @@
 from typing import List
 
 import pytest
+from core.models import Config
 from embeddings.models import Embedding
 from tests.constants import MULTIPLE_EMBEDDINGS, SINGLE_EMBEDDING
 
@@ -24,3 +25,19 @@ def create_test_embeddings():
 
     Embedding.objects.bulk_create(embeddings)
     return embeddings
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def create_test_embedding_config():
+    config = Config.objects.create(
+        model_type="EMBEDDING", provider="OLLAMA", model_name="nomic-embed-text:latest", active=True
+    )
+    return config
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def create_test_llm_config():
+    config = Config.objects.create(model_type="LLM", provider="OLLAMA", model_name="llama3.2:latest", active=True)
+    return config

@@ -52,7 +52,7 @@ def test_reembed_code():
         ],
     )
 
-    Embedder(OpenAIEmbedder).reembed_code(
+    Embedder(OpenAIEmbedder, model="text-embedding-ada-002").reembed_code(
         files_texts=files_texts,
         embeddings=embeddings,
         repository=REPO1,

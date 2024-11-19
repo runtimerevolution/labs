@@ -139,8 +139,11 @@ def call_llm_with_context(repo_destination, issue_summary):
         raise ValueError("issue_summary cannot be empty.")
 
     ChunkVectorizer().vectorize_to_database(None, repo_destination)
+
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    context = Embedder(OpenAIEmbedder).retrieve_embeddings(issue_summary)
+    embedder_class, *embeder_args = Config.get_active_embedding_model()
+    embedder = Embedder(embedder_class, *embeder_args)
+    context = embedder.retrieve_embeddings(issue_summary)
 
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
