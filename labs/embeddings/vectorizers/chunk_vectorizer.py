@@ -1,11 +1,9 @@
 import logging
 import os
 
-import openai
 import pathspec
 from core.models import Config
 from embeddings.base import Embedder
-from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.base import Vectorizer
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
