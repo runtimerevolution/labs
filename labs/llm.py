@@ -4,7 +4,6 @@ from core.models import Model, VectorizerModel
 from decorators import time_and_log_function
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.base import Vectorizer
-from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from litellm_service.llm_requester import Requester
 from parsers.response_parser import is_valid_json, parse_llm_output
 

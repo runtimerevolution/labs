@@ -1,5 +1,4 @@
 from config.configuration_variables import LOCAL_LLM_HOST
-from litellm_service.llm_requester import Requester
 from ollama import Client
 
 

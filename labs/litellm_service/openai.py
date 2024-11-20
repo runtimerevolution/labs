@@ -2,7 +2,6 @@ import os
 
 import openai
 from litellm import completion
-from litellm_service.llm_requester import Requester
 
 
 class OpenAIRequester:

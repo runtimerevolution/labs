@@ -115,7 +115,7 @@ class VectorizerModel(models.Model):
     def get_active_vectorizer() -> Vectorizer:
         queryset = VectorizerModel.objects.filter(active=True)
         if not queryset.exists():
-            raise ValueError(f"No vectorizer configured")
+            raise ValueError("No vectorizer configured")
 
         vectorizer_model = queryset.first()
         return vectorizer_model_class[vectorizer_model.vectorizer_type]

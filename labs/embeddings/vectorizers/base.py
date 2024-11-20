@@ -1,8 +1,3 @@
-from abc import ABC
-
-from embeddings.embedder import Embedder
-
-
 class Vectorizer:
     def __init__(self, vectorizer, *args, **kwargs):
         self.vectorizer = vectorizer(*args, **kwargs)
