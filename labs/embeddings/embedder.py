@@ -13,7 +13,7 @@ class Embeddings:
     model_config: Optional[Dict[str, Any]] = None
 
 
-class Embedder(ABC):
+class Embedder:
     def __init__(self, embedder, *args, **kwargs):
         self.embedder = embedder(*args, **kwargs)
 

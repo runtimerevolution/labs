@@ -3,7 +3,8 @@ import os
 from types import SimpleNamespace
 
 import pathspec
-from embeddings.vectorizers.base import Vectorizer
+from core.models import Model
+from embeddings.embedder import Embedder
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 from parsers.python import get_lines_code, parse_python_file
@@ -11,10 +12,10 @@ from parsers.python import get_lines_code, parse_python_file
 logger = logging.getLogger(__name__)
 
 
-class PythonVectorizer(Vectorizer):
+class PythonVectorizer:
     def __init__(self):
-        # Override the Vectorizer class init
-        ...
+        embedder_class, *embeder_args = Model.get_active_embedding_model()
+        self.embedder = Embedder(embedder_class, *embeder_args)
 
     def prepare_doc_content(self, metadata, code_snippet):
         metadata = SimpleNamespace(**metadata)

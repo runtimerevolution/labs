@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Dict, List
 
 
-class Requester(ABC):
+class Requester:
     def __init__(self, requester, *args, **kwargs):
         self.requester = requester(*args, **kwargs)
 

@@ -2,17 +2,18 @@ import logging
 import os
 
 import pathspec
-from embeddings.vectorizers.base import Vectorizer
+from core.models import Model
+from embeddings.embedder import Embedder
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
 
 logger = logging.getLogger(__name__)
 
 
-class ChunkVectorizer(Vectorizer):
+class ChunkVectorizer:
     def __init__(self):
-        # Override the Vectorizer class init
-        ...
+        embedder_class, *embeder_args = Model.get_active_embedding_model()
+        self.embedder = Embedder(embedder_class, *embeder_args)
 
     def load_docs(self, root_dir, file_extensions=None):
         """
