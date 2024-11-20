@@ -1,6 +1,5 @@
 import logging
 
-import config.configuration_variables as settings
 from core.models import Config
 from decorators import time_and_log_function
 from embeddings.embedder import Embedder
