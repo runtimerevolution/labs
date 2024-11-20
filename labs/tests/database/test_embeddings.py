@@ -4,7 +4,7 @@ import pytest
 from embeddings.embedder import Embedder, Embeddings
 from embeddings.models import Embedding
 from embeddings.openai import OpenAIEmbedder
-from tests.constants import MULTIPLE_EMBEDDINGS, REPO1, SINGLE_EMBEDDING
+from tests.constants import MULTIPLE_EMBEDDINGS, OPENAI_EMBEDDING_MODEL_NAME, REPO1, SINGLE_EMBEDDING
 
 
 def find_embeddings(repository: str):
@@ -52,7 +52,7 @@ def test_reembed_code():
         ],
     )
 
-    Embedder(OpenAIEmbedder).reembed_code(
+    Embedder(OpenAIEmbedder, model=OPENAI_EMBEDDING_MODEL_NAME).reembed_code(
         files_texts=files_texts,
         embeddings=embeddings,
         repository=REPO1,

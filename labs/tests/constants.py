@@ -5,6 +5,11 @@ def embedding_values() -> list[int]:
     return random.sample(range(1, 5000), 1536)
 
 
+OPENAI_LLM_MODEL_NAME = "gpt-4o"
+OPENAI_EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
+OLLAMA_LLM_MODEL_NAME = "llama3.2:latest"
+OLLAMA_EMBEDDING_MODEL_NAME = "nomic-embed-text:latest"
+
 REPO1 = "repo1"
 REPO2 = "repo2"
 

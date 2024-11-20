@@ -1,9 +1,19 @@
 import json
 import logging
 
-from litellm_service.request import PullRequest
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
+
+
+class Step(BaseModel):
+    type: str
+    path: str
+    content: str
+
+
+class PullRequest(BaseModel):
+    steps: list[Step]
 
 
 def parse_llm_output(text_output):
