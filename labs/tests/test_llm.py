@@ -76,7 +76,7 @@ class TestLocalLLM:
         assert success
 
     @patch("llm.validate_llm_response")
-    @patch("embeddings.vectorizers.chunk_vectorizer.ChunkVectorizer.vectorize_to_database")
+    @patch("embeddings.vectorizers.base.Vectorizer.vectorize_to_database")
     @patch("litellm_service.ollama.OllamaRequester.completion_without_proxy")
     @patch("embeddings.embedder.Embedder.retrieve_embeddings")
     @pytest.mark.django_db
@@ -88,6 +88,7 @@ class TestLocalLLM:
         mocked_validate_llm_reponse,
         create_test_ollama_llm_config,
         create_test_ollama_embedding_config,
+        create_test_chunk_vectorizer_config,
     ):
         mocked_context.return_value = [["file1", "/path/to/file1", "content"]]
         mocked_validate_llm_reponse.return_value = False, ""
