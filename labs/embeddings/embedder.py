@@ -14,9 +14,7 @@ class Embeddings:
 
 
 class Embedder(ABC):
-    def __init__(self, embedder: type["Embedder"], *args, **kwargs):
-        if not issubclass(embedder, Embedder):
-            raise TypeError(f"embedder must be a subclass of {Embedder}")
+    def __init__(self, embedder, *args, **kwargs):
         self.embedder = embedder(*args, **kwargs)
 
     def embed(self, prompt, *args, **kwargs) -> Embeddings:

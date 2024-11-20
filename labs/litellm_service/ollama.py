@@ -3,7 +3,7 @@ from litellm_service.llm_requester import Requester
 from ollama import Client
 
 
-class OllamaRequester(Requester):
+class OllamaRequester:
     def __init__(self, model):
         self._model_name = model
 

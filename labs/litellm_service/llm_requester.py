@@ -3,10 +3,7 @@ from typing import Dict, List
 
 
 class Requester(ABC):
-    def __init__(self, requester: type["Requester"], *args, **kwargs):
-        if not issubclass(requester, Requester):
-            raise TypeError(f"requester must be a subclass of {Requester}")
-
+    def __init__(self, requester, *args, **kwargs):
         self.requester = requester(*args, **kwargs)
 
     def completion_without_proxy(self, messages: List[Dict[str, str]], *args, **kwargs):
