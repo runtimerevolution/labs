@@ -3,7 +3,6 @@ import os
 from types import SimpleNamespace
 
 import pathspec
-from core.models import Model
 from embeddings.embedder import Embedder
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
@@ -14,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 class PythonVectorizer:
     def __init__(self):
+        from core.models import Model  # Avoid circular imports
+
         embedder_class, *embeder_args = Model.get_active_embedding_model()
         self.embedder = Embedder(embedder_class, *embeder_args)
 
