@@ -81,4 +81,7 @@ def create_test_openai_llm_config():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_chunk_vectorizer_config():
-    return VectorizerModel.objects.create(vectorizer_type=VectorizerEnum.CHUNK_VECTORIZER.name, active=True)
+    return VectorizerModel.objects.create(
+        vectorizer_type=VectorizerEnum.CHUNK_VECTORIZER.name,
+        active=True,
+    )
