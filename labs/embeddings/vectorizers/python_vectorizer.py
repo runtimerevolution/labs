@@ -12,11 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 class PythonVectorizer:
-    def __init__(self):
-        from core.models import Model  # Avoid circular imports
-
-        embedder_class, *embeder_args = Model.get_active_embedding_model()
-        self.embedder = Embedder(embedder_class, *embeder_args)
+    def __init__(self, embedder):
+        self.embedder = embedder
 
     def prepare_doc_content(self, metadata, code_snippet):
         metadata = SimpleNamespace(**metadata)

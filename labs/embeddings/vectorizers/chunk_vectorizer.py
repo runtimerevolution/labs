@@ -2,7 +2,6 @@ import logging
 import os
 
 import pathspec
-from embeddings.embedder import Embedder
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
 
@@ -10,11 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 class ChunkVectorizer:
-    def __init__(self):
-        from core.models import Model  # Avoid circular imports
-
-        embedder_class, *embeder_args = Model.get_active_embedding_model()
-        self.embedder = Embedder(embedder_class, *embeder_args)
+    def __init__(self, embedder):
+        self.embedder = embedder
 
     def load_docs(self, root_dir, file_extensions=None):
         """

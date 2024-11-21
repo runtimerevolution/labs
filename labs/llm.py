@@ -136,12 +136,13 @@ def call_llm_with_context(repo_destination, issue_summary):
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
 
-    vectorizer = VectorizerModel.get_active_vectorizer()
-    Vectorizer(vectorizer).vectorize_to_database(None, repo_destination)
-
-    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embedder = Embedder(embedder_class, *embeder_args)
+
+    vectorizer_class = VectorizerModel.get_active_vectorizer()
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repo_destination)
+
+    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
     context = embedder.retrieve_embeddings(issue_summary)
 
     prompt = get_prompt(issue_summary)

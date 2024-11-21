@@ -18,8 +18,11 @@ redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_P
 def vectorize_repo_to_database_task(prefix="", repo_destination=""):
     repo_destination = redis_client.get(f"{prefix}_repo_destination") if prefix else repo_destination
 
-    vectorizer = VectorizerModel.get_active_vectorizer()
-    Vectorizer(vectorizer).vectorize_to_database(None, repo_destination)
+    embedder_class, *embeder_args = Model.get_active_embedding_model()
+    embedder = Embedder(embedder_class, *embeder_args)
+
+    vectorizer_class = VectorizerModel.get_active_vectorizer()
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repo_destination)
 
     if prefix:
         return prefix
