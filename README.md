@@ -15,21 +15,6 @@ Create a copy of the reference env file in the root of the project and update th
 
 `cp .env.sample .env.local`
 
-### Test Env
-
-Create a file named `.env.test` and the the following
-
-```env
-TEST_ENVIRONMENT=True
-
-DATABASE_HOST=localhost
-DATABASE_USER=postgres
-DATABASE_PASS=postgres
-DATABASE_NAME=test
-DATABASE_PORT=65433
-DATABASE_URL=postgresql://${DATABASE_USER}:${DATABASE_PASS}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}
-```
-
 ## Run project
 
 Here's the steps to set up the project locally:

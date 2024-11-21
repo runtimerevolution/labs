@@ -1,6 +1,6 @@
 [
 {
-  "model": "core.config",
+  "model": "core.model",
   "pk": 1,
   "fields": {
     "model_type": "EMBEDDING",
@@ -12,7 +12,7 @@
   }
 },
 {
-  "model": "core.config",
+  "model": "core.model",
   "pk": 2,
   "fields": {
     "model_type": "LLM",
@@ -24,7 +24,7 @@
   }
 },
 {
-  "model": "core.config",
+  "model": "core.model",
   "pk": 3,
   "fields": {
     "model_type": "EMBEDDING",
@@ -36,7 +36,7 @@
   }
 },
 {
-  "model": "core.config",
+  "model": "core.model",
   "pk": 4,
   "fields": {
     "model_type": "LLM",

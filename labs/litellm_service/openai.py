@@ -2,10 +2,9 @@ import os
 
 import openai
 from litellm import completion
-from litellm_service.llm_requester import Requester
 
 
-class OpenAIRequester(Requester):
+class OpenAIRequester:
     def __init__(self, model):
         self._model_name = model
 

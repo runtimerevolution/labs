@@ -1,11 +1,11 @@
 import os
 
 import openai
-from embeddings.embedder import Embedder, Embeddings
+from embeddings.embedder import Embeddings
 from litellm import embedding
 
 
-class OpenAIEmbedder(Embedder):
+class OpenAIEmbedder:
     def __init__(self, model):
         self._model_name = model
 

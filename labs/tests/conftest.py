@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from core.models import Config
+from core.models import Model, ModelTypeEnum, ProviderEnum, VectorizerEnum, VectorizerModel
 from embeddings.models import Embedding
 from tests.constants import (
     MULTIPLE_EMBEDDINGS,
@@ -37,30 +37,51 @@ def create_test_embeddings():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_ollama_embedding_config():
-    config = Config.objects.create(
-        model_type="EMBEDDING", provider="OLLAMA", model_name=OLLAMA_EMBEDDING_MODEL_NAME, active=True
+    return Model.objects.create(
+        model_type=ModelTypeEnum.EMBEDDING.name,
+        provider=ProviderEnum.OLLAMA.name,
+        model_name=OLLAMA_EMBEDDING_MODEL_NAME,
+        active=True,
     )
-    return config
 
 
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_ollama_llm_config():
-    config = Config.objects.create(model_type="LLM", provider="OLLAMA", model_name=OLLAMA_LLM_MODEL_NAME, active=True)
-    return config
+    return Model.objects.create(
+        model_type=ModelTypeEnum.LLM.name,
+        provider=ProviderEnum.OLLAMA.name,
+        model_name=OLLAMA_LLM_MODEL_NAME,
+        active=True,
+    )
 
 
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_openai_embedding_config():
-    config = Config.objects.create(
-        model_type="EMBEDDING", provider="OPENAI", model_name=OPENAI_EMBEDDING_MODEL_NAME, active=True
+    return Model.objects.create(
+        model_type=ModelTypeEnum.EMBEDDING.name,
+        provider=ProviderEnum.OPENAI.name,
+        model_name=OPENAI_EMBEDDING_MODEL_NAME,
+        active=True,
     )
-    return config
 
 
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_openai_llm_config():
-    config = Config.objects.create(model_type="LLM", provider="OPENAI", model_name=OPENAI_LLM_MODEL_NAME, active=True)
-    return config
+    return Model.objects.create(
+        model_type=ModelTypeEnum.LLM.name,
+        provider=ProviderEnum.OPENAI.name,
+        model_name=OPENAI_LLM_MODEL_NAME,
+        active=True,
+    )
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def create_test_chunk_vectorizer_config():
+    return VectorizerModel.objects.create(
+        vectorizer_type=VectorizerEnum.CHUNK_VECTORIZER.name,
+        active=True,
+    )

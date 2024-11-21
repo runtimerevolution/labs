@@ -1,4 +1,3 @@
-from abc import ABC
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
@@ -13,10 +12,8 @@ class Embeddings:
     model_config: Optional[Dict[str, Any]] = None
 
 
-class Embedder(ABC):
-    def __init__(self, embedder: type["Embedder"], *args, **kwargs):
-        if not issubclass(embedder, Embedder):
-            raise TypeError(f"embedder must be a subclass of {Embedder}")
+class Embedder:
+    def __init__(self, embedder, *args, **kwargs):
         self.embedder = embedder(*args, **kwargs)
 
     def embed(self, prompt, *args, **kwargs) -> Embeddings:
