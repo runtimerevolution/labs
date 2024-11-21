@@ -3,7 +3,6 @@ import os
 from types import SimpleNamespace
 
 import pathspec
-from embeddings.embedder import Embedder
 from langchain_community.document_loaders import TextLoader
 from langchain_core.documents import Document
 from parsers.python import get_lines_code, parse_python_file
