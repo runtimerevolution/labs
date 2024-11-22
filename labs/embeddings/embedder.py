@@ -25,7 +25,7 @@ class Embedder:
         query = query.replace("\n", "")
         embedded_query = self.embed(prompt=query).embeddings
         if not embedded_query:
-            return []
+            raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
         return Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query[0])).filter(
             repository=repository, distance__lt=similarity_threshold

@@ -104,7 +104,7 @@ async def vectorize_repo_to_database_endpoint(
 @async_time_and_log_function
 async def find_similar_embeddings_endpoint(request: HttpRequest, find_similar_embeddings: FindSimilarEmbeddingsRequest):
     return await sync_to_async(find_similar_embeddings_task, thread_sensitive=True)(
-        issue_body=find_similar_embeddings.issue_body
+        issue_body=find_similar_embeddings.issue_body, repo_destination=find_similar_embeddings.repo_destination
     )
 
 
