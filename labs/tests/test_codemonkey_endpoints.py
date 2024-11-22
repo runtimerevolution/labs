@@ -88,7 +88,9 @@ class TestCodemonkeyEndpoints:
     @patch("api.codemonkey_endpoints.find_similar_embeddings_task")
     async def test_find_similar_embeddings_endpoint(self, mock_task):
         mock_task.return_value = {}
-        response = await client.post("/find_similar_embeddings", json={"issue_body": "issue body"})
+        response = await client.post(
+            "/find_similar_embeddings", json={"repo_destination": "destination/path", "issue_body": "issue body"}
+        )
         assert response.status_code == 200
         mock_task.assert_called_once()
 
