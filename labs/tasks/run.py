@@ -1,4 +1,5 @@
 import logging
+import os.path
 
 import config.configuration_variables as settings
 import redis
@@ -24,6 +25,9 @@ redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_P
 
 @app.task(bind=True)
 def init_task(self, **kwargs):
+    if "repo_destination" in kwargs:
+        if not os.path.exists(kwargs["repo_destination"]):
+            raise FileNotFoundError(f"Directory {kwargs['repo_destination']} does not exist")
     prefix = self.request.id
     for k, v in kwargs.items():
         redis_client.set(f"{prefix}_{k}", v, ex=3600)
