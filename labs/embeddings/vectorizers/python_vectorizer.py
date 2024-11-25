@@ -129,7 +129,7 @@ class PythonVectorizer:
         for doc in docs:
             embeddings = self.embedder.embed(prompt=doc)
 
-            logger.debug("Storing embeddins...")
+            logger.debug("Storing embeddings...")
             self.embedder.reembed_code(
                 files_texts=[(doc.metadata["source"], doc.page_content)],
                 embeddings=embeddings,

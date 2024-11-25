@@ -16,9 +16,9 @@ For more details on the implementation and the test results, refer to the Jupyte
 ### Test results
 
 The following table consisely presents the results obtained where:
-* **Embeddins model**: indicates the model used to generate the embeddings;
+* **Embeddings model**: indicates the model used to generate the embeddings;
 * **LLM**: indicates the LLM used, which can be either a Local LLM or via an external API (like OpenAI);
-* **Embeddins creation method**: indicates the method used to create embeddins, as previously described;
+* **Embeddings creation method**: indicates the method used to create embeddings, as previously described;
 * **Response quality**: indicates the quality of the LLM's response, which can be:
   * **Very poor**: The code contains critical issues such as syntax errors, missing imports or broken logic 
   that prevent it from running;
@@ -34,7 +34,7 @@ The following table consisely presents the results obtained where:
 * **Prompt**: indicates the prompt used in the LLM.
 
 
-| Embedding model                                                                               | LLM (Local/API) | Embeddins creation method | Response quality | Prompt   |
+| Embedding model                                                                               | LLM (Local/API) | Embeddings creation method | Response quality | Prompt   |
 |-----------------------------------------------------------------------------------------------|-----------------|---------------------------|------------------|----------|
 | [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API      | File chunks               | Poor             | Prompt 1 |
 | [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API      | Python code structure     | Poor             | Prompt 1 |
