@@ -30,10 +30,11 @@ def vectorize_repo_to_database_task(prefix="", repo_destination=""):
 
 
 @app.task
-def find_similar_embeddings_task(prefix="", issue_body=""):
+def find_similar_embeddings_task(prefix="", issue_body="", repo_destination=""):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embeddings_results = Embedder(embedder_class, *embeder_args).retrieve_embeddings(
-        redis_client.get(f"{prefix}_issue_body") if prefix else issue_body
+        redis_client.get(f"{prefix}_issue_body") if prefix else issue_body,
+        redis_client.get(f"f{prefix}_repo_destination") if prefix else repo_destination,
     )
     similar_embeddings = [
         (embedding.repository, embedding.file_path, embedding.text) for embedding in embeddings_results

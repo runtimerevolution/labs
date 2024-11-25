@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 
 
 class GithubModel(BaseModel):
@@ -21,7 +21,7 @@ class RunOnRepoRequest(BaseModel):
 
 class RunOnLocalRepoRequest(BaseModel):
     repo_path: str
-    issue_text: str
+    issue_text: constr(min_length=10) = "string"
 
 
 class GetIssueRequest(BaseModel):
@@ -47,6 +47,7 @@ class VectorizeRepoToDatabaseRequest(BaseModel):
 
 
 class FindSimilarEmbeddingsRequest(BaseModel):
+    repo_destination: str
     issue_body: str
 
 

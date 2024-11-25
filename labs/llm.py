@@ -143,7 +143,7 @@ def call_llm_with_context(repo_destination, issue_summary):
     Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repo_destination)
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    context = embedder.retrieve_embeddings(issue_summary)
+    context = embedder.retrieve_embeddings(issue_summary, repo_destination)
 
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
