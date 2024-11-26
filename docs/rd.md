@@ -36,8 +36,9 @@ The following table consisely presents the results obtained where:
 
 | Embedding model                                                                               | LLM (Local/API) | Embeddings creation method | Response quality | Prompt   |
 |-----------------------------------------------------------------------------------------------|-----------------|---------------------------|------------------|----------|
-| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API      | File chunks               | Poor             | Prompt 1 |
-| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API      | Python code structure     | Poor             | Prompt 1 |
+| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API      | File chunks               | Good             | Prompt 1 |
+| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API      | Python code structure     | Good             | Prompt 1 |
+| [nomic-embed-text](https://ollama.com/library/nomic-embed-text) | Local starcoder2:15b-instruct      | File chunks     | Poor             | Prompt 1 |
 
 
 Below is the prompt used in the LLM for the test conducted:
