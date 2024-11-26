@@ -41,4 +41,4 @@ Here's the steps to set up the project locally:
 1. `export LOCAL_LLM=True`
 2. `make up`
 3. `make ollama model=nomic-embed-text:latest`
-4. `make ollama model=starcoder2:7b`
+4. `make ollama model=starcoder2:15b-instruct`
