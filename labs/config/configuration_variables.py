@@ -39,5 +39,4 @@ CELERY_BACKEND_URL = os.environ.get("CELERY_BACKEND_URL")
 REDIS_HOST = os.environ.get("REDIS_HOST")
 REDIS_PORT = os.environ.get("REDIS_PORT")
 
-LOCAL_LLM = eval(os.environ.get("LOCAL_LLM", "False"))
 LOCAL_LLM_HOST = os.environ.get("LOCAL_LLM_HOST", "http://ollama:11434")

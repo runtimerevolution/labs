@@ -30,7 +30,13 @@ Here's the steps to set up the project locally:
 
 ### Using Llama 3.2 with nomic:
 
-1. `export LOCAL_LLM=True`
-2. `make up`
-3. `make ollama model=nomic-embed-text:latest`
-4. `make ollama model=llama3.2:latest`
+1. `make up`
+2. `make ollama model=nomic-embed-text:latest`
+3. `make ollama model=llama3.2:latest`
+
+
+### Using Starcoder2 with nomic:
+
+1. `make up`
+2. `make ollama model=nomic-embed-text:latest`
+3. `make ollama model=starcoder2:15b-instruct`
