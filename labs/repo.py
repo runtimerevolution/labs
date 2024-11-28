@@ -8,17 +8,17 @@ from parsers.response_parser import create_file, modify_file, parse_llm_output
 logger = logging.getLogger(__name__)
 
 
-def clone_repository(repo_url, local_path):
-    logger.debug(f"Cloning repo from {repo_url}")
-    subprocess.run(["git", "clone", repo_url, local_path])
+def clone_repository(repository_url, local_path):
+    logger.debug(f"Cloning repository from {repository_url}")
+    subprocess.run(["git", "clone", repository_url, local_path])
 
 
 @time_and_log_function
-def get_issue(token, repo_owner, repo_name, username, issue_number):
+def get_issue(token, repository_owner, repository_name, username, issue_number):
     github_request = GithubRequests(
         github_token=token,
-        repo_owner=repo_owner,
-        repo_name=repo_name,
+        repository_owner=repository_owner,
+        repository_name=repository_name,
         username=username,
     )
     return github_request.get_issue(issue_number)
@@ -27,8 +27,8 @@ def get_issue(token, repo_owner, repo_name, username, issue_number):
 @time_and_log_function
 def create_branch(
     token,
-    repo_owner,
-    repo_name,
+    repository_owner,
+    repository_name,
     username,
     issue_number,
     issue_title,
@@ -36,8 +36,8 @@ def create_branch(
 ):
     github_request = GithubRequests(
         github_token=token,
-        repo_owner=repo_owner,
-        repo_name=repo_name,
+        repository_owner=repository_owner,
+        repository_name=repository_name,
         username=username,
     )
     branch_name = f"{issue_number}-{issue_title}"
@@ -51,22 +51,22 @@ def change_issue_to_in_progress():
 
 
 @time_and_log_function
-def commit_changes(token, repo_owner, repo_name, username, branch_name, file_list):
+def commit_changes(token, repository_owner, repository_name, username, branch_name, file_list, message="Fix"):
     github_request = GithubRequests(
         github_token=token,
-        repo_owner=repo_owner,
-        repo_name=repo_name,
+        repository_owner=repository_owner,
+        repository_name=repository_name,
         username=username,
     )
-    return github_request.commit_changes("fix", branch_name=branch_name, files=file_list)
+    return github_request.commit_changes(message, branch_name, file_list)
 
 
 @time_and_log_function
-def create_pull_request(token, repo_owner, repo_name, username, original_branch, branch_name):
+def create_pull_request(token, repository_owner, repository_name, username, original_branch, branch_name):
     github_request = GithubRequests(
         github_token=token,
-        repo_owner=repo_owner,
-        repo_name=repo_name,
+        repository_owner=repository_owner,
+        repository_name=repository_name,
         username=username,
     )
     return github_request.create_pull_request(branch_name, base=original_branch)

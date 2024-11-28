@@ -64,7 +64,7 @@ services:
       - labs-db
     volumes:
       - ./labs/:/app/
-      - ${LOCAL_REPOS_PATH}:/local-repos/
+      - ${LOCAL_REPOSITORIES_PATH}:/local-repos/
 
   ollama:
     image: ollama/ollama:latest
@@ -75,3 +75,7 @@ services:
 
 volumes:
   ollama:
+
+
+# nomic-embed-text:latest
+# qwen2.5:7b-instruct-fp16

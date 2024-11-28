@@ -65,7 +65,7 @@ class PythonVectorizer:
                         docs.extend(loader.load_and_split())
 
                     except Exception:
-                        logger.exception("Failed to load repo documents into memory.")
+                        logger.exception("Failed to load repository documents into memory.")
 
                     continue
 
@@ -121,8 +121,8 @@ class PythonVectorizer:
 
         return docs
 
-    def vectorize_to_database(self, include_file_extensions, repo_destination, *args, **kwargs):
-        docs = self.load_docs(repo_destination, include_file_extensions)
+    def vectorize_to_database(self, include_file_extensions, repository_path, *args, **kwargs):
+        docs = self.load_docs(repository_path, include_file_extensions)
 
         logger.debug(f"Loading {len(docs)} documents...")
 
@@ -133,5 +133,5 @@ class PythonVectorizer:
             self.embedder.reembed_code(
                 files_texts=[(doc.metadata["source"], doc.page_content)],
                 embeddings=embeddings,
-                repository=repo_destination,
+                repository=repository_path,
             )

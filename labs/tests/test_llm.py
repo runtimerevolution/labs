@@ -18,11 +18,11 @@ from tests.constants import (
 
 class TestCallLLMWithContext:
     def test_empty_summary(self):
-        repo_destination = "repo_destination"
+        repository_path = "repository_path"
         issue_summary = ""
 
         with pytest.raises(Exception) as excinfo:
-            call_llm_with_context(repo_destination, issue_summary)
+            call_llm_with_context(repository_path, issue_summary)
 
         assert "issue_summary cannot be empty" in str(excinfo.value)
 
@@ -69,9 +69,9 @@ class TestLocalLLM:
     @skip("This is used locally with an Ollama instance running in docker")
     def test_local_llm_connection(self, mocked_context, mocked_vectorize_to_database):
         mocked_context.return_value = [["file1", "/path/to/file1", "content"]]
-        repo_destination = "repo"
+        repository_destination = "repo"
         issue_summary = "Fix the bug in the authentication module"
-        success, response = call_llm_with_context(repo_destination, issue_summary)
+        success, response = call_llm_with_context(repository_destination, issue_summary)
 
         assert success
 
@@ -92,9 +92,9 @@ class TestLocalLLM:
     ):
         mocked_context.return_value = [["file1", "/path/to/file1", "content"]]
         mocked_validate_llm_reponse.return_value = False, ""
-        repo_destination = "repo"
+        repository_destination = "repo"
         issue_summary = "Fix the bug in the authentication module"
-        call_llm_with_context(repo_destination, issue_summary)
+        call_llm_with_context(repository_destination, issue_summary)
 
         mocked_local_llm.assert_called_once()
 
