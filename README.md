@@ -40,3 +40,10 @@ Here's the steps to set up the project locally:
 1. `make up`
 2. `make ollama model=nomic-embed-text:latest`
 3. `make ollama model=starcoder2:15b-instruct`
+
+
+### Using Qwen2.5 with nomic:
+
+1. `make up`
+2. `make ollama model=nomic-embed-text:latest`
+3. `make ollama model=qwen2.5:7b-instruct`
