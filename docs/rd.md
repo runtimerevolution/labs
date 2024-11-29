@@ -34,12 +34,12 @@ The following table consisely presents the results obtained where:
 * **Prompt**: indicates the prompt used in the LLM.
 
 
-| Embedding model                                                                               | LLM (Local/API)                                                  | Embeddings creation method | Response quality | Prompt   |
-|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------|--------------------------|------------------|----------|
-| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API                                                       | File chunks              | Good             | Prompt 1 |
-| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API                                                       | Python code structure    | Good             | Prompt 1 |
-| [nomic-embed-text](https://ollama.com/library/nomic-embed-text) | [starcoder2:15b-instruct](https://ollama.com/library/starcoder2) | File chunks     | Poor             | Prompt 1 |
-| [nomic-embed-text](https://ollama.com/library/nomic-embed-text) | [qwen2.5:7b-instruct](https://ollama.com/library/qwen2.5) | File chunks     | Poor             | Prompt 1 |
+| Embedding model                                                                               | LLM (Local/API)                                                  | Embeddings creation method | Response quality | Prompt   | Notes/Observations                                                 |
+|-----------------------------------------------------------------------------------------------|------------------------------------------------------------------|----------------------------|------------------|----------|--------------------------------------------------------------------|
+| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API                                                       | File chunks                | Good             | Prompt 1 |
+| [text-embedding-ada-002](https://platform.openai.com/docs/guides/embeddings/embedding-models) | OpenAI API                                                       | Python code structure      | Good             | Prompt 1 |
+| [nomic-embed-text](https://ollama.com/library/nomic-embed-text) | [starcoder2:15b-instruct](https://ollama.com/library/starcoder2) | File chunks                | Poor             | Prompt 1 |
+| [nomic-embed-text](https://ollama.com/library/nomic-embed-text) | [qwen2.5:7b-instruct](https://ollama.com/library/qwen2.5) | File chunks                | Poor             | Prompt 1 | The requested JSON in `Prompt 1` was poorly formatted or incorrect. |
 
 
 Below is the prompt used in the LLM for the test conducted:
