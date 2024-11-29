@@ -75,7 +75,3 @@ services:
 
 volumes:
   ollama:
-
-
-# nomic-embed-text:latest
-# qwen2.5:7b-instruct-fp16
