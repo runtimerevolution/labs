@@ -160,7 +160,7 @@ class GithubRequests:
         tree_url = f"{self.github_api_url}/git/trees"
         tree_response_json = self._post(tree_url, headers, tree_data)
         if "status" in tree_response_json:
-            logger.error(f"Error while creating tree with updated files: {tree_response_json["message"]}")
+            logger.error(f"Error while creating tree with updated files: {tree_response_json['message']}")
             return None
 
         new_tree_sha = tree_response_json["sha"]
