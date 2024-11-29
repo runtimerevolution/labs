@@ -40,8 +40,8 @@ async def run_on_repository_endpoint(request: HttpRequest, run_on_repository: Gi
     try:
         run_on_repository_task(
             token=run_on_repository.token,
-            repo_owner=run_on_repository.repository_owner,
-            repo_name=run_on_repository.repository_name,
+            repository_owner=run_on_repository.repository_owner,
+            repository_name=run_on_repository.repository_name,
             issue_number=run_on_repository.issue_number,
             username=run_on_repository.username,
             original_branch=run_on_repository.original_branch,
@@ -104,8 +104,8 @@ async def apply_code_changes_endpoint(request: HttpRequest, apply_code_changes: 
 async def get_issue_endpoint(request: HttpRequest, issue: IssueSchema):
     return get_issue_task(
         token=issue.token,
-        repo_owner=issue.repository_owner,
-        repo_name=issue.repository_name,
+        repository_owner=issue.repository_owner,
+        repository_name=issue.repository_name,
         username=issue.username,
         issue_number=issue.issue_number,
     )
@@ -116,8 +116,8 @@ async def get_issue_endpoint(request: HttpRequest, issue: IssueSchema):
 async def create_branch_endpoint(request: HttpRequest, branch: BranchIssueSchema):
     return create_branch_task(
         token=branch.token,
-        repo_owner=branch.repository_owner,
-        repo_name=branch.repository_name,
+        repository_owner=branch.repository_owner,
+        repository_name=branch.repository_name,
         username=branch.username,
         issue_number=branch.issue_number,
         original_branch=branch.original_branch,

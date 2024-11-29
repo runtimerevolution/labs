@@ -4,7 +4,7 @@ from tasks.llm import (
     prepare_prompt_and_context_task,
     vectorize_repository_task,
 )
-from tasks.repo import (
+from tasks.repository import (
     apply_code_changes_task,
     clone_repository_task,
     commit_changes_task,

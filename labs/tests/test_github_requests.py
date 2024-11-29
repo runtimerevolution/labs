@@ -17,16 +17,16 @@ class TestGithubRequests:
         mock_get.return_value.json.return_value = sample_response
 
         github_token = "valid_token"
-        repo_owner = "owner_username"
-        repo_name = "repository_name"
+        repository_owner = "owner_username"
+        repository_name = "repository_name"
         username = "your_username"
-        github_requests = GithubRequests(github_token, repo_owner, repo_name, username)
+        github_requests = GithubRequests(github_token, repository_owner, repository_name, username)
 
         issues = github_requests.list_issues()
 
         assert issues == sample_response
         mock_get.assert_called_once_with(
-            f"https://api.github.com/repos/{repo_owner}/{repo_name}/issues",
+            f"https://api.github.com/repos/{repository_owner}/{repository_name}/issues",
             headers={
                 "Authorization": f"token {github_token}",
                 "Accept": "application/vnd.github.v3+json",
@@ -57,10 +57,10 @@ class TestGithubRequests:
         mock_get.return_value.json.return_value = sample_response
 
         github_token = "valid_token"
-        repo_owner = "owner_username"
-        repo_name = "repository_name"
+        repository_owner = "owner_username"
+        repository_name = "repository_name"
         username = "your_username"
-        github_requests = GithubRequests(github_token, repo_owner, repo_name, username)
+        github_requests = GithubRequests(github_token, repository_owner, repository_name, username)
 
         issue = github_requests.get_issue(1)
 

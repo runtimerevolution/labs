@@ -108,8 +108,8 @@ async def create_pull_request_endpoint(request: HttpRequest, params: PullRequest
     try:
         github_requests = GithubRequests(
             github_token=params.token,
-            repo_owner=params.repository_owner,
-            repo_name=params.repository_name,
+            repository_owner=params.repository_owner,
+            repository_name=params.repository_name,
             username=params.username,
         )
         return github_requests.create_pull_request(
@@ -126,8 +126,8 @@ async def clone_repository_endpoint(request: HttpRequest, params: GithubSchema):
     try:
         github_requests = GithubRequests(
             github_token=params.token,
-            repo_owner=params.repository_owner,
-            repo_name=params.repository_name,
+            repository_owner=params.repository_owner,
+            repository_name=params.repository_name,
             username=params.username,
         )
         return github_requests.clone()

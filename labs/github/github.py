@@ -141,6 +141,9 @@ class GithubRequests:
         tree_items = []
         for file_path in files:
             file_name = file_path.replace(f"{self.directory_dir}/", "")
+            if file_name.startswith("/"):
+                file_name = file_name[1:]
+
             # Step 3: Read the file content and encode it in Base64
             with open(file_path, "rb") as file:
                 file_content = base64.b64encode(file.read()).decode("utf-8")
@@ -156,6 +159,10 @@ class GithubRequests:
         tree_data = {"base_tree": base_tree_sha, "tree": tree_items}
         tree_url = f"{self.github_api_url}/git/trees"
         tree_response_json = self._post(tree_url, headers, tree_data)
+        if "status" in tree_response_json:
+            logger.error(f"Error while creating tree with updated files: {tree_response_json["message"]}")
+            return None
+
         new_tree_sha = tree_response_json["sha"]
 
         # Step 6: Create a new commit with the new tree
