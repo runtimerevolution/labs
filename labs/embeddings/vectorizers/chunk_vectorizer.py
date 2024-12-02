@@ -53,7 +53,7 @@ class ChunkVectorizer:
                     loader = TextLoader(file_path, encoding="utf-8")
                     docs.extend(loader.load_and_split())
                 except Exception:
-                    logger.exception("Failed to load repo documents into memory.")
+                    logger.exception("Failed to load repository documents into memory.")
         return docs
 
     def split_docs(self, docs):
@@ -61,16 +61,16 @@ class ChunkVectorizer:
         text_splitter = CharacterTextSplitter(chunk_size=2000, chunk_overlap=0)
         return text_splitter.split_documents(docs)
 
-    def vectorize_to_database(self, include_file_extensions, repo_destination, *args, **kwargs):
+    def vectorize_to_database(self, include_file_extensions, repository_path, *args, **kwargs):
         logger.debug("Loading and splitting all documents into chunks.")
-        docs = self.load_docs(repo_destination, include_file_extensions)
+        docs = self.load_docs(repository_path, include_file_extensions)
         texts = self.split_docs(docs)
         files_and_texts = [(text.metadata["source"], text.page_content) for text in texts]
         texts = [file_and_text[1] for file_and_text in files_and_texts]
 
-        logger.debug("Embedding all repo documents.")
+        logger.debug("Embedding all repository documents.")
 
         embeddings = self.embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")
-        self.embedder.reembed_code(files_texts=files_and_texts, embeddings=embeddings, repository=repo_destination)  # type: ignore
+        self.embedder.reembed_code(files_texts=files_and_texts, embeddings=embeddings, repository=repository_path)  # type: ignore

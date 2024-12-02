@@ -1,5 +1,4 @@
 import json
-import logging
 
 import config.configuration_variables as settings
 import redis
@@ -9,20 +8,18 @@ from embeddings.embedder import Embedder
 from embeddings.vectorizers.base import Vectorizer
 from llm import get_llm_response, get_prompt, prepare_context
 
-logger = logging.getLogger(__name__)
-
 redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 
 @app.task
-def vectorize_repo_to_database_task(prefix="", repo_destination=""):
-    repo_destination = redis_client.get(f"{prefix}_repo_destination") if prefix else repo_destination
+def vectorize_repository_task(prefix="", repository_path=""):
+    repository_path = redis_client.get(f"{prefix}_repository_path") if prefix else repository_path
 
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embedder = Embedder(embedder_class, *embeder_args)
 
     vectorizer_class = VectorizerModel.get_active_vectorizer()
-    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repo_destination)
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repository_path)
 
     if prefix:
         return prefix
@@ -30,11 +27,11 @@ def vectorize_repo_to_database_task(prefix="", repo_destination=""):
 
 
 @app.task
-def find_similar_embeddings_task(prefix="", issue_body="", repo_destination=""):
+def find_embeddings_task(prefix="", issue_body="", repository_path=""):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embeddings_results = Embedder(embedder_class, *embeder_args).retrieve_embeddings(
         redis_client.get(f"{prefix}_issue_body") if prefix else issue_body,
-        redis_client.get(f"f{prefix}_repo_destination") if prefix else repo_destination,
+        redis_client.get(f"f{prefix}_repository_path") if prefix else repository_path,
     )
     similar_embeddings = [
         (embedding.repository, embedding.file_path, embedding.text) for embedding in embeddings_results

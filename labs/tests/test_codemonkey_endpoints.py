@@ -9,12 +9,12 @@ client = TestAsyncClient(router)
 
 class TestCodemonkeyEndpoints:
     @pytest.mark.asyncio
-    @patch("api.codemonkey_endpoints.run_on_local_repo_task")
-    async def test_run_on_local_repo_endpoint(self, mock_task):
+    @patch("api.codemonkey_endpoints.run_on_local_repository_task")
+    async def test_run_on_local_repository_endpoint(self, mock_task):
         mock_task.return_value = None
         response = await client.post(
-            "/run_on_local_repo",
-            json={"repo_path": "path/to/repo", "issue_text": "example issue text"},
+            "/run_on_local_repository",
+            json={"repository_path": "path/to/repo", "prompt": "example issue text"},
         )
         assert response.status_code == 200
         mock_task.assert_called_once()
@@ -26,9 +26,9 @@ class TestCodemonkeyEndpoints:
         response = await client.post(
             "/get_issue",
             json={
-                "github_token": "token",
-                "repo_owner": "owner",
-                "repo_name": "name",
+                "token": "token",
+                "repository_owner": "owner",
+                "repository_name": "name",
                 "issue_number": 1,
                 "username": "user",
             },
@@ -37,15 +37,15 @@ class TestCodemonkeyEndpoints:
         mock_task.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch("api.codemonkey_endpoints.run_on_repo_task")
-    async def test_run_on_repo_endpoint(self, mock_task):
+    @patch("api.codemonkey_endpoints.run_on_repository_task")
+    async def test_run_on_repository_endpoint(self, mock_task):
         mock_task.return_value = None
         response = await client.post(
-            "/run_on_repo",
+            "/run_on_repository",
             json={
-                "github_token": "token",
-                "repo_owner": "owner",
-                "repo_name": "name",
+                "token": "token",
+                "repository_owner": "owner",
+                "repository_name": "name",
                 "issue_number": 1,
                 "username": "user",
                 "original_branch": "main",
@@ -61,9 +61,9 @@ class TestCodemonkeyEndpoints:
         response = await client.post(
             "/create_branch",
             json={
-                "github_token": "token",
-                "repo_owner": "owner",
-                "repo_name": "name",
+                "token": "token",
+                "repository_owner": "owner",
+                "repository_name": "name",
                 "issue_number": 1,
                 "username": "user",
                 "original_branch": "main",
@@ -74,22 +74,22 @@ class TestCodemonkeyEndpoints:
         mock_task.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch("api.codemonkey_endpoints.vectorize_repo_to_database_task")
-    async def test_vectorize_repo_to_database_endpoint(self, mock_task):
+    @patch("api.codemonkey_endpoints.vectorize_repository_task")
+    async def test_vectorize_repository_endpoint(self, mock_task):
         mock_task.return_value = {}
         response = await client.post(
-            "/vectorize_repo_to_database",
-            json={"repo_destination": "destination/path"},
+            "/vectorize_repository",
+            json={"repository_path": "destination/path"},
         )
         assert response.status_code == 200
         mock_task.assert_called_once()
 
     @pytest.mark.asyncio
-    @patch("api.codemonkey_endpoints.find_similar_embeddings_task")
-    async def test_find_similar_embeddings_endpoint(self, mock_task):
+    @patch("api.codemonkey_endpoints.find_embeddings_task")
+    async def test_find_embeddings_endpoint(self, mock_task):
         mock_task.return_value = {}
         response = await client.post(
-            "/find_similar_embeddings", json={"repo_destination": "destination/path", "issue_body": "issue body"}
+            "/find_embeddings", json={"repository_path": "destination/path", "prompt": "issue body"}
         )
         assert response.status_code == 200
         mock_task.assert_called_once()
@@ -100,7 +100,7 @@ class TestCodemonkeyEndpoints:
         mock_task.return_value = {}
         response = await client.post(
             "/prepare_prompt_and_context",
-            json={"issue_body": "body", "embeddings": []},
+            json={"prompt": "body", "embeddings": []},
         )
         assert response.status_code == 200
         mock_task.assert_called_once()
@@ -117,7 +117,7 @@ class TestCodemonkeyEndpoints:
     @patch("api.codemonkey_endpoints.apply_code_changes_task")
     async def test_apply_code_changes_endpoint(self, mock_task):
         mock_task.return_value = {}
-        response = await client.post("/apply_code_changes", json={"llm_response": "response"})
+        response = await client.post("/apply_code_changes", json={"changes": "response"})
         assert response.status_code == 200
         mock_task.assert_called_once()
 
@@ -128,9 +128,9 @@ class TestCodemonkeyEndpoints:
         response = await client.post(
             "/commit_changes",
             json={
-                "github_token": "token",
-                "repo_owner": "owner",
-                "repo_name": "name",
+                "token": "token",
+                "repository_owner": "owner",
+                "repository_name": "name",
                 "username": "user",
                 "branch_name": "branch",
                 "files": [],
@@ -146,12 +146,12 @@ class TestCodemonkeyEndpoints:
         response = await client.post(
             "/create_pull_request",
             json={
-                "github_token": "token",
-                "repo_owner": "owner",
-                "repo_name": "name",
+                "token": "token",
+                "repository_owner": "owner",
+                "repository_name": "name",
                 "username": "user",
-                "branch_name": "branch",
-                "original_branch": "main",
+                "changes_branch_name": "branch",
+                "base_branch_name": "main",
             },
         )
         assert response.status_code == 200

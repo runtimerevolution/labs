@@ -14,13 +14,13 @@ logger = logging.getLogger(__name__)
 class GithubRequests:
     """Class to handle Github API requests"""
 
-    def __init__(self, github_token, repo_owner, repo_name, username=None):
+    def __init__(self, github_token, repository_owner, repository_name, username=None):
         self.github_token = github_token
-        self.repo_owner = repo_owner
-        self.repo_name = repo_name
+        self.repository_owner = repository_owner
+        self.repository_name = repository_name
         self.username = username
-        self.github_api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}"
-        self.directory_dir = f"{settings.CLONE_DESTINATION_DIR}{repo_owner}/{repo_name}"
+        self.github_api_url = f"{settings.GITHUB_API_BASE_URL}/repos/{repository_owner}/{repository_name}"
+        self.directory_dir = f"{settings.CLONE_DESTINATION_DIR}{repository_owner}/{repository_name}"
 
     def _get(self, url, headers={}, params={}):
         try:
@@ -104,8 +104,8 @@ class GithubRequests:
             return self._post(create_ref_url, headers, data)
         return None
 
-    def change_issue_status(self, issue_number, state):
-        if state not in ["open", "closed"]:
+    def change_issue_status(self, issue_number, status):
+        if status not in ["open", "closed"]:
             raise ValueError("Invalid state. The state must be 'open' or 'closed'.")
 
         url = f"{self.github_api_url}/issues/{issue_number}"
@@ -113,7 +113,7 @@ class GithubRequests:
             "Authorization": f"token {self.github_token}",
             "user-agent": "request",
         }
-        data = {"state": state}
+        data = {"state": status}
 
         return self._patch(url, headers, data)
 
@@ -141,6 +141,9 @@ class GithubRequests:
         tree_items = []
         for file_path in files:
             file_name = file_path.replace(f"{self.directory_dir}/", "")
+            if file_name.startswith("/"):
+                file_name = file_name[1:]
+
             # Step 3: Read the file content and encode it in Base64
             with open(file_path, "rb") as file:
                 file_content = base64.b64encode(file.read()).decode("utf-8")
@@ -156,6 +159,10 @@ class GithubRequests:
         tree_data = {"base_tree": base_tree_sha, "tree": tree_items}
         tree_url = f"{self.github_api_url}/git/trees"
         tree_response_json = self._post(tree_url, headers, tree_data)
+        if "status" in tree_response_json:
+            logger.error(f"Error while creating tree with updated files: {tree_response_json['message']}")
+            return None
+
         new_tree_sha = tree_response_json["sha"]
 
         # Step 6: Create a new commit with the new tree
@@ -183,9 +190,9 @@ class GithubRequests:
 
     def clone(self):
         try:
-            url = f"https://github.com/{self.repo_owner}/{self.repo_name}.git"
+            url = f"https://github.com/{self.repository_owner}/{self.repository_name}.git"
             branch = "main"
-            probe = settings.CLONE_DESTINATION_DIR + f"{self.repo_owner}/{self.repo_name}/.git"
+            probe = settings.CLONE_DESTINATION_DIR + f"{self.repository_owner}/{self.repository_name}/.git"
             if not os.path.exists(probe):
                 git.Repo.clone_from(url, self.directory_dir, branch=branch)
             return self.directory_dir

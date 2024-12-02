@@ -131,7 +131,7 @@ def get_llm_response(prepared_context):
 
 
 @time_and_log_function
-def call_llm_with_context(repo_destination, issue_summary):
+def call_llm_with_context(repository_path, issue_summary):
     if not issue_summary:
         logger.error("issue_summary cannot be empty.")
         raise ValueError("issue_summary cannot be empty.")
@@ -140,10 +140,10 @@ def call_llm_with_context(repo_destination, issue_summary):
     embedder = Embedder(embedder_class, *embeder_args)
 
     vectorizer_class = VectorizerModel.get_active_vectorizer()
-    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repo_destination)
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repository_path)
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    context = embedder.retrieve_embeddings(issue_summary, repo_destination)
+    context = embedder.retrieve_embeddings(issue_summary, repository_path)
 
     prompt = get_prompt(issue_summary)
     prepared_context = prepare_context(context, prompt)
