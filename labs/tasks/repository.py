@@ -1,11 +1,12 @@
 import json
 
-import config.configuration_variables as settings
-from config.celery import app
 from decorators import time_and_log_function
 from github.github import GithubRequests
 from parsers.response import create_file, modify_file, parse_llm_output
 from tasks.redis_client import RedisStrictClient, RedisVariable
+
+import config.configuration_variables as settings
+from config.celery import app
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
