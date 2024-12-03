@@ -26,7 +26,7 @@ def get_prompt(issue_summary):
         If the file is to be modified send the finished version of the entire file.
         path, which is the absolute path of the file to create/modify;
         content, which is the content to write to the file.
-        lines, which is the lines number where the content should be written.
+        line, which is an integer that represents the number of the first line where the content should be written.
     """
 
 
