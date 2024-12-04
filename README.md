@@ -25,7 +25,7 @@ Here's the steps to set up the project locally:
 ### Using OpenAI
 
 1. `make up`
-2. `make api` or `ENV=local make api`
+2. `make runserver`
 3. `ENV=test make tests`
 
 ### Using Llama 3.2 with nomic:
