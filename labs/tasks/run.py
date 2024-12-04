@@ -1,4 +1,3 @@
-import logging
 import os.path
 
 import config.configuration_variables as settings
@@ -18,16 +17,14 @@ from tasks import (
 )
 from tasks.redis_client import RedisStrictClient, RedisVariables
 
-logger = logging.getLogger(__name__)
-
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 
 @app.task(bind=True)
 def init_task(self, **kwargs):
-    if "repository_path" in kwargs:
-        if not os.path.exists(kwargs["repository_path"]):
-            raise FileNotFoundError(f"Directory {kwargs['repository_path']} does not exist")
+    if RedisVariables.REPOSITORY_PATH.value in kwargs:
+        if not os.path.exists(kwargs[RedisVariables.REPOSITORY_PATH.value]):
+            raise FileNotFoundError(f"Directory {kwargs[RedisVariables.REPOSITORY_PATH.value]} does not exist")
 
     prefix = self.request.id
     for k, v in kwargs.items():

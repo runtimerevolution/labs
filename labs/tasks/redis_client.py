@@ -6,18 +6,21 @@ from redis.typing import AbsExpiryT, EncodableT, ExpiryT, ResponseT
 
 
 class RedisVariables(Enum):
-    TOKEN = "token"
-    REPOSITORY_OWNER = "repository_owner"
-    REPOSITORY_NAME = "repository_name"
-    REPOSITORY_PATH = "repository_path"
-    USERNAME = "username"
+    BRANCH_NAME = "branch_name"
+    CONTEXT = "context"
+    EMBEDDINGS = "embeddings"
+    FILES_MODIFIED = "files_modified"
+    ISSUE_BODY = "issue_body"
     ISSUE_NUMBER = "issue_number"
     ISSUE_TITLE = "issue_title"
-    ISSUE_BODY = "issue_body"
-    ORIGINAL_BRANCH_NAME = "original_branch_name"
-    BRANCH_NAME = "branch_name"
     LLM_RESPONSE = "llm_response"
-    FILES_MODIFIED = "files_modified"
+    ORIGINAL_BRANCH_NAME = "original_branch_name"
+    PROMPT = "prompt"
+    REPOSITORY_NAME = "repository_name"
+    REPOSITORY_OWNER = "repository_owner"
+    REPOSITORY_PATH = "repository_path"
+    TOKEN = "token"
+    USERNAME = "username"
 
 
 class RedisStrictClient(StrictRedis):

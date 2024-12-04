@@ -8,8 +8,6 @@ from github.github import GithubRequests
 from llm import apply_code_changes
 from tasks.redis_client import RedisStrictClient, RedisVariables
 
-logger = logging.getLogger(__name__)
-
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 
@@ -91,7 +89,7 @@ def clone_repository_task(prefix="", repository_owner="", repository_name=""):
     repository_path = github_request.clone()
 
     if prefix:
-        redis_client.set(RedisVariables.REPOSITORY_NAME, prefix=prefix, value=repository_path, ex=300)
+        redis_client.set(RedisVariables.REPOSITORY_PATH, prefix=prefix, value=repository_path, ex=300)
         return prefix
     return True
 
