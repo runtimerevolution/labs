@@ -1,26 +1,41 @@
 import json
 import logging
+from types import SimpleNamespace
 
 import config.configuration_variables as settings
-import redis
 from config.celery import app
-from repo import call_agent_to_apply_code_changes, clone_repository
-from run import commit_changes, create_branch, create_pull_request, get_issue
+from github.github import GithubRequests
+from llm import apply_code_changes
+from tasks.redis_client import RedisStrictClient, RedisVariables
 
 logger = logging.getLogger(__name__)
 
-redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
+redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
+
+
+def get_redis_github_data(
+    prefix, token="", repository_owner="", repository_name="", username="", as_namespace=False
+) -> dict | SimpleNamespace:
+    variables = dict(
+        token=redis_client.get(RedisVariables.TOKEN, prefix, default=token),
+        repository_owner=redis_client.get(RedisVariables.REPOSITORY_OWNER, prefix, default=repository_owner),
+        repository_name=redis_client.get(RedisVariables.REPOSITORY_NAME, prefix, default=repository_name),
+        username=redis_client.get(RedisVariables.USERNAME, prefix, default=username),
+    )
+
+    if as_namespace:
+        return SimpleNamespace(**variables)
+
+    return variables
 
 
 @app.task
 def get_issue_task(prefix="", token="", repository_owner="", repository_name="", issue_number="", username=""):
-    token = redis_client.get(f"{prefix}_token") if prefix else token
-    repository_owner = redis_client.get(f"{prefix}_repository_owner") if prefix else repository_owner
-    repository_name = redis_client.get(f"{prefix}_repository_name") if prefix else repository_name
-    username = redis_client.get(f"{prefix}_username") if prefix else username
-    issue_number = redis_client.get(f"{prefix}_issue_number") if prefix else issue_number
+    github_request_data = get_redis_github_data(prefix, token, repository_owner, repository_name, username)
+    issue_number = redis_client.get(RedisVariables.ISSUE_NUMBER, prefix, default=issue_number)
 
-    issue = get_issue(token, repository_owner, repository_name, username, issue_number)
+    github_request = GithubRequests(**github_request_data)
+    issue = github_request.get_issue(issue_number)
 
     if prefix:
         issue_title = issue["title"].replace(" ", "-")
@@ -42,23 +57,15 @@ def create_branch_task(
     original_branch="",
     issue_title="",
 ):
-    token = redis_client.get(f"{prefix}_token") if prefix else token
-    repository_owner = redis_client.get(f"{prefix}_repository_owner") if prefix else repository_owner
-    repository_name = redis_client.get(f"{prefix}_repository_name") if prefix else repository_name
-    username = redis_client.get(f"{prefix}_username") if prefix else username
-    issue_number = redis_client.get(f"{prefix}_issue_number") if prefix else issue_number
-    original_branch = redis_client.get(f"{prefix}_original_branch") if prefix else original_branch
-    issue_title = redis_client.get("issue_title") if prefix else issue_title
+    github_request_data = get_redis_github_data(prefix, token, repository_owner, repository_name, username)
+    issue_number = redis_client.get(RedisVariables.ISSUE_NUMBER, prefix, default=issue_number)
+    original_branch = redis_client.get(RedisVariables.ORIGINAL_BRANCH_NAME, prefix, default=original_branch)
+    issue_title = redis_client.get(RedisVariables.ISSUE_TITLE, prefix, default=issue_title)
 
-    branch_name = create_branch(
-        token,
-        repository_owner,
-        repository_name,
-        username,
-        issue_number,
-        issue_title,
-        original_branch,
-    )
+    branch_name = f"{issue_number}-{issue_title}"
+
+    github_request = GithubRequests(**github_request_data)
+    github_request.create_branch(branch_name=branch_name, original_branch=original_branch)
 
     if prefix:
         redis_client.set(f"{prefix}_branch_name", branch_name, ex=300)
@@ -68,10 +75,12 @@ def create_branch_task(
 
 @app.task
 def clone_repository_task(prefix="", repository_owner="", repository_name=""):
-    repository_owner = redis_client.get(f"{prefix}_repository_owner") if prefix else repository_owner
-    repository_name = redis_client.get(f"{prefix}_repository_name") if prefix else repository_name
-    repository_path = f"{settings.CLONE_DESTINATION_DIR}{repository_owner}/{repository_name}"
-    clone_repository(f"https://github.com/{repository_owner}/{repository_name}", repository_path)
+    github_request_data = get_redis_github_data(
+        prefix, repository_owner=repository_owner, repository_name=repository_name
+    )
+
+    github_request = GithubRequests(**github_request_data)
+    repository_path = github_request.clone()
 
     if prefix:
         redis_client.set(f"{prefix}_repository_path", repository_path, ex=300)
@@ -81,8 +90,8 @@ def clone_repository_task(prefix="", repository_owner="", repository_name=""):
 
 @app.task
 def apply_code_changes_task(prefix="", llm_response=""):
-    llm_response = redis_client.get(f"{prefix}_llm_response") if prefix else llm_response
-    files_modified = call_agent_to_apply_code_changes(llm_response)
+    llm_response = redis_client.get(RedisVariables.LLM_RESPONSE, prefix, default=llm_response)
+    files_modified = apply_code_changes(llm_response)
 
     if prefix:
         redis_client.set(f"{prefix}_files_modified", json.dumps(files_modified))
@@ -100,13 +109,12 @@ def commit_changes_task(
     branch_name="",
     files_modified=[],
 ):
-    commit_changes(
-        token=redis_client.get(f"{prefix}_token") if prefix else token,
-        repository_owner=redis_client.get(f"{prefix}_repository_owner") if prefix else repository_owner,
-        repository_name=redis_client.get(f"{prefix}_repository_name") if prefix else repository_name,
-        username=redis_client.get(f"{prefix}_username") if prefix else username,
-        branch_name=(redis_client.get(f"{prefix}_branch_name") if prefix else branch_name),
-        file_list=(json.loads(redis_client.get(f"{prefix}_files_modified")) if prefix else files_modified),
+    github_request_data = get_redis_github_data(prefix, token, repository_owner, repository_name, username)
+    github_request = GithubRequests(**github_request_data)
+    github_request.commit_changes(
+        message="Fix",
+        branch_name=redis_client.get(RedisVariables.BRANCH_NAME, prefix, default=branch_name),
+        files=json.loads(redis_client.get(RedisVariables.FILES_MODIFIED, prefix, default=files_modified)),
     )
 
     if prefix:
@@ -124,13 +132,11 @@ def create_pull_request_task(
     branch_name="",
     original_branch="",
 ):
-    create_pull_request(
-        token=redis_client.get(f"{prefix}_token") if prefix else token,
-        repository_owner=redis_client.get(f"{prefix}_repository_owner") if prefix else repository_owner,
-        repository_name=redis_client.get(f"{prefix}_repository_name") if prefix else repository_name,
-        username=redis_client.get(f"{prefix}_username") if prefix else username,
-        original_branch=(redis_client.get(f"{prefix}_original_branch") if prefix else original_branch),
-        branch_name=(redis_client.get(f"{prefix}_branch_name") if prefix else branch_name),
+    github_request_data = get_redis_github_data(prefix, token, repository_owner, repository_name, username)
+    github_request = GithubRequests(**github_request_data)
+    github_request.create_pull_request(
+        head=redis_client.get(RedisVariables.BRANCH_NAME, prefix, default=branch_name),
+        base=redis_client.get(RedisVariables.ORIGINAL_BRANCH_NAME, prefix, default=original_branch),
     )
 
     if prefix:

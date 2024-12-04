@@ -5,7 +5,7 @@ from decorators import time_and_log_function
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.base import Vectorizer
 from litellm_service.llm_requester import Requester
-from parsers.response_parser import is_valid_json, parse_llm_output
+from parsers.response_parser import create_file, is_valid_json, modify_file, parse_llm_output
 
 logger = logging.getLogger(__name__)
 
@@ -151,3 +151,17 @@ def call_llm_with_context(repository_path, issue_summary):
     logger.debug(f"Issue Summary: {issue_summary} - LLM Model: {embeder_args[0]}")
 
     return get_llm_response(prepared_context)
+
+
+@time_and_log_function
+def apply_code_changes(llm_response):
+    pull_request = parse_llm_output(llm_response)
+
+    files = []
+    for step in pull_request.steps:
+        if step.type == "create":
+            files.append(create_file(step.path, step.content))
+        elif step.type == "modify":
+            files.append(modify_file(step.path, step.content))
+
+    return files

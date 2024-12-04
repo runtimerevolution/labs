@@ -25,7 +25,7 @@ router = Router(tags=["github"])
 async def list_issues_endpoint(request: HttpRequest, params: ListIssuesSchema):
     try:
         github_requests = GithubRequests(
-            github_token=params.token,
+            token=params.token,
             repository_owner=params.repository_owner,
             repository_name=params.repository_name,
             username=params.username,
@@ -41,7 +41,7 @@ async def list_issues_endpoint(request: HttpRequest, params: ListIssuesSchema):
 async def get_issue_endpoint(request: HttpRequest, params: IssueSchema):
     try:
         github_requests = GithubRequests(
-            github_token=params.token,
+            token=params.token,
             repository_owner=params.repository_owner,
             repository_name=params.repository_name,
             username=params.username,
@@ -57,7 +57,7 @@ async def get_issue_endpoint(request: HttpRequest, params: IssueSchema):
 async def create_branch_endpoint(request: HttpRequest, params: BranchSchema):
     try:
         github_requests = GithubRequests(
-            github_token=params.token,
+            token=params.token,
             repository_owner=params.repository_owner,
             repository_name=params.repository_name,
             username=params.username,
@@ -73,7 +73,7 @@ async def create_branch_endpoint(request: HttpRequest, params: BranchSchema):
 async def change_issue_status_endpoint(request: HttpRequest, params: IssueStatusSchema):
     try:
         github_requests = GithubRequests(
-            github_token=params.token,
+            token=params.token,
             repository_owner=params.repository_owner,
             repository_name=params.repository_name,
             username=params.username,
@@ -89,7 +89,7 @@ async def change_issue_status_endpoint(request: HttpRequest, params: IssueStatus
 async def commit_changes_endpoint(request: HttpRequest, params: CommitSchema):
     try:
         github_requests = GithubRequests(
-            github_token=params.token,
+            token=params.token,
             repository_owner=params.repository_owner,
             repository_name=params.repository_name,
             username=params.username,
@@ -107,7 +107,7 @@ async def commit_changes_endpoint(request: HttpRequest, params: CommitSchema):
 async def create_pull_request_endpoint(request: HttpRequest, params: PullRequestSchema):
     try:
         github_requests = GithubRequests(
-            github_token=params.token,
+            token=params.token,
             repository_owner=params.repository_owner,
             repository_name=params.repository_name,
             username=params.username,
@@ -125,7 +125,7 @@ async def create_pull_request_endpoint(request: HttpRequest, params: PullRequest
 async def clone_repository_endpoint(request: HttpRequest, params: GithubSchema):
     try:
         github_requests = GithubRequests(
-            github_token=params.token,
+            token=params.token,
             repository_owner=params.repository_owner,
             repository_name=params.repository_name,
             username=params.username,
