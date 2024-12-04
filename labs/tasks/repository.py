@@ -38,10 +38,18 @@ def get_issue_task(prefix="", token="", repository_owner="", repository_name="",
     issue = github_request.get_issue(issue_number)
 
     if prefix:
-        issue_title = issue["title"].replace(" ", "-")
-        issue_body = issue["body"]
-        redis_client.set(f"{prefix}_issue_title", issue_title, ex=300)
-        redis_client.set(f"{prefix}_issue_body", issue_body, ex=300)
+        redis_client.set(
+            RedisVariables.ISSUE_TITLE,
+            prefix=prefix,
+            value=issue["title"].replace(" ", "-"),
+            ex=300,
+        )
+        redis_client.set(
+            RedisVariables.ISSUE_BODY,
+            prefix=prefix,
+            value=issue["body"],
+            ex=300,
+        )
         return prefix
     return issue
 
@@ -68,7 +76,7 @@ def create_branch_task(
     github_request.create_branch(branch_name=branch_name, original_branch=original_branch)
 
     if prefix:
-        redis_client.set(f"{prefix}_branch_name", branch_name, ex=300)
+        redis_client.set(RedisVariables.BRANCH_NAME, prefix=prefix, value=branch_name, ex=300)
         return prefix
     return branch_name
 
@@ -83,7 +91,7 @@ def clone_repository_task(prefix="", repository_owner="", repository_name=""):
     repository_path = github_request.clone()
 
     if prefix:
-        redis_client.set(f"{prefix}_repository_path", repository_path, ex=300)
+        redis_client.set(RedisVariables.REPOSITORY_NAME, prefix=prefix, value=repository_path, ex=300)
         return prefix
     return True
 
@@ -94,7 +102,7 @@ def apply_code_changes_task(prefix="", llm_response=""):
     files_modified = apply_code_changes(llm_response)
 
     if prefix:
-        redis_client.set(f"{prefix}_files_modified", json.dumps(files_modified))
+        redis_client.set(RedisVariables.FILES_MODIFIED, prefix=prefix, value=json.dumps(files_modified))
         return prefix
     return files_modified
 
