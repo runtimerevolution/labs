@@ -59,7 +59,7 @@ def get_llm_response(prompt):
 
         except Exception as e:
             is_invalid, reason = True, str(e)
-            logger.error(f"Invalid LLM response:", exc_info=e)
+            logger.error("Invalid LLM response:", exc_info=e)
 
         if is_invalid:
             retries += 1
