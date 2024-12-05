@@ -1,11 +1,11 @@
 import json
-import logging
 from types import SimpleNamespace
 
 import config.configuration_variables as settings
 from config.celery import app
+from decorators import time_and_log_function
 from github.github import GithubRequests
-from llm import apply_code_changes
+from parsers.response_parser import create_file, modify_file, parse_llm_output
 from tasks.redis_client import RedisStrictClient, RedisVariables
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
@@ -25,6 +25,20 @@ def get_redis_github_data(
         return SimpleNamespace(**variables)
 
     return variables
+
+
+@time_and_log_function
+def apply_code_changes(llm_response):
+    pull_request = parse_llm_output(llm_response)
+
+    files = []
+    for step in pull_request.steps:
+        if step.type == "create":
+            files.append(create_file(step.path, step.content))
+        elif step.type == "modify":
+            files.append(modify_file(step.path, step.content))
+
+    return files
 
 
 @app.task
@@ -97,12 +111,12 @@ def clone_repository_task(prefix="", repository_owner="", repository_name=""):
 @app.task
 def apply_code_changes_task(prefix="", llm_response=""):
     llm_response = redis_client.get(RedisVariables.LLM_RESPONSE, prefix, default=llm_response)
-    files_modified = apply_code_changes(llm_response)
+    modified_files = apply_code_changes(llm_response)
 
     if prefix:
-        redis_client.set(RedisVariables.FILES_MODIFIED, prefix=prefix, value=json.dumps(files_modified))
+        redis_client.set(RedisVariables.FILES_MODIFIED, prefix=prefix, value=json.dumps(modified_files))
         return prefix
-    return files_modified
+    return modified_files
 
 
 @app.task

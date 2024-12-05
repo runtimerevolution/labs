@@ -15,9 +15,9 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BD=redis://redis:6379/0
+#    environment:
+#      - CELERY_BROKER_URL=redis://redis:6379/0
+#      - CELERY_RESULT_BD=redis://redis:6379/0
     ports:
       - "8000:8000"
     depends_on:
@@ -54,11 +54,11 @@ services:
       context: .
       dockerfile: ./Dockerfile
     command: celery -A config worker --beat --scheduler redbeat.RedBeatScheduler --loglevel=INFO --concurrency=1
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - CELERY_TASK_ALWAYS_EAGER=False
-      - DATABASE_URL=postgresql://postgres:postgres@labs-db:5432/postgres
+#    environment:
+#      - CELERY_BROKER_URL=redis://redis:6379/0
+#      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+#      - CELERY_TASK_ALWAYS_EAGER=False
+#      - DATABASE_URL=postgresql://postgres:postgres@labs-db:5432/postgres
     depends_on:
       - redis
       - labs-db

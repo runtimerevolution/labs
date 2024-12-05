@@ -2,18 +2,40 @@ from unittest import skip
 from unittest.mock import patch
 
 import pytest
-from core.models import Model
+from core.models import Model, VectorizerModel
+from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
+from embeddings.vectorizers.base import Vectorizer
 from litellm_service.ollama import OllamaRequester
 from litellm_service.openai import OpenAIRequester
-from llm import call_llm_with_context, check_invalid_json_response
+from tasks.checks import check_invalid_json
+from tasks.llm import get_context, get_llm_response, get_prompt
 from tests.constants import (
     OLLAMA_EMBEDDING_MODEL_NAME,
     OLLAMA_LLM_MODEL_NAME,
     OPENAI_EMBEDDING_MODEL_NAME,
     OPENAI_LLM_MODEL_NAME,
 )
+
+
+def call_llm_with_context(repository_path, issue_summary):
+    if not issue_summary:
+        raise ValueError("issue_summary cannot be empty.")
+
+    embedder_class, *embeder_args = Model.get_active_embedding_model()
+    embedder = Embedder(embedder_class, *embeder_args)
+
+    vectorizer_class = VectorizerModel.get_active_vectorizer()
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repository_path)
+
+    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
+    context = embedder.retrieve_embeddings(issue_summary, repository_path)
+
+    prompt = get_prompt(issue_summary)
+    prepared_context = get_context(context, prompt)
+
+    return get_llm_response(prepared_context)
 
 
 class TestCallLLMWithContext:
@@ -38,7 +60,7 @@ class TestCheckInvalidJsonResponse:
                 }
             ]
         }
-        is_invalid, message = check_invalid_json_response(llm_response)
+        is_invalid, message = check_invalid_json(llm_response)
         assert not is_invalid
         assert message == ""
 
@@ -52,13 +74,13 @@ class TestCheckInvalidJsonResponse:
                 }
             ]
         }
-        is_invalid, message = check_invalid_json_response(llm_response)
+        is_invalid, message = check_invalid_json(llm_response)
         assert is_invalid
         assert message == "Invalid JSON response."
 
     def test_invalid_json_structure(self):
         llm_response = {"choices": [{"message": {"content": '{"invalid_key": invalid_value"}'}}]}
-        is_invalid, message = check_invalid_json_response(llm_response)
+        is_invalid, message = check_invalid_json(llm_response)
         assert is_invalid
         assert message == "Invalid JSON response."
 

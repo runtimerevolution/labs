@@ -1,14 +1,72 @@
 import json
+import logging
 
 import config.configuration_variables as settings
 from config.celery import app
 from core.models import Model, VectorizerModel
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.base import Vectorizer
-from llm import get_llm_response, get_prompt, prepare_context
+from litellm_service.llm_requester import Requester
+from tasks.checks import run_response_checks
 from tasks.redis_client import RedisStrictClient, RedisVariables
 
+logger = logging.getLogger(__name__)
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
+
+
+def get_prompt(issue_summary):
+    return f"""
+        You're a diligent software engineer AI. You can't see, draw, or interact with a 
+        browser, but you can read and write files, and you can think.
+        You've been given the following task: {issue_summary}.
+        Any imports will be at the beggining of the file.
+        Add tests for the new functionalities, considering any existing test files.
+        The file paths provided are **absolute paths relative to the project root**, 
+        and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
+        Do not prepend or modify the paths.
+        Please provide a json response in the following format: {{"steps": [...]}}
+        Where steps is a list of objects where each object contains three fields:
+        type, which is either 'create' to add a new file or 'modify' to edit an existing one;
+        If the file is to be modified send the finished version of the entire file.
+        path, which is the absolute path of the file to create/modify;
+        content, which is the content to write to the file.
+    """
+
+
+def get_context(embeddings, prompt):
+    context = []
+    for file in embeddings:
+        context.append(dict(role="system", content=f"File: {file[1]}, Content: {file[2]}"))
+
+    context.append(dict(role="user", content=prompt))
+    return context
+
+
+def get_llm_response(prompt):
+    llm_requester, *llm_requester_args = Model.get_active_llm_model()
+    requester = Requester(llm_requester, *llm_requester_args)
+
+    retries, max_retries = 0, 5
+    is_invalid, reason = True, None
+
+    llm_response = None
+    while is_invalid and retries < max_retries:
+        try:
+            llm_response = requester.completion_without_proxy(prompt)
+            logger.debug(f"LLM reponse: {llm_response}")
+
+            is_invalid, redo_reason = run_response_checks(llm_response)
+
+        except Exception as e:
+            is_invalid, redo_reason = True, str(e)
+            logger.error(f"Invalid LLM response:", exc_info=e)
+
+        if is_invalid:
+            retries += 1
+            llm_response = None
+            logger.info(f"Redoing LLM response request doe to error (retries: {retries} of {max_retries})")
+
+    return not is_invalid, llm_response
 
 
 @app.task
@@ -49,7 +107,7 @@ def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings=[]):
     redis_client.set(RedisVariables.PROMPT, prefix=prefix, value=prompt)
 
     embeddings = json.loads(redis_client.get(RedisVariables.EMBEDDINGS, prefix=prefix, default=embeddings))
-    prepared_context = prepare_context(embeddings, prompt)
+    prepared_context = get_context(embeddings, prompt)
 
     if prefix:
         redis_client.set(RedisVariables.CONTEXT, prefix=prefix, value=json.dumps(prepared_context))

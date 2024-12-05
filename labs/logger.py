@@ -44,5 +44,6 @@ def setup_logger():
         )
         handler.setFormatter(formatter)
         logger.addHandler(handler)
+
     except Exception:
         pass
