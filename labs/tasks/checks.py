@@ -1,6 +1,7 @@
 import logging
 
 from parsers.response_parser import is_valid_json, parse_llm_output
+from pydantic import ValidationError as PydanticValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,10 @@ def check_invalid_json(llm_response):
     if not is_valid_json(response_content):
         raise ValidationError("Malformed JSON LLM response.")
 
-    elif not parse_llm_output(response_content):
+    try:
+        parse_llm_output(response_content)
+
+    except PydanticValidationError:
         raise ValidationError("JSON response from LLM not match the expected format.")
 
 

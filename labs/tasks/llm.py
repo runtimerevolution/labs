@@ -66,7 +66,7 @@ def get_llm_response(prompt):
             llm_response = None
             logger.info(f"Redoing LLM response request doe to error (retries: {retries} of {max_retries})")
 
-    return not is_invalid, llm_response
+    return True, llm_response
 
 
 @app.task
