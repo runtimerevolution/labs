@@ -21,7 +21,7 @@ class Embedder:
 
     def retrieve_embeddings(
         self, query: str, repository: str, similarity_threshold: int = 0.7, number_of_results: int = 10
-    ) -> List[Embeddings]:
+    ) -> List[Embedding]:
         query = query.replace("\n", "")
         embedded_query = self.embed(prompt=query).embeddings
         if not embedded_query:

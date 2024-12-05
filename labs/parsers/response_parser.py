@@ -12,12 +12,12 @@ class Step(BaseModel):
     content: str
 
 
-class PullRequest(BaseModel):
+class Steps(BaseModel):
     steps: list[Step]
 
 
 def parse_llm_output(text_output):
-    return PullRequest.model_validate_json(text_output)
+    return Steps.model_validate_json(text_output)
 
 
 def create_file(path, content):
@@ -47,6 +47,6 @@ def modify_file(path, content):
 def is_valid_json(text):
     try:
         json.loads(text)
-        return True
     except ValueError:
         return False
+    return True

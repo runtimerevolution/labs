@@ -56,7 +56,7 @@ async def run_on_repository_endpoint(request: HttpRequest, run_on_repository: Gi
 async def run_on_local_repository_endpoint(request: HttpRequest, run_on_local_repository: LocalRepositoryShema):
     try:
         run_on_local_repository_task(
-            repository_path=run_on_local_repository.repository_path, issue_text=run_on_local_repository.prompt
+            repository_path=run_on_local_repository.repository_path, issue_body=run_on_local_repository.prompt
         )
     except Exception as ex:
         logger.exception("Internal server error")

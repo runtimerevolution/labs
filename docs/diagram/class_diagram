@@ -12,8 +12,8 @@ digraph {
 		color=lightgrey label="./code_examples/calculator.py" style=filled
 		Calculator [label="{ Calculator | + add(self, x, y)\l+ subtract(self, x, y)\l }" shape=record]
 	}
-	subgraph "cluster_./litellm_service/request.py" {
-		color=lightgrey label="./litellm_service/request.py" style=filled
+	subgraph "cluster_./llm/request.py" {
+		color=lightgrey label="./llm/request.py" style=filled
 		RequestLiteLLM [label="{ RequestLiteLLM | + __init__(self, litellm_api_key)\l+ completion(self, messages, model)\l+ completion_without_proxy(self, messages, model)\l }" shape=record]
 	}
 }
