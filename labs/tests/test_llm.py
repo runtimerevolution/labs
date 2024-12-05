@@ -6,9 +6,9 @@ from core.models import Model, VectorizerModel
 from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
-from embeddings.vectorizers.base import Vectorizer
-from litellm_service.ollama import OllamaRequester
-from litellm_service.openai import OpenAIRequester
+from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.ollama import OllamaRequester
+from llm.openai import OpenAIRequester
 from tasks.checks import check_invalid_json
 from tasks.llm import get_context, get_llm_response, get_prompt
 from tests.constants import (
@@ -99,7 +99,7 @@ class TestLocalLLM:
 
     @patch("llm.validate_llm_response")
     @patch("embeddings.vectorizers.base.Vectorizer.vectorize_to_database")
-    @patch("litellm_service.ollama.OllamaRequester.completion_without_proxy")
+    @patch("llm.ollama.OllamaRequester.completion_without_proxy")
     @patch("embeddings.embedder.Embedder.retrieve_embeddings")
     @pytest.mark.django_db
     def test_local_llm_redirect(

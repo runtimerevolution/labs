@@ -32,10 +32,10 @@ def check_refusal(llm_response):
 def check_invalid_json(llm_response):
     response_content = llm_response["choices"][0]["message"]["content"]
     if not is_valid_json(response_content):
-        raise ValidationError("Invalid JSON LLM response.")
+        raise ValidationError("Malformed JSON LLM response.")
 
     elif not parse_llm_output(response_content):
-        raise ValidationError("Invalid JSON LLM response.")
+        raise ValidationError("JSON response from LLM not match the expected format.")
 
 
 check_list = [

@@ -5,8 +5,8 @@ import config.configuration_variables as settings
 from config.celery import app
 from core.models import Model, VectorizerModel
 from embeddings.embedder import Embedder
-from embeddings.vectorizers.base import Vectorizer
-from litellm_service.llm_requester import Requester
+from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.requester import Requester
 from tasks.checks import run_response_checks
 from tasks.redis_client import RedisStrictClient, RedisVariables
 
