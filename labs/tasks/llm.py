@@ -55,16 +55,16 @@ def get_llm_response(prompt):
             llm_response = requester.completion_without_proxy(prompt)
             logger.debug(f"LLM reponse: {llm_response}")
 
-            is_invalid, redo_reason = run_response_checks(llm_response)
+            is_invalid, reason = run_response_checks(llm_response)
 
         except Exception as e:
-            is_invalid, redo_reason = True, str(e)
+            is_invalid, reason = True, str(e)
             logger.error(f"Invalid LLM response:", exc_info=e)
 
         if is_invalid:
             retries += 1
             llm_response = None
-            logger.info(f"Redoing LLM response request doe to error (retries: {retries} of {max_retries})")
+            logger.info(f"Redoing LLM response request doe to error (retries: {retries} of {max_retries}): {reason}")
 
     return True, llm_response
 
