@@ -1,8 +1,11 @@
+import logging
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
 from embeddings.models import Embedding
 from pgvector.django import CosineDistance
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -20,16 +23,20 @@ class Embedder:
         return self.embedder.embed(prompt, *args, **kwargs)
 
     def retrieve_embeddings(
-        self, query: str, repository: str, similarity_threshold: int = 0.7, number_of_results: int = 10
+        self, query: str, repository: str, similarity_threshold: float = 0.3, number_of_results: int = 10
     ) -> List[Embeddings]:
         query = query.replace("\n", "")
         embedded_query = self.embed(prompt=query).embeddings
         if not embedded_query:
             raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
-        return Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query[0])).filter(
-            repository=repository, distance__lt=similarity_threshold
+        embeddings = (
+            Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query[0]))
+            .filter(repository=repository, distance__lt=similarity_threshold)
+            .order_by("distance")
         )[:number_of_results]
+
+        return embeddings
 
     def reembed_code(
         self,
