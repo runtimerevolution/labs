@@ -16,11 +16,11 @@ class TestGithubRequests:
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = sample_response
 
-        github_token = "valid_token"
+        token = "valid_token"
         repository_owner = "owner_username"
         repository_name = "repository_name"
         username = "your_username"
-        github_requests = GithubRequests(github_token, repository_owner, repository_name, username)
+        github_requests = GithubRequests(token, repository_owner, repository_name, username)
 
         issues = github_requests.list_issues()
 
@@ -28,7 +28,7 @@ class TestGithubRequests:
         mock_get.assert_called_once_with(
             f"https://api.github.com/repos/{repository_owner}/{repository_name}/issues",
             headers={
-                "Authorization": f"token {github_token}",
+                "Authorization": f"token {token}",
                 "Accept": "application/vnd.github.v3+json",
             },
             params={
@@ -43,7 +43,7 @@ class TestGithubRequests:
         mock_response.raise_for_status.side_effect = requests.exceptions.RequestException("HTTP Error")
         mocker.patch("requests.get", return_value=mock_response)
 
-        github_requests = GithubRequests(github_token="fake_token", repository_owner="owner", repository_name="repo")
+        github_requests = GithubRequests(token="fake_token", repository_owner="owner", repository_name="repo")
 
         issues = github_requests.list_issues()
 
@@ -56,11 +56,11 @@ class TestGithubRequests:
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = sample_response
 
-        github_token = "valid_token"
+        token = "valid_token"
         repository_owner = "owner_username"
         repository_name = "repository_name"
         username = "your_username"
-        github_requests = GithubRequests(github_token, repository_owner, repository_name, username)
+        github_requests = GithubRequests(token, repository_owner, repository_name, username)
 
         issue = github_requests.get_issue(1)
 
@@ -71,7 +71,7 @@ class TestGithubRequests:
         mock_response.raise_for_status.side_effect = requests.exceptions.RequestException("Mocked Request Exception")
         mocker.patch("requests.get", return_value=mock_response)
 
-        github_requests = GithubRequests(github_token="fake_token", repository_owner="owner", repository_name="repo")
+        github_requests = GithubRequests(token="fake_token", repository_owner="owner", repository_name="repo")
 
         issue = github_requests.get_issue(1)
 
@@ -82,7 +82,7 @@ class TestGithubRequests:
         mock_response.json.return_value = {"status": "closed"}
         mocker.patch("requests.patch", return_value=mock_response)
 
-        github_requests = GithubRequests(github_token="fake_token", repository_owner="owner", repository_name="repo")
+        github_requests = GithubRequests(token="fake_token", repository_owner="owner", repository_name="repo")
 
         response = github_requests.change_issue_status(issue_number=1, status="closed")
 
@@ -120,7 +120,7 @@ class TestGithubRequests:
         mock_response_patch.json.return_value = {"sha": "fake_update_sha"}
         mocker.patch("requests.patch", return_value=mock_response_patch)
 
-        github_requests = GithubRequests(github_token="fake_token", repository_owner="owner", repository_name="repo")
+        github_requests = GithubRequests(token="fake_token", repository_owner="owner", repository_name="repo")
 
         result = github_requests.commit_changes(
             message="Commit message",
@@ -137,7 +137,7 @@ class TestGithubRequests:
         mock_response.raise_for_status.return_value = None
         mocker.patch("requests.post", return_value=mock_response)
 
-        github_requests = GithubRequests(github_token="fake_token", repository_owner="owner", repository_name="repo")
+        github_requests = GithubRequests(token="fake_token", repository_owner="owner", repository_name="repo")
 
         pull_request = github_requests.create_pull_request(head="feature_branch")
 
