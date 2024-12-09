@@ -12,12 +12,12 @@ class Step(BaseModel):
     content: str
 
 
-class Steps(BaseModel):
+class Response(BaseModel):
     steps: list[Step]
 
 
-def parse_llm_output(text_output):
-    return Steps.model_validate_json(text_output)
+def parse_llm_output(text_output) -> Response:
+    return Response.model_validate_json(text_output)
 
 
 def create_file(path, content):

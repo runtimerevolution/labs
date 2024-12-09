@@ -15,16 +15,16 @@ from tasks import (
     prepare_prompt_and_context_task,
     vectorize_repository_task,
 )
-from tasks.redis_client import RedisStrictClient, RedisVariables
+from tasks.redis_client import RedisStrictClient, RedisVariable
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 
 @app.task(bind=True)
 def init_task(self, **kwargs):
-    if RedisVariables.REPOSITORY_PATH.value in kwargs:
-        if not os.path.exists(kwargs[RedisVariables.REPOSITORY_PATH.value]):
-            raise FileNotFoundError(f"Directory {kwargs[RedisVariables.REPOSITORY_PATH.value]} does not exist")
+    if RedisVariable.REPOSITORY_PATH.value in kwargs:
+        if not os.path.exists(kwargs[RedisVariable.REPOSITORY_PATH.value]):
+            raise FileNotFoundError(f"Directory {kwargs[RedisVariable.REPOSITORY_PATH.value]} does not exist")
 
     prefix = self.request.id
     for k, v in kwargs.items():
@@ -42,12 +42,12 @@ def run_on_repository_task(
     original_branch: str = "main",
 ):
     data = {
-        RedisVariables.TOKEN.value: token,
-        RedisVariables.REPOSITORY_OWNER.value: repository_owner,
-        RedisVariables.REPOSITORY_NAME.value: repository_name,
-        RedisVariables.USERNAME.value: username,
-        RedisVariables.ISSUE_NUMBER.value: issue_number,
-        RedisVariables.ORIGINAL_BRANCH_NAME.value: original_branch,
+        RedisVariable.TOKEN.value: token,
+        RedisVariable.REPOSITORY_OWNER.value: repository_owner,
+        RedisVariable.REPOSITORY_NAME.value: repository_name,
+        RedisVariable.USERNAME.value: username,
+        RedisVariable.ISSUE_NUMBER.value: issue_number,
+        RedisVariable.ORIGINAL_BRANCH_NAME.value: original_branch,
     }
     chain(
         init_task.s(**data),
@@ -67,8 +67,8 @@ def run_on_repository_task(
 @app.task
 def run_on_local_repository_task(repository_path, issue_body):
     data = {
-        RedisVariables.ISSUE_BODY.value: issue_body,
-        RedisVariables.REPOSITORY_PATH.value: repository_path,
+        RedisVariable.ISSUE_BODY.value: issue_body,
+        RedisVariable.REPOSITORY_PATH.value: repository_path,
     }
     chain(
         init_task.s(**data),

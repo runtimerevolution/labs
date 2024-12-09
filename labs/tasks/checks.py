@@ -1,6 +1,6 @@
 import logging
 
-from parsers.response_parser import is_valid_json, parse_llm_output
+from parsers.response import is_valid_json, parse_llm_output
 from pydantic import ValidationError as PydanticValidationError
 
 logger = logging.getLogger(__name__)

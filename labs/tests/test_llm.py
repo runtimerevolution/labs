@@ -61,7 +61,6 @@ class TestCheckInvalidJsonResponse(TestCase):
             ]
         }
 
-        # it should pass without raise any excption
         check_invalid_json(llm_response)
 
     def test_invalid_json_response(self):

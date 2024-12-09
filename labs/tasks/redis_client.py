@@ -2,10 +2,10 @@ from enum import Enum
 from typing import Any, Union
 
 from redis import StrictRedis
-from redis.typing import AbsExpiryT, EncodableT, ExpiryT, ResponseT
+from redis.typing import EncodableT, ResponseT
 
 
-class RedisVariables(Enum):
+class RedisVariable(Enum):
     BRANCH_NAME = "branch_name"
     CONTEXT = "context"
     EMBEDDINGS = "embeddings"
@@ -24,41 +24,31 @@ class RedisVariables(Enum):
 
 
 class RedisStrictClient(StrictRedis):
-    def get(
-        self, variable: Union[str, RedisVariables], prefix: str = None, sufix: str = None, default: Any = None
-    ) -> ResponseT:
-        name = variable.value if isinstance(variable, RedisVariables) else variable
+    def get(self, variable: Union[str, RedisVariable], prefix: str = None, default: str = None) -> ResponseT:
+        name = variable
+        if isinstance(variable, RedisVariable):
+            name = variable.value
+
         if prefix:
             name = f"{prefix}_{name}"
 
-        if sufix:
-            name = f"{name}_{sufix}"
-
         if self.exists(name):
             return super().get(name)
-
         return default
 
     def set(
         self,
-        variable: Union[str, RedisVariables],
+        variable: Union[str, RedisVariable],
         value: EncodableT,
         prefix: str = None,
-        sufix: str = None,
-        ex: Union[ExpiryT, None] = None,
-        px: Union[ExpiryT, None] = None,
-        nx: bool = False,
-        xx: bool = False,
-        keepttl: bool = False,
-        get: bool = False,
-        exat: Union[AbsExpiryT, None] = None,
-        pxat: Union[AbsExpiryT, None] = None,
+        *args,
+        **kwargs,
     ) -> ResponseT:
-        name = variable.value if isinstance(variable, RedisVariables) else variable
+        name = variable
+        if isinstance(variable, RedisVariable):
+            name = variable.value
+
         if prefix:
             name = f"{prefix}_{name}"
 
-        if sufix:
-            name = f"{name}_{sufix}"
-
-        return super().set(name, value, ex, px, nx, xx, keepttl, get, exat, pxat)
+        return super().set(name, value, *args, **kwargs)
