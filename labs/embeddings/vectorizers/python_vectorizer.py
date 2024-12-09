@@ -125,13 +125,14 @@ class PythonVectorizer:
         docs = self.load_docs(repository_path, include_file_extensions)
 
         logger.debug(f"Loading {len(docs)} documents...")
+        files_texts = [(doc.metadata["source"], doc.page_content) for doc in docs]
+        texts = [file_and_text[1] for file_and_text in files_texts]
 
-        for doc in docs:
-            embeddings = self.embedder.embed(prompt=doc)
+        embeddings = self.embedder.embed(prompt=texts)
 
-            logger.debug("Storing embeddings...")
-            self.embedder.reembed_code(
-                files_texts=[(doc.metadata["source"], doc.page_content)],
-                embeddings=embeddings,
-                repository=repository_path,
-            )
+        logger.debug("Storing embeddings...")
+        self.embedder.reembed_code(
+            files_texts=files_texts,
+            embeddings=embeddings,
+            repository=repository_path,
+        )
