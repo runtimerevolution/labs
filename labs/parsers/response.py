@@ -1,6 +1,8 @@
 import json
 import logging
+from typing import List, Optional
 
+from file_handling import modify_line_in_file
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -10,17 +12,18 @@ class Step(BaseModel):
     type: str
     path: str
     content: str
+    line: Optional[int] = None
 
 
 class Response(BaseModel):
-    steps: list[Step]
+    steps: List[Step]
 
 
 def parse_llm_output(text_output) -> Response:
     return Response.model_validate_json(text_output)
 
 
-def create_file(path, content):
+def create_file(path: str, content: str) -> str | None:
     logger.debug(f"Creating file on path: {path}")
     try:
         with open(path, "w") as file:
@@ -32,11 +35,10 @@ def create_file(path, content):
         return None
 
 
-def modify_file(path, content):
-    logger.debug(f"Creating file on path: {path}")
+def modify_file(path: str, content: List[str], line: int) -> str | None:
+    logger.debug(f"Modifying file on path: {path}")
     try:
-        with open(path, "w") as file:
-            file.write("\n" + content)
+        modify_line_in_file(file_path=path, content=content, line_number=line)
         logger.debug(f"File modified at {path}")
         return path
     except Exception as e:
