@@ -1,5 +1,6 @@
-from config.configuration_variables import LOCAL_LLM_HOST
 from ollama import Client
+
+from config.configuration_variables import LOCAL_LLM_HOST
 
 
 class OllamaRequester:
