@@ -1,8 +1,8 @@
 import os.path
 
-import config.configuration_variables as settings
 from celery import chain
 from config.celery import app
+from django.conf import settings
 from tasks import (
     apply_code_changes_task,
     clone_repository_task,

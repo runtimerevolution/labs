@@ -93,7 +93,7 @@ migrate:
 	poetry run python labs/manage.py migrate
 
 createuser:
-	DJANGO_SUPERUSER_PASSWORD=admin poetry run python labs/manage.py createsuperuser --noinput --username=admin --email=a@b.com
+	DJANGO_SUPERUSER_PASSWORD=admin poetry run python labs/manage.py createsuperuser --noinput --username=admin --email=admin@example.com
 
 load_fixtures:
 	python labs/manage.py loaddata $(wildcard labs/fixtures/*.json)
