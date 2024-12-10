@@ -22,9 +22,9 @@ redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_P
 
 @app.task(bind=True)
 def init_task(self, **kwargs):
-    if RedisVariable.REPOSITORY_PATH.value in kwargs:
-        if not os.path.exists(kwargs[RedisVariable.REPOSITORY_PATH.value]):
-            raise FileNotFoundError(f"Directory {kwargs[RedisVariable.REPOSITORY_PATH.value]} does not exist")
+    path = RedisVariable.REPOSITORY_PATH.value
+    if path in kwargs and not os.path.exists(kwargs[path]):
+        raise FileNotFoundError(f"Directory {kwargs[path]} does not exist")
 
     prefix = self.request.id
     for k, v in kwargs.items():
