@@ -32,9 +32,13 @@ class Embedder:
         if not embedded_query:
             raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
-        return Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query[0])).filter(
-            repository=repository, distance__lt=similarity_threshold
+        embeddings = (
+            Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query[0]))
+            .filter(repository=repository, distance__lt=similarity_threshold)
+            .order_by("distance")
         )[:max_results]
+
+        return list(embeddings)
 
     def reembed_code(
         self,
