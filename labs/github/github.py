@@ -3,9 +3,9 @@ import logging
 import os
 from dataclasses import dataclass
 
-import config.configuration_variables as settings
 import git
 import requests
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 

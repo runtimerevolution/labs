@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
+from django.conf import settings
 from embeddings.models import Embedding
 from pgvector.django import CosineDistance
 
@@ -20,7 +21,11 @@ class Embedder:
         return self.embedder.embed(prompt, *args, **kwargs)
 
     def retrieve_embeddings(
-        self, query: str, repository: str, similarity_threshold: int = 0.7, number_of_results: int = 10
+        self,
+        query: str,
+        repository: str,
+        similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_TRESHOLD,
+        max_results: int = settings.EMBEDDINGS_MAX_RESULTS,
     ) -> List[Embedding]:
         query = query.replace("\n", "")
         embedded_query = self.embed(prompt=query).embeddings
@@ -29,7 +34,7 @@ class Embedder:
 
         return Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query[0])).filter(
             repository=repository, distance__lt=similarity_threshold
-        )[:number_of_results]
+        )[:max_results]
 
     def reembed_code(
         self,

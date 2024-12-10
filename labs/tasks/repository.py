@@ -1,8 +1,8 @@
 import json
 
-import config.configuration_variables as settings
 from config.celery import app
 from decorators import time_and_log_function
+from django.conf import settings
 from github.github import GithubRequests
 from parsers.response import create_file, modify_file, parse_llm_output
 from tasks.redis_client import RedisStrictClient, RedisVariable

@@ -1,4 +1,4 @@
-from config.configuration_variables import LOCAL_LLM_HOST
+from django.conf import settings
 from ollama import Client
 
 
@@ -6,7 +6,7 @@ class OllamaRequester:
     def __init__(self, model):
         self._model_name = model
 
-        self._client = Client(LOCAL_LLM_HOST)
+        self._client = Client(settings.LOCAL_LLM_HOST)
 
     def completion_without_proxy(self, messages, *args, **kwargs):
         """
