@@ -1,19 +1,41 @@
-from unittest import skip
+from unittest import TestCase, skip
 from unittest.mock import patch
 
 import pytest
-from core.models import Model
+from core.models import Model, VectorizerModel
+from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
-from litellm_service.ollama import OllamaRequester
-from litellm_service.openai import OpenAIRequester
-from llm import call_llm_with_context, check_invalid_json_response
+from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.ollama import OllamaRequester
+from llm.openai import OpenAIRequester
+from tasks.checks import ValidationError, check_invalid_json
+from tasks.llm import get_context, get_llm_response, get_prompt
 from tests.constants import (
     OLLAMA_EMBEDDING_MODEL_NAME,
     OLLAMA_LLM_MODEL_NAME,
     OPENAI_EMBEDDING_MODEL_NAME,
     OPENAI_LLM_MODEL_NAME,
 )
+
+
+def call_llm_with_context(repository_path, issue_summary):
+    if not issue_summary:
+        raise ValueError("issue_summary cannot be empty.")
+
+    embedder_class, *embeder_args = Model.get_active_embedding_model()
+    embedder = Embedder(embedder_class, *embeder_args)
+
+    vectorizer_class = VectorizerModel.get_active_vectorizer()
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repository_path)
+
+    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
+    context = embedder.retrieve_embeddings(issue_summary, repository_path)
+
+    prompt = get_prompt(issue_summary)
+    prepared_context = get_context(context, prompt)
+
+    return get_llm_response(prepared_context)
 
 
 class TestCallLLMWithContext:
@@ -27,7 +49,7 @@ class TestCallLLMWithContext:
         assert "issue_summary cannot be empty" in str(excinfo.value)
 
 
-class TestCheckInvalidJsonResponse:
+class TestCheckInvalidJsonResponse(TestCase):
     def test_valid_json_response(self):
         llm_response = {
             "choices": [
@@ -38,9 +60,8 @@ class TestCheckInvalidJsonResponse:
                 }
             ]
         }
-        is_invalid, message = check_invalid_json_response(llm_response)
-        assert not is_invalid
-        assert message == ""
+
+        check_invalid_json(llm_response)
 
     def test_invalid_json_response(self):
         llm_response = {
@@ -52,15 +73,15 @@ class TestCheckInvalidJsonResponse:
                 }
             ]
         }
-        is_invalid, message = check_invalid_json_response(llm_response)
-        assert is_invalid
-        assert message == "Invalid JSON response."
+
+        with self.assertRaises(ValidationError, msg="Malformed JSON LLM response."):
+            check_invalid_json(llm_response)
 
     def test_invalid_json_structure(self):
-        llm_response = {"choices": [{"message": {"content": '{"invalid_key": invalid_value"}'}}]}
-        is_invalid, message = check_invalid_json_response(llm_response)
-        assert is_invalid
-        assert message == "Invalid JSON response."
+        llm_response = {"choices": [{"message": {"content": '{"invalid_key": "invalid_value"}'}}]}
+
+        with self.assertRaises(ValidationError, msg="JSON response from LLM not match the expected format."):
+            check_invalid_json(llm_response)
 
 
 class TestLocalLLM:
@@ -75,28 +96,28 @@ class TestLocalLLM:
 
         assert success
 
-    @patch("llm.validate_llm_response")
-    @patch("embeddings.vectorizers.base.Vectorizer.vectorize_to_database")
-    @patch("litellm_service.ollama.OllamaRequester.completion_without_proxy")
+    @patch("tasks.llm.run_response_checks")
+    @patch("embeddings.vectorizers.vectorizer.Vectorizer.vectorize_to_database")
+    @patch("llm.ollama.OllamaRequester.completion_without_proxy")
     @patch("embeddings.embedder.Embedder.retrieve_embeddings")
     @pytest.mark.django_db
     def test_local_llm_redirect(
         self,
-        mocked_context,
-        mocked_local_llm,
+        mocked_retrieve_embeddings,
+        mocked_completion_without_proxy,
         mocked_vectorize_to_database,
-        mocked_validate_llm_reponse,
+        mocked_run_response_checks,
         create_test_ollama_llm_config,
         create_test_ollama_embedding_config,
         create_test_chunk_vectorizer_config,
     ):
-        mocked_context.return_value = [["file1", "/path/to/file1", "content"]]
-        mocked_validate_llm_reponse.return_value = False, ""
-        repository_destination = "repo"
+        mocked_retrieve_embeddings.return_value = [["file1", "/path/to/file1", "content"]]
+        mocked_run_response_checks.return_value = False, ""
+        repository_path = "repo"
         issue_summary = "Fix the bug in the authentication module"
-        call_llm_with_context(repository_destination, issue_summary)
+        call_llm_with_context(repository_path, issue_summary)
 
-        mocked_local_llm.assert_called_once()
+        mocked_completion_without_proxy.assert_called_once()
 
 
 class TestLLMRequester:

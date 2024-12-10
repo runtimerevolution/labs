@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 class GithubRequests:
     """Class to handle Github API requests"""
 
-    def __init__(self, github_token, repository_owner, repository_name, username=None):
-        self.github_token = github_token
+    def __init__(self, token, repository_owner, repository_name, username=None):
+        self.token = token
         self.repository_owner = repository_owner
         self.repository_name = repository_name
         self.username = username
@@ -67,7 +67,7 @@ class GithubRequests:
         url = f"{self.github_api_url}/issues"
 
         headers = {
-            "Authorization": f"token {self.github_token}",
+            "Authorization": f"token {self.token}",
             "Accept": "application/vnd.github.v3+json",
         }
         params = {
@@ -84,7 +84,7 @@ class GithubRequests:
         # issue_number is the actual number of the issue, not the id.
         url = f"{self.github_api_url}/issues/{issue_number}"
         headers = {
-            "Authorization": f"token {self.github_token}",
+            "Authorization": f"token {self.token}",
             "Accept": "application/vnd.github.v3+json",
         }
         response_json, _ = self._get(url, headers, {})
@@ -93,7 +93,7 @@ class GithubRequests:
     def create_branch(self, branch_name, original_branch="main"):
         url = f"{self.github_api_url}/git/refs/heads/{original_branch}"
         headers = {
-            "Authorization": f"Bearer {self.github_token}",
+            "Authorization": f"Bearer {self.token}",
             "X-Accepted-GitHub-Permissions": "contents=write",
         }
         response_json, status_code = self._get(url, headers=headers)
@@ -110,7 +110,7 @@ class GithubRequests:
 
         url = f"{self.github_api_url}/issues/{issue_number}"
         headers = {
-            "Authorization": f"token {self.github_token}",
+            "Authorization": f"token {self.token}",
             "user-agent": "request",
         }
         data = {"state": status}
@@ -121,7 +121,7 @@ class GithubRequests:
         # Step 1: Get the latest commit SHA on the specified branch
         url = f"{self.github_api_url}/git/refs/heads/{branch_name}"
         headers = {
-            "Authorization": f"token {self.github_token}",
+            "Authorization": f"token {self.token}",
             "Content-Type": "application/json",
         }
         response_json, _ = self._get(url, headers)
@@ -184,7 +184,7 @@ class GithubRequests:
 
     def create_pull_request(self, head, base="main", title="New Pull Request", body=""):
         url = f"{self.github_api_url}/pulls"
-        headers = {"Authorization": f"token {self.github_token}"}
+        headers = {"Authorization": f"token {self.token}"}
         data = {"title": title, "body": body, "head": head, "base": base}
         return self._post(url, headers, data)
 

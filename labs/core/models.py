@@ -6,12 +6,12 @@ from django.db import models
 from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
-from embeddings.vectorizers.base import Vectorizer
 from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from embeddings.vectorizers.python_vectorizer import PythonVectorizer
-from litellm_service.llm_requester import Requester
-from litellm_service.ollama import OllamaRequester
-from litellm_service.openai import OpenAIRequester
+from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.ollama import OllamaRequester
+from llm.openai import OpenAIRequester
+from llm.requester import Requester
 
 provider_model_class = {
     "OPENAI": {"embedding": OpenAIEmbedder, "llm": OpenAIRequester},

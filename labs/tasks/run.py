@@ -1,8 +1,6 @@
-import logging
 import os.path
 
 import config.configuration_variables as settings
-import redis
 from celery import chain
 from config.celery import app
 from tasks import (
@@ -17,20 +15,20 @@ from tasks import (
     prepare_prompt_and_context_task,
     vectorize_repository_task,
 )
+from tasks.redis_client import RedisStrictClient, RedisVariable
 
-logger = logging.getLogger(__name__)
-
-redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
+redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 
 @app.task(bind=True)
 def init_task(self, **kwargs):
-    if "repository_path" in kwargs:
-        if not os.path.exists(kwargs["repository_path"]):
-            raise FileNotFoundError(f"Directory {kwargs['repository_path']} does not exist")
+    path = RedisVariable.REPOSITORY_PATH.value
+    if path in kwargs and not os.path.exists(kwargs[path]):
+        raise FileNotFoundError(f"Directory {kwargs[path]} does not exist")
+
     prefix = self.request.id
     for k, v in kwargs.items():
-        redis_client.set(f"{prefix}_{k}", v, ex=3600)
+        redis_client.set(k, v, prefix=prefix, ex=3600)
     return prefix
 
 
@@ -44,12 +42,12 @@ def run_on_repository_task(
     original_branch: str = "main",
 ):
     data = {
-        "token": token,
-        "repository_owner": repository_owner,
-        "repository_name": repository_name,
-        "username": username,
-        "issue_number": issue_number,
-        "original_branch": original_branch,
+        RedisVariable.TOKEN.value: token,
+        RedisVariable.REPOSITORY_OWNER.value: repository_owner,
+        RedisVariable.REPOSITORY_NAME.value: repository_name,
+        RedisVariable.USERNAME.value: username,
+        RedisVariable.ISSUE_NUMBER.value: issue_number,
+        RedisVariable.ORIGINAL_BRANCH_NAME.value: original_branch,
     }
     chain(
         init_task.s(**data),
@@ -67,11 +65,10 @@ def run_on_repository_task(
 
 
 @app.task
-def run_on_local_repository_task(repository_path, issue_text):
+def run_on_local_repository_task(repository_path, issue_body):
     data = {
-        "issue_text": issue_text,
-        "issue_body": issue_text,
-        "repository_path": repository_path,
+        RedisVariable.ISSUE_BODY.value: issue_body,
+        RedisVariable.REPOSITORY_PATH.value: repository_path,
     }
     chain(
         init_task.s(**data),
