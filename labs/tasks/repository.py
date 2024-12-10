@@ -29,11 +29,9 @@ def apply_code_changes(llm_response):
     for step in response.steps:
         file_path = None
         if step.type == "create":
-            file_path = files.append(create_file(path=step.path, content=step.content))
+            file_path = create_file(path=step.path, content=step.content)
         elif step.type == "modify":
-            file_path = files.append(
-                modify_file(path=step.path, content=step.content, line_number=cast(int, step.line))
-            )
+            file_path = modify_file(path=step.path, content=step.content.splitlines(), line=cast(int, step.line))
         files.append(file_path)
 
     return files

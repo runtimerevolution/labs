@@ -2,6 +2,7 @@ import json
 import logging
 from typing import List, Optional
 
+from file_handling import modify_line_in_file
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
