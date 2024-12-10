@@ -12,7 +12,19 @@ from tasks.redis_client import RedisStrictClient, RedisVariable
 from config.celery import app
 
 logger = logging.getLogger(__name__)
+
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
+
+JSON_RESPONSE = {
+    "steps": [
+        {
+            "type": "String field, either 'create' or 'modify'",
+            "path": "String field, the absolute path of the file to create/modify",
+            "content": "String field, the content to write to the file",
+            "line": "Integer optional field, should only be included if the type is 'modify'. This field should be the number of the first line where the content should be written.",
+        },
+    ]
+}
 
 
 def get_prompt(issue_summary):
@@ -25,13 +37,7 @@ def get_prompt(issue_summary):
         The file paths provided are **absolute paths relative to the project root**, 
         and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
         Do not prepend or modify the paths.
-        Please provide a json response in the following format: {{"steps": [...]}}
-        Where steps is a list of objects where each object contains four fields:
-        type, which is either 'create' to add a new file or 'modify' to edit an existing one;
-        If the file is to be modified send the finished version of the entire file.
-        path, which is the absolute path of the file to create/modify;
-        content, which is the content to write to the file.
-        line, which is an integer that represents the number of the first line where the content should be written.
+        Please provide a json response in the following format: {JSON_RESPONSE}
     """
 
 
