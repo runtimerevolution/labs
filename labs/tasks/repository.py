@@ -1,4 +1,5 @@
 import json
+from typing import List, cast
 
 from decorators import time_and_log_function
 from django.conf import settings
@@ -24,12 +25,16 @@ def github_repository_data(prefix, token="", repository_owner="", repository_nam
 def apply_code_changes(llm_response):
     response = parse_llm_output(llm_response)
 
-    files = []
+    files: List[str | None] = []
     for step in response.steps:
+        file_path = None
         if step.type == "create":
-            files.append(create_file(step.path, step.content))
+            file_path = files.append(create_file(path=step.path, content=step.content))
         elif step.type == "modify":
-            files.append(modify_file(step.path, step.content))
+            file_path = files.append(
+                modify_file(path=step.path, content=step.content, line_number=cast(int, step.line))
+            )
+        files.append(file_path)
 
     return files
 
