@@ -34,11 +34,10 @@ def create_file(path: str, content: str) -> str | None:
         return None
 
 
-def modify_file(path: str, content: str, line_number: int) -> str | None:
+def modify_file(path: str, content: List[str], line: int) -> str | None:
     logger.debug(f"Modifying file on path: {path}")
     try:
-        with open(path, "w") as file:
-            file.write("\n" + content)
+        modify_line_in_file(file_path=path, content=content, line_number=line)
         logger.debug(f"File modified at {path}")
         return path
     except Exception as e:
