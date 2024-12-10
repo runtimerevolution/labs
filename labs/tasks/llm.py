@@ -85,11 +85,13 @@ def vectorize_repository_task(prefix="", repository_path=""):
 
 
 @app.task
-def find_embeddings_task(prefix="", issue_body="", repository_path=""):
+def find_embeddings_task(prefix="", issue_body="", repository_path="", similarity_threshold=0.7, max_results=10):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embeddings_results = Embedder(embedder_class, *embeder_args).retrieve_embeddings(
         redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body),
         redis_client.get(RedisVariable.REPOSITORY_PATH, prefix=prefix, default=repository_path),
+        similarity_threshold,
+        max_results,
     )
     similar_embeddings = [
         (embedding.repository, embedding.file_path, embedding.text) for embedding in embeddings_results
@@ -102,7 +104,10 @@ def find_embeddings_task(prefix="", issue_body="", repository_path=""):
 
 
 @app.task
-def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings=[]):
+def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings=None):
+    if not embeddings:
+        embeddings = []
+
     prompt = get_prompt(redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body))
     redis_client.set(RedisVariable.PROMPT, prefix=prefix, value=prompt)
 
@@ -116,7 +121,10 @@ def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings=[]):
 
 
 @app.task
-def get_llm_response_task(prefix="", context={}):
+def get_llm_response_task(prefix="", context=None):
+    if not context:
+        context = {}
+
     context = json.loads(redis_client.get(RedisVariable.CONTEXT, prefix=prefix, default=context))
     llm_response = get_llm_response(context)
 
