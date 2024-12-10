@@ -8,6 +8,8 @@ from django.conf import settings
 from kombu import Queue
 from redbeat import RedBeatSchedulerEntry, schedulers
 
+import config.configuration_variables as settings
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 logger = logging.getLogger(__name__)
