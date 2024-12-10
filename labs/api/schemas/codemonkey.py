@@ -18,7 +18,9 @@ class VectorizeRepositorySchema(BaseModel):
     repository_path: str
 
 
-class FindEmbeddingsSchema(LocalRepositoryShema): ...
+class FindEmbeddingsSchema(LocalRepositoryShema):
+    similarity_threshold: float = 0.7
+    max_results: int = 10
 
 
 class PreparePromptContextSchema(BaseModel):
