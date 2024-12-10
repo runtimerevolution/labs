@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Union
+from typing import Union
 
 from redis import StrictRedis
 from redis.typing import EncodableT, ResponseT
@@ -24,7 +24,9 @@ class RedisVariable(Enum):
 
 
 class RedisStrictClient(StrictRedis):
-    def get(self, variable: Union[str, RedisVariable], prefix: str = None, default: str = None) -> ResponseT:
+    def get(
+        self, variable: Union[str, RedisVariable], prefix: str = None, default: str | list | dict = None
+    ) -> ResponseT:
         name = variable
         if isinstance(variable, RedisVariable):
             name = variable.value

@@ -39,7 +39,7 @@ def check_invalid_json(llm_response):
         parse_llm_output(response_content)
 
     except PydanticValidationError:
-        raise ValidationError("JSON response from LLM not match the expected format.")
+        raise ValidationError("JSON response from LLM does not match the expected format.")
 
 
 check_list = [
