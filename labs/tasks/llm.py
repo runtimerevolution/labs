@@ -1,7 +1,6 @@
 import json
 import logging
 
-from config.celery import app
 from core.models import Model, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
@@ -9,6 +8,8 @@ from embeddings.vectorizers.vectorizer import Vectorizer
 from llm.requester import Requester
 from tasks.checks import run_response_checks
 from tasks.redis_client import RedisStrictClient, RedisVariable
+
+from config.celery import app
 
 logger = logging.getLogger(__name__)
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
@@ -25,11 +26,12 @@ def get_prompt(issue_summary):
         and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
         Do not prepend or modify the paths.
         Please provide a json response in the following format: {{"steps": [...]}}
-        Where steps is a list of objects where each object contains three fields:
+        Where steps is a list of objects where each object contains four fields:
         type, which is either 'create' to add a new file or 'modify' to edit an existing one;
         If the file is to be modified send the finished version of the entire file.
         path, which is the absolute path of the file to create/modify;
         content, which is the content to write to the file.
+        line, which is an integer that represents the number of the first line where the content should be written.
     """
 
 
