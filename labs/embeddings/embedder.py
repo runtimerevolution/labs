@@ -1,9 +1,13 @@
+import logging
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Union
 
 from django.conf import settings
+from django.db.models import Min
 from embeddings.models import Embedding
 from pgvector.django import CosineDistance
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -33,11 +37,10 @@ class Embedder:
             raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
         file_paths = (
-            Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query[0]))
-            .filter(repository=repository, distance__lt=similarity_threshold)
+            Embedding.objects.values("file_path")
+            .annotate(distance=Min(CosineDistance("embedding", embedded_query[0])))
             .order_by("distance")
             .values_list("file_path", flat=True)
-            .distinct()
         )[:max_results]
 
         return list(file_paths)
