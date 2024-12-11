@@ -117,13 +117,13 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
             "filename": create_logging_directory(),
-            "maxBytes": 10000000,
+            "maxBytes": 10000000,  # 10 Mb
             "backupCount": 5,
             "formatter": "json",
         },
     },
     "loggers": {
-        "labs": {
+        "root": {
             "level": "DEBUG",
             "handlers": ["console", "file"],
             "propagate": False,

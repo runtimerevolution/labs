@@ -14,6 +14,6 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         if log_record.get("level"):
             log_record["level"] = log_record["level"].upper()
         else:
-            log_record["level"] = record.levelname
+            log_record["level"] = record.levelname.upper()
 
-        log_record["project"] = "codemonkey"
+        log_record["project"] = "labs"
