@@ -24,7 +24,7 @@ class Embedder:
         self,
         query: str,
         repository: str,
-        similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_TRESHOLD,
+        similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_THRESHOLD,
         max_results: int = settings.EMBEDDINGS_MAX_RESULTS,
     ) -> List[Embedding]:
         query = query.replace("\n", "")

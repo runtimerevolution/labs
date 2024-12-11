@@ -89,7 +89,7 @@ def find_embeddings_task(
     prefix="",
     issue_body="",
     repository_path="",
-    similarity_threshold=settings.EMBEDDINGS_SIMILARITY_TRESHOLD,
+    similarity_threshold=settings.EMBEDDINGS_SIMILARITY_THRESHOLD,
     max_results=settings.EMBEDDINGS_MAX_RESULTS,
 ):
     embedder_class, *embeder_args = Model.get_active_embedding_model()

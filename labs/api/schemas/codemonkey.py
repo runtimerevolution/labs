@@ -20,7 +20,7 @@ class VectorizeRepositorySchema(BaseModel):
 
 
 class FindEmbeddingsSchema(LocalRepositoryShema):
-    similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_TRESHOLD
+    similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_THRESHOLD
     max_results: int = settings.EMBEDDINGS_MAX_RESULTS
 
 
