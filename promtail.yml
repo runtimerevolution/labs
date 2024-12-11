@@ -38,9 +38,9 @@ scrape_configs:
           format: RFC3339Nano
       - labels:
           name:
-          output:
-          project:
+          message:
           level:
+          project:
           timestamp:
       - output:
           source: message
