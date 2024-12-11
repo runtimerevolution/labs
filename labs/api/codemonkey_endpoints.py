@@ -75,7 +75,10 @@ async def vectorize_repository_endpoint(request: HttpRequest, vectorize_reposito
 @async_time_and_log_function
 async def find_embeddings_endpoint(request: HttpRequest, find_embeddings: FindEmbeddingsSchema):
     return await sync_to_async(find_embeddings_task, thread_sensitive=True)(
-        issue_body=find_embeddings.prompt, repository_path=find_embeddings.repository_path
+        issue_body=find_embeddings.prompt,
+        repository_path=find_embeddings.repository_path,
+        similarity_threshold=find_embeddings.similarity_threshold,
+        max_results=find_embeddings.max_results,
     )
 
 
