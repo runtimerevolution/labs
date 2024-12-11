@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 
 def modify_line_in_file(file_path: str, content: List[str], line_number: int):
-    logger.info(f"args=(file_path={file_path}, content={content}, line_number={line_number})")
     line_number -= 1
 
     temp_file_path = f"{file_path}.tmp"
