@@ -25,3 +25,19 @@ def modify_line_in_file(file_path: str, content: List[str], line_number: int):
         return
 
     os.replace(temp_file_path, file_path)
+
+
+def get_file_contents(file_path: str) -> str:
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            contents = file.read()
+
+            if not contents:
+                return ""
+
+            return contents
+
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Error: The file '{file_path}' was not found.") from e
+    except PermissionError as e:
+        raise PermissionError(f"Error: You do not have permission to read the file '{file_path}'.") from e

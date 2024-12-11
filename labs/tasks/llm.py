@@ -1,10 +1,13 @@
 import json
 import logging
+from typing import List, Optional
 
 from core.models import Model, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.context import get_context
+from llm.prompt import get_prompt
 from llm.requester import Requester
 from tasks.checks import run_response_checks
 from tasks.redis_client import RedisStrictClient, RedisVariable
@@ -14,40 +17,6 @@ from config.celery import app
 logger = logging.getLogger(__name__)
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
-
-JSON_RESPONSE = {
-    "steps": [
-        {
-            "type": "String field, either 'create' or 'modify'",
-            "path": "String field, the absolute path of the file to create/modify",
-            "content": "String field, the content to write to the file",
-            "line": "Integer optional field, should only be included if the type is 'modify'. This field should be the number of the first line where the content should be written.",
-        },
-    ]
-}
-
-
-def get_prompt(issue_summary):
-    return f"""
-        You're a diligent software engineer AI. You can't see, draw, or interact with a 
-        browser, but you can read and write files, and you can think.
-        You've been given the following task: {issue_summary}.
-        Any imports will be at the beggining of the file.
-        Add tests for the new functionalities, considering any existing test files.
-        The file paths provided are **absolute paths relative to the project root**, 
-        and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
-        Do not prepend or modify the paths.
-        Please provide a json response in the following format: {JSON_RESPONSE}
-    """
-
-
-def get_context(embeddings, prompt):
-    context = []
-    for file in embeddings:
-        context.append(dict(role="system", content=f"File: {file[1]}, Content: {file[2]}"))
-
-    context.append(dict(role="user", content=prompt))
-    return context
 
 
 def get_llm_response(prompt):
@@ -101,24 +70,21 @@ def find_embeddings_task(
     max_results=settings.EMBEDDINGS_MAX_RESULTS,
 ):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
-    embeddings_results = Embedder(embedder_class, *embeder_args).retrieve_embeddings(
+    file_paths = Embedder(embedder_class, *embeder_args).retrieve_file_paths(
         redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body),
         redis_client.get(RedisVariable.REPOSITORY_PATH, prefix=prefix, default=repository_path),
         similarity_threshold,
         max_results,
     )
-    similar_embeddings = [
-        (embedding.repository, embedding.file_path, embedding.text) for embedding in embeddings_results
-    ]
 
     if prefix:
-        redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(similar_embeddings))
+        redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(file_paths))
         return prefix
-    return similar_embeddings
+    return file_paths
 
 
 @app.task
-def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings=None):
+def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings: Optional[List[str]] = None):
     if not embeddings:
         embeddings = []
 

@@ -20,25 +20,27 @@ class Embedder:
     def embed(self, prompt, *args, **kwargs) -> Embeddings:
         return self.embedder.embed(prompt, *args, **kwargs)
 
-    def retrieve_embeddings(
+    def retrieve_file_paths(
         self,
         query: str,
         repository: str,
         similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_THRESHOLD,
         max_results: int = settings.EMBEDDINGS_MAX_RESULTS,
-    ) -> List[Embedding]:
+    ) -> List[str]:
         query = query.replace("\n", "")
         embedded_query = self.embed(prompt=query).embeddings
         if not embedded_query:
             raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
-        embeddings = (
+        file_paths = (
             Embedding.objects.annotate(distance=CosineDistance("embedding", embedded_query[0]))
             .filter(repository=repository, distance__lt=similarity_threshold)
             .order_by("distance")
+            .values_list("file_path", flat=True)
+            .distinct()
         )[:max_results]
 
-        return list(embeddings)
+        return list(file_paths)
 
     def reembed_code(
         self,
