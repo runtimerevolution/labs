@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from api.schemas.github import GithubSchema
+from django.conf import settings
 from pydantic import BaseModel
 
 
@@ -19,8 +20,8 @@ class VectorizeRepositorySchema(BaseModel):
 
 
 class FindEmbeddingsSchema(LocalRepositoryShema):
-    similarity_threshold: float = 0.7
-    max_results: int = 10
+    similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_THRESHOLD
+    max_results: int = settings.EMBEDDINGS_MAX_RESULTS
 
 
 class PreparePromptContextSchema(BaseModel):

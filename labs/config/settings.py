@@ -87,6 +87,50 @@ DATABASES = {
 }
 
 
+# Logging
+def create_logging_directory() -> Path:
+    logs_path = BASE_DIR.parent / "logs"
+    if not os.path.exists(logs_path):
+        os.makedirs(logs_path)
+
+    return logs_path / "debug.log"
+
+
+LOGGING_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S,%f"
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "[%(asctime)s][%(levelname)s][%(name)s]: %(message)s",
+            "datefmt": LOGGING_DATETIME_FORMAT,
+        },
+        "json": {"()": "config.logger.CustomJsonFormatter"},
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": create_logging_directory(),
+            "maxBytes": 10000000,  # 10 Mb
+            "backupCount": 5,
+            "formatter": "json",
+        },
+    },
+    "loggers": {
+        "root": {
+            "level": "DEBUG",
+            "handlers": ["console", "file"],
+            "propagate": False,
+        }
+    },
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
@@ -127,3 +171,20 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Celery settings
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_BACKEND_URL = os.environ.get("CELERY_BACKEND_URL")
+
+# Redis settings
+REDIS_HOST = os.environ.get("REDIS_HOST")
+REDIS_PORT = os.environ.get("REDIS_PORT")
+
+# Custom settings
+GITHUB_API_BASE_URL = "https://api.github.com"
+
+LOCAL_LLM_HOST = os.environ.get("LOCAL_LLM_HOST", "http://ollama:11434")
+
+CLONE_DESTINATION_DIR = os.getenv("CLONE_DESTINATION_DIR", "/tmp/")
+EMBEDDINGS_SIMILARITY_THRESHOLD = 0.7
+EMBEDDINGS_MAX_RESULTS = 10

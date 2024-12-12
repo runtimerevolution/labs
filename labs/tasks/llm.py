@@ -1,9 +1,9 @@
 import json
 import logging
 
-import config.configuration_variables as settings
 from config.celery import app
 from core.models import Model, VectorizerModel
+from django.conf import settings
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.vectorizer import Vectorizer
 from llm.requester import Requester
@@ -85,7 +85,13 @@ def vectorize_repository_task(prefix="", repository_path=""):
 
 
 @app.task
-def find_embeddings_task(prefix="", issue_body="", repository_path="", similarity_threshold=0.7, max_results=10):
+def find_embeddings_task(
+    prefix="",
+    issue_body="",
+    repository_path="",
+    similarity_threshold=settings.EMBEDDINGS_SIMILARITY_THRESHOLD,
+    max_results=settings.EMBEDDINGS_MAX_RESULTS,
+):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embeddings_results = Embedder(embedder_class, *embeder_args).retrieve_embeddings(
         redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body),
