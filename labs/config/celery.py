@@ -12,10 +12,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 logger = logging.getLogger(__name__)
 
-CELERY_QUEUE_PREFIX = "code-monkey"
-DEFAULT_QUEUE_NAME = CELERY_QUEUE_PREFIX
-LOW_PRIORITY_QUEUE_NAME = f"{CELERY_QUEUE_PREFIX}-low"
-HIGH_PRIORITY_QUEUE_NAME = f"{CELERY_QUEUE_PREFIX}-high"
+DEFAULT_QUEUE_NAME = "labs"
+LOW_PRIORITY_QUEUE_NAME = f"{DEFAULT_QUEUE_NAME}-low"
+HIGH_PRIORITY_QUEUE_NAME = f"{DEFAULT_QUEUE_NAME}-high"
 
 redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
@@ -43,7 +42,7 @@ app = Celery(
 )
 
 # Add a redbeat prefix so that it doesn't mix with other connectors when on a shared cluster.
-app.conf.redbeat_key_prefix = CELERY_QUEUE_PREFIX
+app.conf.redbeat_key_prefix = DEFAULT_QUEUE_NAME
 
 app.autodiscover_tasks(["tasks"])
 

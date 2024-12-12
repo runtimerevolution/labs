@@ -10,29 +10,51 @@ clients:
   - url: https://${PROMTAIL_ID}:${PROMTAIL_ACCESS_TOKEN}@logs-prod-012.grafana.net/loki/api/v1/push
 
 scrape_configs:
-- job_name: system
-  static_configs:
-  - labels:
-      job: labs
-      host: localhost
-      agent: promtail
-      __path__: /var/log/*.log
-  pipeline_stages:
-  - match:
-      selector: '{agent="promtail"}'
-      stages:
-      - json:
-          expressions:
-            task: taskName
-            message: message
-            level: level
-            project: project
-            timestamp: timestamp
-      - timestamp:
-          format: RFC3339Nano
-          source: timestamp
+  - job_name: system
+    static_configs:
+      # local logs
+      - targets:
+          - localhost
       - labels:
-          level:
-          message:
-      - output:
-          source: message
+          job: labs
+          host: localhost
+          agent: promtail
+          __path__: /var/log/*.log
+
+      # api container logs
+      - targets:
+        - api
+      - labels:
+          job: labs_api
+          host: api
+          agent: promtail
+          __path__: /var/log/api/*.log
+
+      # worker container logs
+      - targets:
+          - worker
+      - labels:
+          job: labs_worker
+          host: worker
+          agent: promtail
+          __path__: /var/log/worker/*.log
+
+    pipeline_stages:
+      - match:
+          selector: '{agent="promtail"}'
+          stages:
+            - json:
+                expressions:
+                  task: taskName
+                  message: message
+                  level: level
+                  project: project
+                  timestamp: timestamp
+            - timestamp:
+                format: RFC3339Nano
+                source: timestamp
+            - labels:
+                level:
+                message:
+            - output:
+                source: message
