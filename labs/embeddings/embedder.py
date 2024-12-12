@@ -37,8 +37,8 @@ class Embedder:
             raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
         file_paths = (
-            Embedding.objects
-            .values("file_path")    # the combination of values and annotate, is the Django way of making a group by
+            Embedding.objects.filter(repository=repository)
+            .values("file_path")  # the combination of values and annotate, is the Django way of making a group by
             .annotate(distance=Min(CosineDistance("embedding", embedded_query[0])))
             .order_by("distance")
             .values_list("file_path", flat=True)
