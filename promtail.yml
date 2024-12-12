@@ -15,32 +15,24 @@ scrape_configs:
   - labels:
       job: labs
       host: localhost
+      agent: promtail
       __path__: /var/log/*.log
-
   pipeline_stages:
-  - json:
-      expressions:
-        project: labs
-  - labels:
-      project:
   - match:
-      selector: '{project="labs"}'
+      selector: '{agent="promtail"}'
       stages:
       - json:
           expressions:
-            name: taskName
+            task: taskName
             message: message
             level: level
             project: project
             timestamp: timestamp
       - timestamp:
-          source: timestamp
           format: RFC3339Nano
+          source: timestamp
       - labels:
-          name:
-          message:
           level:
-          project:
-          timestamp:
+          message:
       - output:
           source: message
