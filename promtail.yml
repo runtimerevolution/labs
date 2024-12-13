@@ -25,7 +25,7 @@ scrape_configs:
       - targets:
         - api
       - labels:
-          job: labs_api
+          job: labs
           host: api
           agent: promtail
           __path__: /var/log/api/*.log
