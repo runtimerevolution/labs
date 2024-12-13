@@ -7,8 +7,6 @@ import git
 import requests
 from django.conf import settings
 
-import config.configuration_variables as settings
-
 logger = logging.getLogger(__name__)
 
 
