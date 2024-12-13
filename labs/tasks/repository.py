@@ -1,11 +1,13 @@
 import json
+from typing import List, cast
 
-from config.celery import app
 from decorators import time_and_log_function
 from django.conf import settings
 from github.github import GithubRequests
 from parsers.response import create_file, modify_file, parse_llm_output
 from tasks.redis_client import RedisStrictClient, RedisVariable
+
+from config.celery import app
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
@@ -23,12 +25,14 @@ def github_repository_data(prefix, token="", repository_owner="", repository_nam
 def apply_code_changes(llm_response):
     response = parse_llm_output(llm_response)
 
-    files = []
+    files: List[str | None] = []
     for step in response.steps:
+        file_path = None
         if step.type == "create":
-            files.append(create_file(step.path, step.content))
+            file_path = create_file(path=step.path, content=step.content)
         elif step.type == "modify":
-            files.append(modify_file(step.path, step.content))
+            file_path = modify_file(path=step.path, content=step.content.splitlines(), line=cast(int, step.line))
+        files.append(file_path)
 
     return files
 
