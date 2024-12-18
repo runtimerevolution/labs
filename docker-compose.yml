@@ -20,15 +20,29 @@ services:
     depends_on:
       - labs-db
     volumes:
+      - api_logs:/app/logs
       - ./labs/:/app/
 
-  promtail:
-    image: grafana/promtail:3.1.1
+  worker:
+    env_file: .env.local
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: celery -A config worker --beat --scheduler redbeat.RedBeatScheduler --loglevel=INFO --concurrency=1
+    depends_on:
+      - redis
+      - labs-db
     volumes:
-      - ./logs/:/var/log
-      - ./promtail.yml:/etc/promtail/config.yml
-    entrypoint: >
-      /bin/bash -c "/usr/bin/promtail -config.expand-env=true -config.file /etc/promtail/config.yml"
+      - worker_logs:/app/logs
+      - ./labs/:/app/
+      - ${LOCAL_REPOSITORIES_PATH}:/local-repos/
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
 
   redis:
     image: redis:latest
@@ -45,25 +59,18 @@ services:
     depends_on:
       - redis
 
-  worker:
+  promtail:
     env_file: .env.local
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    command: celery -A config worker --beat --scheduler redbeat.RedBeatScheduler --loglevel=INFO --concurrency=1
-    depends_on:
-      - redis
-      - labs-db
+    image: grafana/promtail:3.1.1
     volumes:
-      - ./labs/:/app/
-      - ${LOCAL_REPOSITORIES_PATH}:/local-repos/
-
-  ollama:
-    image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama:/root/.ollama
+      - api_logs:/var/log/api
+      - worker_logs:/var/log/worker
+      - ./logs/:/var/log
+      - ./promtail.yml:/etc/promtail/config.yml
+    entrypoint: >
+      /bin/bash -c "/usr/bin/promtail -config.expand-env=true -config.file /etc/promtail/config.yml"
 
 volumes:
+  api_logs:
+  worker_logs:
   ollama:

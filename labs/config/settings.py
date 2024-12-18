@@ -89,7 +89,7 @@ DATABASES = {
 
 # Logging
 def create_logging_directory() -> Path:
-    logs_path = BASE_DIR.parent / "logs"
+    logs_path = BASE_DIR / "logs"
     if not os.path.exists(logs_path):
         os.makedirs(logs_path)
 
