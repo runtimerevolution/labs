@@ -22,7 +22,6 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
     temp_file_path = f"{file_path}.tmp"
     skip_lines = 0
     try:
-        logger.info(f"{content=}")
         with open(file_path, "r") as original_file, open(temp_file_path, "w") as temp_file:
             for current_line_number, line in enumerate(original_file, start=1):
                 if current_line_number == line_number:
