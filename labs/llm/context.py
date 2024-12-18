@@ -1,15 +1,15 @@
 from typing import List
 
-from file_handling import get_file_contents
+from file_handler import get_file_contents
 
-CONTENT_TEMPLATE = "File: {file}, Content: {content}"
+CONTENT_TEMPLATE = "File: {file}\nContent:\n{content}"
 
 
-def get_context(file_paths: List[str], prompt: str):
+def get_context(files_path: List[str], prompt: str):
     context = []
-    for file in file_paths:
-        content = get_file_contents(file)
-        context.append(dict(role="system", content=CONTENT_TEMPLATE.format(file=file, content=content)))
+    for path in files_path:
+        content = get_file_contents(path)
+        context.append(dict(role="system", content=CONTENT_TEMPLATE.format(file=path, content=content)))
 
     context.append(dict(role="user", content=prompt))
     return context

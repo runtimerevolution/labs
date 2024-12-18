@@ -24,7 +24,7 @@ class Embedder:
     def embed(self, prompt, *args, **kwargs) -> Embeddings:
         return self.embedder.embed(prompt, *args, **kwargs)
 
-    def retrieve_file_paths(
+    def retrieve_files_path(
         self,
         query: str,
         repository: str,
@@ -36,7 +36,7 @@ class Embedder:
         if not embedded_query:
             raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
-        file_paths = (
+        files_path = (
             Embedding.objects.filter(repository=repository)
             .values("file_path")  # the combination of values and annotate, is the Django way of making a group by
             .annotate(distance=Min(CosineDistance("embedding", embedded_query[0])))
@@ -44,7 +44,8 @@ class Embedder:
             .values_list("file_path", flat=True)
         )[:max_results]
 
-        return list(file_paths)
+        logger.debug(f"Files retrieved (using {self.embedder.__class__.__name__}):\n {'\n'.join(files_path)}")
+        return list(files_path)
 
     def reembed_code(
         self,

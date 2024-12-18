@@ -1,15 +1,17 @@
 import json
+import logging
 from typing import List, cast
 
+from config.celery import app
+from config.redis_client import RedisStrictClient, RedisVariable
 from decorators import time_and_log_function
 from django.conf import settings
+from file_handler import create_file, modify_file_line
 from github.github import GithubRequests
-from parsers.response import create_file, modify_file, parse_llm_output
-from tasks.redis_client import RedisStrictClient, RedisVariable
-
-from config.celery import app
+from parsers.response import parse_llm_output
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
+logger = logging.getLogger(__name__)
 
 
 def github_repository_data(prefix, token="", repository_owner="", repository_name="", username="") -> dict:
@@ -27,13 +29,16 @@ def apply_code_changes(llm_response):
 
     files: List[str | None] = []
     for step in response.steps:
-        file_path = None
         if step.type == "create":
-            file_path = create_file(path=step.path, content=step.content)
-        elif step.type == "modify":
-            file_path = modify_file(path=step.path, content=step.content.splitlines(), line=cast(int, step.line))
-        files.append(file_path)
+            create_file(step.path, step.content)
 
+        elif step.type == "modify":
+            modify_file_line(step.path, step.content, cast(int, step.line))
+
+        elif step.type == "overwrite":
+            modify_file_line(step.path, step.content, cast(int, step.line), overwrite=True)
+
+        files.append(step.path)
     return files
 
 

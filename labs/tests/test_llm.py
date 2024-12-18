@@ -7,11 +7,11 @@ from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.checks import ValidationError, check_invalid_json
 from llm.context import get_context
 from llm.ollama import OllamaRequester
 from llm.openai import OpenAIRequester
 from llm.prompt import get_prompt
-from tasks.checks import ValidationError, check_invalid_json
 from tasks.llm import get_llm_response
 from tests.constants import (
     OLLAMA_EMBEDDING_MODEL_NAME,
@@ -32,7 +32,7 @@ def call_llm_with_context(repository_path, issue_summary):
     Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repository_path)
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    file_paths = embedder.retrieve_file_paths(issue_summary, repository_path)
+    file_paths = embedder.retrieve_files_path(issue_summary, repository_path)
 
     prompt = get_prompt(issue_summary)
     prepared_context = get_context(file_paths, prompt)

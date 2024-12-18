@@ -11,15 +11,15 @@ class TestModifyFile(unittest.TestCase):
         "line": 2,
     }
 
-    @patch("parsers.response.modify_line_in_file")
-    def test_file_modified(self, mock_modify_line_in_file):
+    @patch("parsers.response.modify_file_line")
+    def test_file_modified(self, mock_modify_file_line):
         file_path = modify_file(**self.modify_file_args)
 
         self.assertEqual(file_path, self.modify_file_args["path"])
 
-    @patch("parsers.response.modify_line_in_file")
-    def test_error_handling(self, mock_modify_line_in_file):
-        mock_modify_line_in_file.side_effect = Exception("error message")
+    @patch("parsers.response.modify_file_line")
+    def test_error_handling(self, mock_modify_file_line):
+        mock_modify_file_line.side_effect = Exception("error message")
 
         file_path = modify_file(**self.modify_file_args)
 

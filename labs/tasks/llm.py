@@ -2,17 +2,16 @@ import json
 import logging
 from typing import List, Optional
 
+from config.celery import app
+from config.redis_client import RedisStrictClient, RedisVariable
 from core.models import Model, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.checks import run_response_checks
 from llm.context import get_context
 from llm.prompt import get_prompt
 from llm.requester import Requester
-from tasks.checks import run_response_checks
-from tasks.redis_client import RedisStrictClient, RedisVariable
-
-from config.celery import app
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +69,7 @@ def find_embeddings_task(
     max_results=settings.EMBEDDINGS_MAX_RESULTS,
 ):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
-    file_paths = Embedder(embedder_class, *embeder_args).retrieve_file_paths(
+    files_path = Embedder(embedder_class, *embeder_args).retrieve_files_path(
         redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body),
         redis_client.get(RedisVariable.REPOSITORY_PATH, prefix=prefix, default=repository_path),
         similarity_threshold,
@@ -78,9 +77,9 @@ def find_embeddings_task(
     )
 
     if prefix:
-        redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(file_paths))
+        redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(files_path))
         return prefix
-    return file_paths
+    return files_path
 
 
 @app.task
