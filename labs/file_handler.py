@@ -17,7 +17,7 @@ def create_file(file_path: str, content: str) -> None:
 
 
 def modify_file_line(file_path: str, content: Union[str | List[str]], line_number: int, overwrite=False) -> None:
-    logger.info(f"{'Overwriting' if overwrite else 'Modifying'} file {file_path} lines {line_number}")
+    logger.info(f"{'Overwriting' if overwrite else 'Modifying'} file {file_path} line {line_number}")
 
     temp_file_path = f"{file_path}.tmp"
     skip_lines = 0
@@ -34,6 +34,7 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
                     continue
 
                 temp_file.write(line)
+
     except Exception as e:
         logger.error(f"Error modifying file {file_path}: {e}")
         return
@@ -41,12 +42,33 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
     os.replace(temp_file_path, file_path)
 
 
-def get_file_contents(file_path: str) -> str:
+def delete_file_line(file_path: str, line_number: int) -> None:
+    logger.info(f"Deleting file {file_path} line {line_number}")
+
+    temp_file_path = f"{file_path}.tmp"
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            if not (contents := file.read()):
-                return ""
-            return contents
+        with open(file_path, "r") as original_file, open(temp_file_path, "w") as temp_file:
+            for current_line_number, line in enumerate(original_file, start=1):
+                if current_line_number == line_number:
+                    continue
+
+                temp_file.write(line)
+
+    except Exception as e:
+        logger.error(f"Error deleting lines file {file_path}: {e}")
+        return
+
+    os.replace(temp_file_path, file_path)
+
+
+def get_file_content(file_path: str) -> str:
+    try:
+        content = ""
+        with open(file_path, "r") as file:
+            for line_number, line in enumerate(file, start=1):
+                content += f"{line_number}: {line}"
+
+        return content
 
     except FileNotFoundError as e:
         raise FileNotFoundError(f"Error: The file '{file_path}' was not found.") from e

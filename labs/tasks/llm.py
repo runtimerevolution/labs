@@ -29,7 +29,7 @@ def get_llm_response(prompt):
     while is_invalid and retries < max_retries:
         try:
             llm_response = requester.completion_without_proxy(prompt)
-            logger.debug(f"LLM reponse: {llm_response}")
+            logger.debug(f"LLM response: {llm_response}")
 
             is_invalid, reason = run_response_checks(llm_response)
 

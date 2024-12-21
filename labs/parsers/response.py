@@ -1,15 +1,12 @@
-import logging
 from typing import List, Optional
 
 from pydantic import BaseModel
-
-logger = logging.getLogger(__name__)
 
 
 class Step(BaseModel):
     type: str
     path: str
-    content: str
+    content: Optional[str] = None
     line: Optional[int] = None
 
 

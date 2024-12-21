@@ -6,7 +6,7 @@ from config.celery import app
 from config.redis_client import RedisStrictClient, RedisVariable
 from decorators import time_and_log_function
 from django.conf import settings
-from file_handler import create_file, modify_file_line
+from file_handler import create_file, delete_file_line, modify_file_line
 from github.github import GithubRequests
 from parsers.response import parse_llm_output
 
@@ -29,14 +29,15 @@ def apply_code_changes(llm_response):
 
     files: List[str | None] = []
     for step in response.steps:
-        if step.type == "create":
-            create_file(step.path, step.content)
-
-        elif step.type == "modify":
-            modify_file_line(step.path, step.content, cast(int, step.line))
-
-        elif step.type == "overwrite":
-            modify_file_line(step.path, step.content, cast(int, step.line), overwrite=True)
+        match step.type:
+            case "create":
+                create_file(step.path, step.content)
+            case "update":
+                modify_file_line(step.path, step.content, cast(int, step.line))
+            case "overwrite":
+                modify_file_line(step.path, step.content, cast(int, step.line), overwrite=True)
+            case "delete":
+                delete_file_line(step.path, cast(int, step.line))
 
         files.append(step.path)
     return files
