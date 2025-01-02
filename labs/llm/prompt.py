@@ -1,3 +1,19 @@
+INPUT = """
+Task description:
+    {issue_summary}
+"""
+
+INSTRUCTION = """
+Based on the task description and the provided system context:
+    - Write the Python code changes required to resolve the task.
+    - Ensure that changes are made only within the allowed scope.
+"""
+
+OUTPUT = """
+You must provide a JSON response in the following format: {json_response}
+"""
+
+
 JSON_RESPONSE = {
     "steps": [
         {
@@ -11,14 +27,9 @@ JSON_RESPONSE = {
 
 
 def get_prompt(issue_summary: str):
-    return f"""
-        You're a diligent software engineer AI. You can't see, draw, or interact with a 
-        browser, but you can read and write files, and you can think.
-        You've been given the following task: {issue_summary}.
-        Any imports will be at the beggining of the file.
-        Add tests for the new functionalities, considering any existing test files.
-        The file paths provided are **absolute paths relative to the project root**, 
-        and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
-        Do not prepend or modify the paths.
-        Please provide a json response in the following format: {JSON_RESPONSE}
-    """
+    input = INPUT.format(issue_summary=issue_summary)
+    output = OUTPUT.format(json_response=JSON_RESPONSE)
+
+    prompt = "\n".join([INSTRUCTION, input, output])
+
+    return prompt
