@@ -33,13 +33,11 @@ def get_prompt(issue_summary: str):
         - Ensure the code integrates seamlessly into the existing structure of the project.
 
     Task description:
-    {issue_summary}
+        {issue_summary}
     
     Based on the task description and the provided system context:
-        - Provide a brief justification for the chosen locations.
         - Write the Python code changes required to resolve the task.
         - Ensure that changes are made only within the allowed scope.
-
     
     You must provide a JSON response in the following format: {JSON_RESPONSE}
     
