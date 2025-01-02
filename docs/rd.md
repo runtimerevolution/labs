@@ -123,7 +123,6 @@ class UserTest(TestCase):
 
 Other prompts tested include:
 
-* **"Remove the created_at and updated_at at User model"**
 * **"Remove created_at and updated_at fields to User model"**
 * **"Add created_at and updated_at fields to User admin model"**
 * **"Remove created_at and updated_at fields at User admin model"**
