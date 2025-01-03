@@ -1,9 +1,7 @@
-import json
 import os.path
 
 from celery import chain
 from django.conf import settings
-from core.models import Model, WorkflowResult
 from tasks import (
     apply_code_changes_task,
     clone_repository_task,
@@ -14,6 +12,7 @@ from tasks import (
     get_issue_task,
     get_llm_response_task,
     prepare_prompt_and_context_task,
+    save_workflow_result_task,
     vectorize_repository_task,
 )
 from tasks.redis_client import RedisStrictClient, RedisVariable
@@ -65,35 +64,6 @@ def run_on_repository_task(
         commit_changes_task.s(),
         create_pull_request_task.s(),
     ).apply_async()
-
-
-@app.task
-def save_workflow_result_task(prefix):
-    # Embed model
-    _, embedding_model_name = Model.get_active_embedding_model()
-
-    # Prompt model
-    _, llm_model_name = Model.get_active_llm_model()
-
-    # Embeddings
-    embeddings = json.loads(redis_client.get(RedisVariable.EMBEDDINGS, prefix=prefix))
-
-    # Context
-    context = json.loads(redis_client.get(RedisVariable.CONTEXT, prefix=prefix))
-
-    # LLM response
-    llm_response = redis_client.get(RedisVariable.LLM_RESPONSE, prefix)
-
-    WorkflowResult.objects.create(
-        task_id=prefix,
-        embed_model=embedding_model_name,
-        prompt_model=llm_model_name,
-        embeddings=embeddings,
-        context=context,
-        llm_response=llm_response,
-    )
-
-    return prefix
 
 
 @app.task
