@@ -7,7 +7,7 @@ Task description:
 
 INSTRUCTION = """
 Based on the task description and the provided system context:
-    - Write the Python code changes required to resolve the task.
+    - Write the code changes required to resolve the task.
     - Ensure that changes are made only within the allowed scope.
 """
 
@@ -34,6 +34,6 @@ def get_prompt(issue_summary: str):
     formatted_input = INPUT.format(issue_summary=issue_summary)
     formatted_output = OUTPUT.format(json_response=JSON_RESPONSE)
 
-    prompt = "\n".join([INSTRUCTION, formatted_input, formatted_output])
+    prompt = "\n".join([formatted_input, INSTRUCTION, formatted_output])
 
     return prompt
