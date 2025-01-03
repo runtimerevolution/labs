@@ -136,3 +136,4 @@ class WorkflowResult(models.Model):
     embeddings = models.JSONField(null=True)
     context = models.JSONField(null=True)
     llm_response = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)

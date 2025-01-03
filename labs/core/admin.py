@@ -53,7 +53,13 @@ class VectorizerModel(admin.ModelAdmin):
 
 @admin.register(WorkflowResult)
 class WorkflowResultAdmin(admin.ModelAdmin):
-    list_display = ("task_id",)
+    list_display = ("task_id", "created_at")
     list_display_links = ("task_id",)
     search_fields = ("task_id",)
-    readonly_fields = ("task_id", "embed_model", "prompt_model", "embeddings", "context", "llm_response")
+    readonly_fields = ("task_id", "created_at", "embed_model", "prompt_model", "embeddings", "context", "llm_response")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
