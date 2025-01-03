@@ -78,13 +78,17 @@ def save_workflow_result_task(prefix):
     embeddings = json.loads(redis_client.get(RedisVariable.EMBEDDINGS, prefix=prefix))
 
     # Context
-    # TODO
+    context = json.loads(redis_client.get(RedisVariable.CONTEXT, prefix=prefix))
 
     # LLM response
     # TODO
 
     WorkflowResult.objects.create(
-        task_id=prefix, embed_model=embedding_model_name, prompt_model=llm_model_name, embeddings=embeddings
+        task_id=prefix,
+        embed_model=embedding_model_name,
+        prompt_model=llm_model_name,
+        embeddings=embeddings,
+        context=context,
     )
 
 
