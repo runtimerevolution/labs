@@ -71,6 +71,7 @@ def run_on_repository_task(
 def save_workflow_result_task(prefix):
     # Embed model
     _, embedding_model_name = Model.get_active_embedding_model()
+
     # Prompt model
     _, llm_model_name = Model.get_active_llm_model()
 
@@ -91,6 +92,8 @@ def save_workflow_result_task(prefix):
         context=context,
         llm_response=llm_response,
     )
+
+    return prefix
 
 
 @app.task
