@@ -16,8 +16,10 @@ CONTENT_TEMPLATE = "The following is the Python code in `{file}`:\n\n````{mimety
 
 
 def get_file_mimetype(file_path: str) -> str:
-    mimetype, _ = mimetypes.guess_type(file_path)
+    if not file_path:
+        return ""
 
+    mimetype, _ = mimetypes.guess_type(file_path)
     try:
         return MIMETYPE_MD_NAME[mimetype]
 
