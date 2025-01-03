@@ -2,6 +2,7 @@ import os.path
 
 from celery import chain
 from django.conf import settings
+from core.models import Model, WorkflowResult
 from tasks import (
     apply_code_changes_task,
     clone_repository_task,
@@ -66,6 +67,29 @@ def run_on_repository_task(
 
 
 @app.task
+def save_workflow_result_task(prefix):
+    # Embed model
+    _, embedding_model_name = Model.get_active_embedding_model()
+    # Prompt model
+    _, llm_model_name = Model.get_active_llm_model()
+
+    # LLM response
+    # TODO
+
+    # Context
+    # TODO
+
+    # Embeddings
+    # TODO
+
+    WorkflowResult.objects.create(
+        task_id=prefix,
+        embed_model=embedding_model_name,
+        prompt_model=llm_model_name,
+    )
+
+
+@app.task
 def run_on_local_repository_task(repository_path, issue_body):
     data = {
         RedisVariable.ISSUE_BODY.value: issue_body,
@@ -78,4 +102,5 @@ def run_on_local_repository_task(repository_path, issue_body):
         prepare_prompt_and_context_task.s(),
         get_llm_response_task.s(),
         apply_code_changes_task.s(),
-    ).apply_async()
+        save_workflow_result_task.s(),
+    ).apply_async(link_error=save_workflow_result_task.s())
