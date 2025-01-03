@@ -44,7 +44,7 @@ class Embedder:
             .values_list("file_path", flat=True)
         )[:max_results]
 
-        logger.debug(f"Files retrieved (using {self.embedder.__class__.__name__}):\n {'\n'.join(files_path)}")
+        logger.debug("Files retrieved (using %s):\n %s", self.embedder.__class__.__name__, "\n".join(files_path))
         return list(files_path)
 
     def reembed_code(
