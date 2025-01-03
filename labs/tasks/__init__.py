@@ -4,6 +4,7 @@ from tasks.llm import (
     prepare_prompt_and_context_task,
     vectorize_repository_task,
 )
+from tasks.logging import save_workflow_result_task
 from tasks.repository import (
     apply_code_changes_task,
     clone_repository_task,
@@ -28,4 +29,5 @@ __all__ = [
     "init_task",
     "run_on_repository_task",
     "run_on_local_repository_task",
+    "save_workflow_result_task",
 ]

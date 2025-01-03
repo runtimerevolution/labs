@@ -127,3 +127,13 @@ class VectorizerModel(models.Model):
     class Meta:
         verbose_name = "Vectorizer"
         verbose_name_plural = "Vectorizers"
+
+
+class WorkflowResult(models.Model):
+    task_id = models.CharField(max_length=255)
+    embed_model = models.CharField(max_length=255, null=True)
+    prompt_model = models.CharField(max_length=255, null=True)
+    embeddings = models.JSONField(null=True)
+    context = models.JSONField(null=True)
+    llm_response = models.TextField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)

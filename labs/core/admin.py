@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Model, Variable, VectorizerModel
+from .models import Model, Variable, VectorizerModel, WorkflowResult
 
 
 @admin.register(Model)
@@ -49,3 +49,17 @@ class VectorizerModel(admin.ModelAdmin):
     list_editable = ("vectorizer_type", "active")
     list_filter = ("vectorizer_type",)
     search_fields = ("vectorizer_type",)
+
+
+@admin.register(WorkflowResult)
+class WorkflowResultAdmin(admin.ModelAdmin):
+    list_display = ("task_id", "created_at")
+    list_display_links = ("task_id",)
+    search_fields = ("task_id",)
+    readonly_fields = ("task_id", "created_at", "embed_model", "prompt_model", "embeddings", "context", "llm_response")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
