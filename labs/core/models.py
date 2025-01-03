@@ -135,3 +135,4 @@ class WorkflowResult(models.Model):
     prompt_model = models.CharField(max_length=255, null=True)
     embeddings = models.JSONField(null=True)
     context = models.JSONField(null=True)
+    llm_response = models.TextField(null=True)
