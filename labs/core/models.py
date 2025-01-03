@@ -133,3 +133,4 @@ class WorkflowResult(models.Model):
     task_id = models.CharField(max_length=255)
     embed_model = models.CharField(max_length=255, null=True)
     prompt_model = models.CharField(max_length=255, null=True)
+    embeddings = models.JSONField(null=True)

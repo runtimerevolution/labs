@@ -1,3 +1,4 @@
+import json
 import os.path
 
 from celery import chain
@@ -73,19 +74,17 @@ def save_workflow_result_task(prefix):
     # Prompt model
     _, llm_model_name = Model.get_active_llm_model()
 
-    # LLM response
-    # TODO
+    # Embeddings
+    embeddings = json.loads(redis_client.get(RedisVariable.EMBEDDINGS, prefix=prefix))
 
     # Context
     # TODO
 
-    # Embeddings
+    # LLM response
     # TODO
 
     WorkflowResult.objects.create(
-        task_id=prefix,
-        embed_model=embedding_model_name,
-        prompt_model=llm_model_name,
+        task_id=prefix, embed_model=embedding_model_name, prompt_model=llm_model_name, embeddings=embeddings
     )
 
 
