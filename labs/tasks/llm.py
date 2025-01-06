@@ -101,7 +101,6 @@ def prepare_prompt_and_context_task(prefix="", issue_body="", embeddings: Option
 
 @app.task
 def get_llm_response_task(prefix="", context=None):
-    pass
     if not context:
         context = {}
 
