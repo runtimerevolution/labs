@@ -1,13 +1,12 @@
 import json
 from typing import List, cast
 
+from config.celery import app
 from decorators import time_and_log_function
 from django.conf import settings
 from github.github import GithubRequests
 from parsers.response import create_file, modify_file, parse_llm_output
 from tasks.redis_client import RedisStrictClient, RedisVariable
-
-from config.celery import app
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 

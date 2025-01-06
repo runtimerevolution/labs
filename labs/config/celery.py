@@ -1,7 +1,6 @@
-import logging
+import logging.config
 import os
 
-import redis
 from celery import Celery
 from celery.signals import task_failure
 from django.conf import settings
@@ -15,8 +14,6 @@ logger = logging.getLogger(__name__)
 DEFAULT_QUEUE_NAME = "labs"
 LOW_PRIORITY_QUEUE_NAME = f"{DEFAULT_QUEUE_NAME}-low"
 HIGH_PRIORITY_QUEUE_NAME = f"{DEFAULT_QUEUE_NAME}-high"
-
-redis_client = redis.StrictRedis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 app = Celery(
     "config",
@@ -44,7 +41,10 @@ app = Celery(
 # Add a redbeat prefix so that it doesn't mix with other connectors when on a shared cluster.
 app.conf.redbeat_key_prefix = DEFAULT_QUEUE_NAME
 
+app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks(["tasks"])
+
+logging.config.dictConfig(settings.LOGGING)
 
 
 def get_scheduled_tasks_from_redis():

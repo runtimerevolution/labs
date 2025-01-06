@@ -2,6 +2,7 @@ import json
 import logging
 from typing import List, Optional
 
+from config.celery import app
 from core.models import Model, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
@@ -11,8 +12,6 @@ from llm.prompt import get_prompt
 from llm.requester import Requester
 from tasks.checks import run_response_checks
 from tasks.redis_client import RedisStrictClient, RedisVariable
-
-from config.celery import app
 
 logger = logging.getLogger(__name__)
 
