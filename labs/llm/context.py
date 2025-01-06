@@ -13,7 +13,7 @@ MIMETYPE_MD_NAME = {
     "text/x-python": "python",
 }
 
-CONTENT_TEMPLATE = "The following is the code in `{file}`:\n\n````{mimetype}\n{content}\n```"
+CONTENT_TEMPLATE = "The following is the code in `{file}`:\n\n```{mimetype}\n{content}\n```"
 PERSONA_CONTEXT = """
 You are an advanced software engineer assistant designed to resolve code-based tasks.
 You will receive:
