@@ -21,11 +21,11 @@ def save_workflow_result_task(prefix):
     embeddings_data = redis_client.get(RedisVariable.EMBEDDINGS, prefix=prefix)
     embeddings = json.loads(embeddings_data) if embeddings_data else None
 
-    # # Context
+    # Context
     context_data = redis_client.get(RedisVariable.CONTEXT, prefix=prefix)
     context = json.loads(context_data) if context_data else None
 
-    # # LLM response
+    # LLM response
     llm_response = redis_client.get(RedisVariable.LLM_RESPONSE, prefix)
 
     WorkflowResult.objects.create(
