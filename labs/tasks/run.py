@@ -2,7 +2,6 @@ import os.path
 
 from celery import chain
 from config.celery import app
-from config.redis_client import RedisStrictClient, RedisVariable
 from django.conf import settings
 from tasks import (
     apply_code_changes_task,
@@ -16,6 +15,7 @@ from tasks import (
     prepare_prompt_and_context_task,
     vectorize_repository_task,
 )
+from tasks.redis_client import RedisStrictClient, RedisVariable
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
