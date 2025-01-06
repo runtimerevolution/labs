@@ -1,24 +1,39 @@
-JSON_RESPONSE = {
-    "steps": [
-        {
-            "type": "String field, either 'create' or 'modify'",
-            "path": "String field, the absolute path of the file to create/modify",
-            "content": "String field, the content to write to the file",
-            "line": "Integer optional field, should only be included if the type is 'modify'. This field should be the number of the first line where the content should be written.",
-        },
-    ]
-}
+import json
+
+INPUT = """
+Task description:
+    {issue_summary}
+"""
+
+INSTRUCTION = """
+Based on the task description and the provided system context:
+    - Write the code changes required to resolve the task.
+    - Ensure that changes are made only within the allowed scope.
+"""
+
+OUTPUT = """
+You must provide a JSON response in the following format: {json_response}
+"""
+
+
+JSON_RESPONSE = json.dumps(
+    {
+        "steps": [
+            {
+                "type": "'create', 'update', 'overwrite', or 'delete'",
+                "path": "Absolute file path",
+                "content": "Content to write (required for 'create', 'update', or 'overwrite')",
+                "line": "Initial line number where the content should be written (or erased if 'delete')",
+            }
+        ]
+    }
+)
 
 
 def get_prompt(issue_summary: str):
-    return f"""
-        You're a diligent software engineer AI. You can't see, draw, or interact with a 
-        browser, but you can read and write files, and you can think.
-        You've been given the following task: {issue_summary}.
-        Any imports will be at the beggining of the file.
-        Add tests for the new functionalities, considering any existing test files.
-        The file paths provided are **absolute paths relative to the project root**, 
-        and **must not be changed**. Ensure the paths you output match the paths provided exactly. 
-        Do not prepend or modify the paths.
-        Please provide a json response in the following format: {JSON_RESPONSE}
-    """
+    formatted_input = INPUT.format(issue_summary=issue_summary)
+    formatted_output = OUTPUT.format(json_response=JSON_RESPONSE)
+
+    prompt = "\n".join([formatted_input, INSTRUCTION, formatted_output])
+
+    return prompt
