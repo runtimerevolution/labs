@@ -1,5 +1,3 @@
-import json
-
 from django.conf import settings
 from core.models import Model, WorkflowResult
 from config.redis_client import RedisStrictClient, RedisVariable
@@ -18,12 +16,10 @@ def save_workflow_result_task(prefix):
     _, llm_model_name = Model.get_active_llm_model()
 
     # Embeddings
-    embeddings_data = redis_client.get(RedisVariable.EMBEDDINGS, prefix=prefix)
-    embeddings = json.loads(embeddings_data) if embeddings_data else None
+    embeddings = redis_client.get(RedisVariable.EMBEDDINGS, prefix=prefix)
 
     # Context
-    context_data = redis_client.get(RedisVariable.CONTEXT, prefix=prefix)
-    context = json.loads(context_data) if context_data else None
+    context = redis_client.get(RedisVariable.CONTEXT, prefix=prefix)
 
     # LLM response
     llm_response = redis_client.get(RedisVariable.LLM_RESPONSE, prefix)
