@@ -29,7 +29,7 @@ def get_llm_response(prompt):
     while is_invalid and retries < max_retries:
         try:
             llm_response = requester.completion_without_proxy(prompt)
-            logger.debug(f"LLM reponse: {llm_response}")
+            logger.debug(f"LLM response: {llm_response}")
 
             is_invalid, reason = run_response_checks(llm_response)
 
@@ -69,7 +69,7 @@ def find_embeddings_task(
     max_results=settings.EMBEDDINGS_MAX_RESULTS,
 ):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
-    file_paths = Embedder(embedder_class, *embeder_args).retrieve_file_paths(
+    files_path = Embedder(embedder_class, *embeder_args).retrieve_files_path(
         redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body),
         redis_client.get(RedisVariable.REPOSITORY_PATH, prefix=prefix, default=repository_path),
         similarity_threshold,
@@ -77,9 +77,9 @@ def find_embeddings_task(
     )
 
     if prefix:
-        redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(file_paths))
+        redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(files_path))
         return prefix
-    return file_paths
+    return files_path
 
 
 @app.task
