@@ -39,7 +39,8 @@ def apply_code_changes(llm_response):
             case "delete":
                 delete_file_line(step.path, cast(int, step.line))
 
-        files.append(step.path)
+        if step.path not in files:
+            files.append(step.path)
     return files
 
 

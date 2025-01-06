@@ -2,7 +2,7 @@ import json
 
 from django.conf import settings
 from core.models import Model, WorkflowResult
-from tasks.redis_client import RedisStrictClient, RedisVariable
+from config.redis_client import RedisStrictClient, RedisVariable
 
 from config.celery import app
 
@@ -28,6 +28,9 @@ def save_workflow_result_task(prefix):
     # LLM response
     llm_response = redis_client.get(RedisVariable.LLM_RESPONSE, prefix)
 
+    # Modified files
+    modified_files = redis_client.get(RedisVariable.FILES_MODIFIED, prefix)
+
     WorkflowResult.objects.create(
         task_id=prefix,
         embed_model=embedding_model_name,
@@ -35,6 +38,7 @@ def save_workflow_result_task(prefix):
         embeddings=embeddings,
         context=context,
         llm_response=llm_response,
+        modified_files=modified_files,
     )
 
     return prefix
