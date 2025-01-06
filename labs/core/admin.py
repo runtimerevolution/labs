@@ -7,6 +7,9 @@ from .models import Model, Variable, VectorizerModel, WorkflowResult
 
 class JSONFormatterMixin:
     def format_json_field(self, json_data):
+        if json_data is None:
+            return "-"
+
         formatted_json = json.dumps(json.loads(json_data), indent=2)
         return mark_safe(f'<p style="white-space: pre-wrap;">{formatted_json}</p>')
 
