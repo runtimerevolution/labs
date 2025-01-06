@@ -3,12 +3,12 @@ import logging
 from typing import List, cast
 
 from config.celery import app
+from config.redis_client import RedisStrictClient, RedisVariable
 from decorators import time_and_log_function
 from django.conf import settings
 from file_handler import create_file, delete_file_line, modify_file_line
 from github.github import GithubRequests
 from parsers.response import parse_llm_output
-from tasks.redis_client import RedisStrictClient, RedisVariable
 
 redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 logger = logging.getLogger(__name__)
