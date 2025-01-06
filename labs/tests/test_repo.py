@@ -14,16 +14,16 @@ class TestApplyCodeChanges(unittest.TestCase):
         Step(type="modify", path="/path/to/modify/file", content="file content", line=1),
     ]
 
-    @patch("tasks.repository.modify_file", return_value="/path/to/modify/file")
+    @patch("file_handler.modify_file_line")
     @patch("tasks.repository.parse_llm_output", return_value=Response(steps=example_single_step))
-    def test_single_file(self, mock_parse_llm_output, mock_modify_file):
+    def test_single_file(self, mock_parse_llm_output, mock_modify_file_line):
         file_paths = apply_code_changes("")
         self.assertCountEqual(file_paths, [step.path for step in self.example_single_step])
 
-    @patch("tasks.repository.modify_file", return_value="/path/to/modify/file")
-    @patch("tasks.repository.create_file", return_value="/path/to/create/file")
+    @patch("file_handler.modify_file_line")
+    @patch("file_handler.create_file")
     @patch("tasks.repository.parse_llm_output", return_value=Response(steps=example_multiple_steps))
-    def test_multiple_files(self, mock_parse_llm_output, mock_create_file, mock_modify_file):
+    def test_multiple_files(self, mock_parse_llm_output, mock_create_file, mock_modify_file_line):
         file_paths = apply_code_changes("")
         self.assertCountEqual(file_paths, [step.path for step in self.example_multiple_steps])
 
