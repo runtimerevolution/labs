@@ -41,7 +41,6 @@ app = Celery(
 # Add a redbeat prefix so that it doesn't mix with other connectors when on a shared cluster.
 app.conf.redbeat_key_prefix = DEFAULT_QUEUE_NAME
 
-app.config_from_object("django.conf:settings", namespace="CELERY")
 app.autodiscover_tasks(["tasks"])
 
 logging.config.dictConfig(settings.LOGGING)
