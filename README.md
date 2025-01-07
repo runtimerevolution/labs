@@ -13,7 +13,7 @@
 
 Create a copy of the reference env file in the root of the project and update the values accordingly.
 
-`cp .env.sample .env.local`
+`cp .env.sample .env`
 
 ## Run project
 

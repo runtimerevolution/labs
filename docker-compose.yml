@@ -11,7 +11,7 @@ services:
       - POSTGRES_PASSWORD=${DATABASE_PASS}
 
   api:
-    env_file: .env.local
+    env_file: .env
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -19,12 +19,13 @@ services:
       - "8000:8000"
     depends_on:
       - labs-db
+      - redis
     volumes:
       - api_logs:/app/logs
       - ./labs/:/app/
 
   worker:
-    env_file: .env.local
+    env_file: .env
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -54,13 +55,13 @@ services:
     ports:
       - "5555:5555"
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
     depends_on:
       - redis
 
   promtail:
-    env_file: .env.local
+    env_file: .env
     image: grafana/promtail:3.1.1
     volumes:
       - api_logs:/var/log/api
