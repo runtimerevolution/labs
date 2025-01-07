@@ -1,11 +1,7 @@
 PROJECT_NAME = labs
 PYTHON_VERSION = 3.11
 PYTHON_INTERPRETER = python
-ENV ?= local
-ENV_FILE := .env.$(ENV)
 
-include $(ENV_FILE)
-export
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
@@ -30,16 +26,12 @@ format:
 ## Stops and removes all the services
 .PHONY: down
 down:
-	docker compose --env-file=$(ENV_FILE) down
+	docker compose down
 
 ## Start all the services
 .PHONY: up
 up: down
-	docker compose --env-file=$(ENV_FILE) up --build -d
-
-.PHONY: simple
-simple: down
-	docker compose --env-file=$(ENV_FILE) up labs-db -d
+	docker compose up --build -d
 
 ## Start a python shell
 .PHONY: shell
