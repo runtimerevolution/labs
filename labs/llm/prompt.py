@@ -16,7 +16,7 @@ You must provide a JSON response in the following format: {json_response}
 
 Operation types explained:  
     - 'create': Creates a new file with the specified content.
-    - 'update': Appends the content at the specified line of an existing file. 
+    - 'update': Inserts the content at the specified line in an existing file. 
     - 'overwrite': Replaces content at the specified line in the file.
     - 'delete': Removes content from the specified line in the file.
 Ensure operations adhere to the JSON format provided.
