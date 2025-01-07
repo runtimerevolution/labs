@@ -1,6 +1,8 @@
 from enum import Enum
 from typing import Union
 
+from django.conf import settings
+
 from redis import StrictRedis
 from redis.typing import EncodableT, ResponseT
 
@@ -54,3 +56,6 @@ class RedisStrictClient(StrictRedis):
             name = f"{prefix}_{name}"
 
         return super().set(name, value, *args, **kwargs)
+
+
+redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)

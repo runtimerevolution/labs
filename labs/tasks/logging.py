@@ -1,10 +1,7 @@
-from django.conf import settings
 from core.models import Model, WorkflowResult
-from config.redis_client import RedisStrictClient, RedisVariable
+from config.redis_client import redis_client, RedisVariable
 
 from config.celery import app
-
-redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 
 @app.task
