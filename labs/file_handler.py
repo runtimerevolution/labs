@@ -19,6 +19,17 @@ def create_file(file_path: str, content: str) -> None:
 def modify_file_line(file_path: str, content: Union[str | List[str]], line_number: int, overwrite=False) -> None:
     logger.info(f"{'Overwriting' if overwrite else 'Modifying'} file {file_path} line {line_number}")
 
+    # Count the number of lines in `content` and ensure it ends in `\n`
+    if isinstance(content, list):
+        content_lines_count = len(content)
+        if content_lines_count > 0 and not content[:-1].endswith("\n"):
+            content[:-1] += "\n"
+
+    else:
+        content_lines_count = len(content.splitlines())
+        if not content.endswith("\n"):
+            content += "\n"
+
     temp_file_path = f"{file_path}.tmp"
     skip_lines = 0
     try:
@@ -27,7 +38,7 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
                 if current_line_number == line_number:
                     temp_file.writelines(content)
                     if overwrite:
-                        skip_lines = len(content)
+                        skip_lines = content_lines_count
 
                 if skip_lines > 0:
                     skip_lines -= 1

@@ -13,6 +13,13 @@ Based on the task description and the provided system context:
 
 OUTPUT = """
 You must provide a JSON response in the following format: {json_response}
+
+Operation types explained:  
+    - 'create': Creates a new file with the specified content.
+    - 'update': Appends the content at the specified line of an existing file. 
+    - 'overwrite': Replaces content at the specified line in the file.
+    - 'delete': Removes content from the specified line in the file.
+Ensure operations adhere to the JSON format provided.
 """
 
 
@@ -20,7 +27,7 @@ JSON_RESPONSE = json.dumps(
     {
         "steps": [
             {
-                "type": "'create', 'update', 'overwrite', or 'delete'",
+                "type": "Operation type: 'create', 'update', 'overwrite', or 'delete'",
                 "path": "Absolute file path",
                 "content": "Content to write (required for 'create', 'update', or 'overwrite')",
                 "line": "Initial line number where the content should be written (or erased if 'delete')",
