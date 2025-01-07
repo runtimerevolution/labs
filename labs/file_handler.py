@@ -22,8 +22,8 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
     # Count the number of lines in `content` and ensure it ends in `\n`
     if isinstance(content, list):
         content_lines_count = len(content)
-        if content_lines_count > 0 and not content[:-1].endswith("\n"):
-            content[:-1] += "\n"
+        if content_lines_count > 0 and not content[-1].endswith("\n"):
+            content[-1] += "\n"
 
     else:
         content_lines_count = len(content.splitlines())
