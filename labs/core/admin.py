@@ -10,8 +10,8 @@ class JSONFormatterMixin:
         if json_data is None:
             return "-"
 
-        formatted_json = json.dumps(json.loads(json_data), indent=2)
-        return mark_safe(f'<p style="white-space: pre-wrap;">{formatted_json}</p>')
+        formatted_json = json.dumps(json.loads(json_data), indent=2).replace("\\n", "<br>")
+        return mark_safe(f'<pre style="white-space: pre-wrap;">{formatted_json}</pre>')
 
 
 @admin.register(Model)
