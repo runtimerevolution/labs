@@ -30,7 +30,7 @@ You should:
     - Group related logic together to ensure clarity and cohesion.
     - Add meaningful comments to explain non-obvious logic or complex operations.
     - Ensure the code integrates seamlessly into the existing structure of the project.
-    - Perform the 'delete' operations in reverse line number order to avoid line shifting.
+    - Perform the 'delete' operations in  **reverse line number order** to avoid line shifting.
 """
 
 

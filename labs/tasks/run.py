@@ -14,6 +14,7 @@ from tasks import (
     get_issue_task,
     get_llm_response_task,
     prepare_prompt_and_context_task,
+    save_workflow_result_task,
     vectorize_repository_task,
 )
 
@@ -77,4 +78,5 @@ def run_on_local_repository_task(repository_path, issue_body):
         prepare_prompt_and_context_task.s(),
         get_llm_response_task.s(),
         apply_code_changes_task.s(),
-    ).apply_async()
+        save_workflow_result_task.s(),
+    ).apply_async(link_error=save_workflow_result_task.s())

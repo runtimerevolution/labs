@@ -1,6 +1,18 @@
-from django.contrib import admin
+import json
 
-from .models import Model, Variable, VectorizerModel
+from django.contrib import admin
+from django.utils.safestring import mark_safe
+
+from .models import Model, Variable, VectorizerModel, WorkflowResult
+
+
+class JSONFormatterMixin:
+    def format_json_field(self, json_data):
+        if json_data is None:
+            return "-"
+
+        formatted_json = json.dumps(json.loads(json_data), indent=2)
+        return mark_safe(f'<p style="white-space: pre-wrap;">{formatted_json}</p>')
 
 
 @admin.register(Model)
@@ -49,3 +61,49 @@ class VectorizerModel(admin.ModelAdmin):
     list_editable = ("vectorizer_type", "active")
     list_filter = ("vectorizer_type",)
     search_fields = ("vectorizer_type",)
+
+
+@admin.register(WorkflowResult)
+class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
+    list_display = ("task_id", "created_at")
+    list_display_links = ("task_id",)
+    search_fields = ("task_id",)
+    readonly_fields = (
+        "task_id",
+        "created_at",
+        "embed_model",
+        "prompt_model",
+        "pretty_embeddings",
+        "pretty_context",
+        "pretty_llm_response",
+        "pretty_modified_files",
+    )
+    exclude = (
+        "embeddings",
+        "context",
+        "llm_response",
+        "modified_files",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def pretty_embeddings(self, obj):
+        return self.format_json_field(obj.embeddings)
+
+    def pretty_context(self, obj):
+        return self.format_json_field(obj.context)
+
+    def pretty_llm_response(self, obj):
+        return self.format_json_field(obj.llm_response)
+
+    def pretty_modified_files(self, obj):
+        return self.format_json_field(obj.modified_files)
+
+    pretty_embeddings.short_description = "Embeddings"
+    pretty_context.short_description = "Context"
+    pretty_llm_response.short_description = "LLM Response"
+    pretty_modified_files.short_description = "Modified Files"
