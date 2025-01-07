@@ -9,22 +9,11 @@ redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_P
 
 @app.task
 def save_workflow_result_task(prefix):
-    # Embed model
     _, embedding_model_name = Model.get_active_embedding_model()
-
-    # Prompt model
     _, llm_model_name = Model.get_active_llm_model()
-
-    # Embeddings
     embeddings = redis_client.get(RedisVariable.EMBEDDINGS, prefix=prefix)
-
-    # Context
     context = redis_client.get(RedisVariable.CONTEXT, prefix=prefix)
-
-    # LLM response
     llm_response = redis_client.get(RedisVariable.LLM_RESPONSE, prefix)
-
-    # Modified files
     modified_files = redis_client.get(RedisVariable.FILES_MODIFIED, prefix)
 
     WorkflowResult.objects.create(
