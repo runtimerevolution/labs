@@ -3,12 +3,10 @@ services:
     container_name: labs-db
     image: pgvector/pgvector:pg16
     ports:
-     - ${DATABASE_PORT}:5432
+     - 5432:5432
     restart: always
     environment:
-      - POSTGRES_DB=test
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASS}
+      - POSTGRES_PASSWORD=postgres
 
   api:
     env_file: .env
