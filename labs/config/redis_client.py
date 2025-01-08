@@ -26,6 +26,13 @@ class RedisVariable(Enum):
 
 
 class RedisStrictClient(StrictRedis):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(RedisStrictClient, cls).__new__(cls)
+        return cls._instance
+
     def get(
         self, variable: Union[str, RedisVariable], prefix: str = None, default: str | list | dict = None
     ) -> ResponseT:
