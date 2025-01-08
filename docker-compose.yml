@@ -3,12 +3,10 @@ services:
     container_name: labs-db
     image: pgvector/pgvector:pg16
     ports:
-     - ${DATABASE_PORT}:5432
+     - 5432:5432
     restart: always
     environment:
-      - POSTGRES_DB=test
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASS}
+      - POSTGRES_PASSWORD=postgres
 
   api:
     env_file: .env.local
@@ -19,6 +17,7 @@ services:
       - "8000:8000"
     depends_on:
       - labs-db
+      - redis
     volumes:
       - api_logs:/app/logs
       - ./labs/:/app/
@@ -54,8 +53,8 @@ services:
     ports:
       - "5555:5555"
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379
+      - CELERY_RESULT_BACKEND=redis://redis:6379
     depends_on:
       - redis
 

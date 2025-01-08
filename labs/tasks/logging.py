@@ -1,7 +1,7 @@
+from config.celery import app
+
 from core.models import Model, WorkflowResult
 from config.redis_client import redis_client, RedisVariable
-
-from config.celery import app
 
 
 @app.task
