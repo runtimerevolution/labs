@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=postgres
 
   api:
-    env_file: .env
+    env_file: .env.local
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -23,7 +23,7 @@ services:
       - ./labs/:/app/
 
   worker:
-    env_file: .env
+    env_file: .env.local
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -59,7 +59,7 @@ services:
       - redis
 
   promtail:
-    env_file: .env
+    env_file: .env.local
     image: grafana/promtail:3.1.1
     volumes:
       - api_logs:/var/log/api

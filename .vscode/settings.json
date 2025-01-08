@@ -4,7 +4,7 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.envFile": "${workspaceFolder}/.env",
+    "python.envFile": "${workspaceFolder}/.env.local",
     "python.analysis.extraPaths": ["./labs"],
     "sqltools.connections": [
         {
@@ -14,6 +14,16 @@
             "driver": "PostgreSQL",
             "name": "pgvector",
             "database": "postgres",
+            "username": "postgres",
+            "password": "postgres"
+        },
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "pgvector-test",
+            "database": "test",
             "username": "postgres",
             "password": "postgres"
         }
