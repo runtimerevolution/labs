@@ -1,11 +1,7 @@
 PROJECT_NAME = labs
 PYTHON_VERSION = 3.11
 PYTHON_INTERPRETER = python
-ENV ?= local
-ENV_FILE := .env.$(ENV)
 
-include $(ENV_FILE)
-export
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
@@ -30,16 +26,12 @@ format:
 ## Stops and removes all the services
 .PHONY: down
 down:
-	docker compose --env-file=$(ENV_FILE) down
+	docker compose down
 
 ## Start all the services
 .PHONY: up
 up: down
-	docker compose --env-file=$(ENV_FILE) up --build -d
-
-.PHONY: simple
-simple: down
-	docker compose --env-file=$(ENV_FILE) up labs-db -d
+	docker compose up --build -d
 
 ## Start a python shell
 .PHONY: shell
@@ -50,14 +42,6 @@ shell:
 .PHONY: tests
 tests:
 	pytest ./labs
-
-.PHONY: clean_tests
-clean_tests:
-	@if [ ! -d ./labs/test/vcr_cassettes ]; then \
-		echo "labs/test/vcr_cassettes does not exist"; \
-	else \
-		rm -rf labs/test/vcr_cassettes; \
-	fi
 
 ## Pull given model from ollama (use `make ollama model=<model name>`)
 .PHONY: ollama
