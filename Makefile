@@ -43,14 +43,6 @@ shell:
 tests:
 	pytest ./labs
 
-.PHONY: clean_tests
-clean_tests:
-	@if [ ! -d ./labs/test/vcr_cassettes ]; then \
-		echo "labs/test/vcr_cassettes does not exist"; \
-	else \
-		rm -rf labs/test/vcr_cassettes; \
-	fi
-
 ## Pull given model from ollama (use `make ollama model=<model name>`)
 .PHONY: ollama
 ollama:
