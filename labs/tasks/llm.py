@@ -3,7 +3,7 @@ import logging
 from typing import List, Optional
 
 from config.celery import app
-from config.redis_client import RedisStrictClient, RedisVariable
+from config.redis_client import redis_client, RedisVariable
 from core.models import Model, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
@@ -14,8 +14,6 @@ from llm.prompt import get_prompt
 from llm.requester import Requester
 
 logger = logging.getLogger(__name__)
-
-redis_client = RedisStrictClient(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=0, decode_responses=True)
 
 
 def get_llm_response(prompt):
