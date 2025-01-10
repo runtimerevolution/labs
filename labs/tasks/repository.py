@@ -25,12 +25,15 @@ def github_repository_data(prefix, token="", repository_owner="", repository_nam
 def apply_code_changes(llm_response):
     response = parse_llm_output(llm_response)
 
+    # We will sort the operations by file and by line number
+    sorted_steps = sorted(response.steps, key=lambda s: (s.path, s.line), reverse=True)
+
     files: List[str | None] = []
-    for step in response.steps:
+    for step in sorted_steps:
         match step.type:
             case "create":
                 create_file(step.path, step.content)
-            case "update":
+            case "insert":
                 modify_file_line(step.path, step.content, cast(int, step.line))
             case "overwrite":
                 modify_file_line(step.path, step.content, cast(int, step.line), overwrite=True)

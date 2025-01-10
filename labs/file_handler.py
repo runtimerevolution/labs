@@ -32,6 +32,11 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
 
     temp_file_path = f"{file_path}.tmp"
     skip_lines = 0
+
+    # Insert should be done in the next line
+    if not overwrite:
+        line_number += 1
+
     try:
         with open(file_path, "r") as original_file, open(temp_file_path, "w") as temp_file:
             for current_line_number, line in enumerate(original_file, start=1):
@@ -77,7 +82,7 @@ def get_file_content(file_path: str) -> str:
         content = ""
         with open(file_path, "r") as file:
             for line_number, line in enumerate(file, start=1):
-                content += "{:>{}}| {}".format(line_number, 4, line)
+                content += f"#{line_number}\n{line}"
 
         return content
 
