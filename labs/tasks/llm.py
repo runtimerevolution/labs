@@ -3,7 +3,7 @@ import logging
 from typing import List, Optional
 
 from config.celery import app
-from config.redis_client import redis_client, RedisVariable
+from config.redis_client import RedisVariable, redis_client
 from core.models import Model, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
@@ -73,6 +73,7 @@ def find_embeddings_task(
         similarity_threshold,
         max_results,
     )
+    logger.debug(f"Retrieved files from embeddings match\n: {'\n'.join(files_path)}")
 
     if prefix:
         redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(files_path))

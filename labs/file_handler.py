@@ -77,7 +77,7 @@ def get_file_content(file_path: str) -> str:
         content = ""
         with open(file_path, "r") as file:
             for line_number, line in enumerate(file, start=1):
-                content += f"{line_number}: {line}"
+                content += "{:>{}}| {}".format(line_number, 4, line)
 
         return content
 

@@ -3,7 +3,7 @@ import logging
 from typing import List, cast
 
 from config.celery import app
-from config.redis_client import redis_client, RedisVariable
+from config.redis_client import RedisVariable, redis_client
 from decorators import time_and_log_function
 from file_handler import create_file, delete_file_line, modify_file_line
 from github.github import GithubRequests

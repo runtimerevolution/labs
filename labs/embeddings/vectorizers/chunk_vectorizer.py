@@ -64,12 +64,20 @@ class ChunkVectorizer:
     def vectorize_to_database(self, include_file_extensions, repository_path, *args, **kwargs):
         logger.debug("Loading and splitting all documents into chunks.")
         docs = self.load_docs(repository_path, include_file_extensions)
-        texts = self.split_docs(docs)
-        files_texts = [(text.metadata["source"], text.page_content) for text in texts]
-        texts = [files_text[1] for files_text in files_texts]
+        docs_parts = self.split_docs(docs)
+
+        texts = []
+        files_texts = []
+        for part in docs_parts:
+            # Add the file path to the content to allow retrieving the file by its path
+            # if it is mentioned in the prompt.
+            file_path = part.metadata["source"]
+            content = f"{file_path}\n\n{part.page_content}"
+
+            files_texts.append((file_path, content))
+            texts.append(content)
 
         logger.debug("Embedding all repository documents.")
-
         embeddings = self.embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")

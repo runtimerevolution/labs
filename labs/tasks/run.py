@@ -2,7 +2,7 @@ import os.path
 
 from celery import chain
 from config.celery import app
-from config.redis_client import redis_client, RedisVariable
+from config.redis_client import RedisVariable, redis_client
 from tasks import (
     apply_code_changes_task,
     clone_repository_task,
