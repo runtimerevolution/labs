@@ -32,11 +32,18 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
 
     temp_file_path = f"{file_path}.tmp"
     skip_lines = 0
+
+    # Insert should be done in the next line
+    if not overwrite:
+        line_number += 1
+
+    content_written = False
     try:
         with open(file_path, "r") as original_file, open(temp_file_path, "w") as temp_file:
             for current_line_number, line in enumerate(original_file, start=1):
                 if current_line_number == line_number:
                     temp_file.writelines(content)
+                    content_written = True
                     if overwrite:
                         skip_lines = content_lines_count
 
@@ -45,6 +52,9 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
                     continue
 
                 temp_file.write(line)
+
+            if not content_written:
+                temp_file.writelines(content)
 
     except Exception as e:
         logger.error(f"Error modifying file {file_path}: {e}")
