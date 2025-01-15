@@ -73,7 +73,6 @@ def find_embeddings_task(
         similarity_threshold,
         max_results,
     )
-    logger.debug(f"Retrieved files from embeddings match\n: {'\n'.join(files_path)}")
 
     if prefix:
         redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(files_path))
