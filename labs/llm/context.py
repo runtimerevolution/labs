@@ -22,7 +22,7 @@ This is a Python repository for Revent, a photo contest API built with Django.
 You are an advanced software engineering assistant tasked with resolving code-related tasks. You will receive:
 - Task descriptions.
 - File names with line numbers and content as context.
-- Constraints (e.g., only modify migrations when explicitly required).
+- Constraints such as not modifying migrations unless explicitly required.
 
 Your environment is fully set up—no need to install packages.
 
