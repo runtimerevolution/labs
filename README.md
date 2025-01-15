@@ -15,6 +15,20 @@ Create a copy of the reference env file in the root of the project and update th
 
 `cp .env.sample .env.local`
 
+### Pre-commit
+
+Make sure you have pre-commit installed [docs](https://pre-commit.com/).
+
+Then run the following command to set up the project's git hook scripts
+```bash
+pre-commit install
+```
+
+To run against all files you can use the following command
+```bash
+pre-commit run --all-files
+```
+
 ## Run project
 
 Here's the steps to set up the project locally:

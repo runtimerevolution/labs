@@ -51,6 +51,9 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
 
                 temp_file.write(line)
 
+            if line_number > current_line_number:
+                temp_file.writelines(content)
+
     except Exception as e:
         logger.error(f"Error modifying file {file_path}: {e}")
         return
@@ -82,7 +85,7 @@ def get_file_content(file_path: str) -> str:
         content = ""
         with open(file_path, "r") as file:
             for line_number, line in enumerate(file, start=1):
-                content += f"#{line_number}\n{line}"
+                content += f"{str(line_number).rjust(6)} | {line}"
 
         return content
 
