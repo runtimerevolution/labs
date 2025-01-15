@@ -2,7 +2,6 @@ from enum import Enum
 from typing import Union
 
 from django.conf import settings
-
 from redis import StrictRedis
 from redis.typing import EncodableT, ResponseT
 

@@ -2,12 +2,13 @@ import json
 import logging
 from typing import List, cast
 
-from config.celery import app
-from config.redis_client import redis_client, RedisVariable
 from decorators import time_and_log_function
 from file_handler import create_file, delete_file_line, modify_file_line
 from github.github import GithubRequests
 from parsers.response import parse_llm_output
+
+from config.celery import app
+from config.redis_client import RedisVariable, redis_client
 
 logger = logging.getLogger(__name__)
 
