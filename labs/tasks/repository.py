@@ -31,7 +31,7 @@ def apply_code_changes(llm_response):
         match step.type:
             case "create":
                 create_file(step.path, step.content)
-            case "update":
+            case "insert":
                 modify_file_line(step.path, step.content, cast(int, step.line))
             case "overwrite":
                 modify_file_line(step.path, step.content, cast(int, step.line), overwrite=True)
