@@ -209,14 +209,9 @@ def parse_python_file(file_path: str) -> str | dict:
         file_content = source.read()
 
     parser = PythonFileParser(file_name=file_path)
-    try:
-        tree = ast.parse(file_content, file_path)
-
-    except SyntaxError as e:
-        print(f"Syntax error at {file_path}: {e}")
-        return dict()
-
+    tree = ast.parse(file_content, file_path)
     parser.visit(tree)
+
     return parser.get_structure()
 
 
