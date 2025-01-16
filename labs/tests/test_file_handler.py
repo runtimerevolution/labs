@@ -11,14 +11,14 @@ class TestFileHandler(TestCase):
     Line 2
     Line 4
     """
-    READ_FILE_EXPECTED_CONTENT = """
-    #1
-    Line 1
-    #2
-    Line 2
-    #3
-    Line 4
-    """
+    NEW_CONTENT = "    Line 3\n"
+    # Read variables
+    READ_FILE_EXPECTED_CONTENT = """     1 | 
+     2 |     Line 1
+     3 |     Line 2
+     4 |     Line 4
+     5 |     """
+    # Insert variables
     INSERT_LINE = 3
     INSERT_LINE_EXPECTED_CONTENT = """
     Line 1
@@ -26,18 +26,26 @@ class TestFileHandler(TestCase):
     Line 3
     Line 4
     """
+    INSERT_EOF_LINE = 4
+    INSERT_EOF_EXPECTED_CONTENT = """
+    Line 1
+    Line 2
+    Line 4
+    Line 3
+    """
+    # Overwrite variables
     OVERWRITE_LINE = 4
     OVERWRITE_LINE_EXPECTED_CONTENT = """
     Line 1
     Line 2
     Line 3
     """
+    # Delete variables
     DELETE_LINE = 4
     DELETE_LINE_EXPECTED_CONTENT = """
     Line 1
     Line 2
     """
-    NEW_CONTENT = "    Line 3\n"
 
     def assertFileContentEqual(self, file_path, expected_content):
         with open(file_path, "r") as file_handler:
@@ -49,7 +57,7 @@ class TestFileHandler(TestCase):
         self.temporary_file.flush()
         self.temporary_file.close()
 
-    def text_get_file_content(self):
+    def test_get_file_content(self):
         content = get_file_content(self.temporary_file.name)
         self.assertEqual(content, self.READ_FILE_EXPECTED_CONTENT)
 
@@ -75,6 +83,10 @@ class TestFileHandler(TestCase):
     def test_delete_file_line(self):
         delete_file_line(self.temporary_file.name, self.DELETE_LINE)
         self.assertFileContentEqual(self.temporary_file.name, self.DELETE_LINE_EXPECTED_CONTENT)
+
+    def test_insert_at_end_of_file(self):
+        modify_file_line(self.temporary_file.name, self.NEW_CONTENT, self.INSERT_EOF_LINE)
+        self.assertFileContentEqual(self.temporary_file.name, self.INSERT_EOF_EXPECTED_CONTENT)
 
     def tearDown(self):
         os.remove(self.temporary_file.name)
