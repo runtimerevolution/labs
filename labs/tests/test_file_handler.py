@@ -26,19 +26,26 @@ class TestFileHandler(TestCase):
     Line 3
     Line 4
     """
-    INSERT_EOF_LINE = 4
+    INSERT_EOF_LINE = 6
     INSERT_EOF_EXPECTED_CONTENT = """
     Line 1
     Line 2
     Line 4
+    
     Line 3
-    """
+"""
     # Overwrite variables
     OVERWRITE_LINE = 4
     OVERWRITE_LINE_EXPECTED_CONTENT = """
     Line 1
     Line 2
     Line 3
+    """
+    OVERWRITE_EOF_LINE = 6
+    OVERWRITE_EOF_EXPECTED_CONTENT = """
+    Line 1
+    Line 2
+    Line 4
     """
     # Delete variables
     DELETE_LINE = 4
@@ -49,7 +56,7 @@ class TestFileHandler(TestCase):
 
     def assertFileContentEqual(self, file_path, expected_content):
         with open(file_path, "r") as file_handler:
-            self.assertEqual(file_handler.read(), expected_content)
+            self.assertEqual(expected_content, file_handler.read())
 
     def setUp(self):
         self.temporary_file = NamedTemporaryFile(mode="w+", delete=False)
@@ -76,17 +83,21 @@ class TestFileHandler(TestCase):
         modify_file_line(self.temporary_file.name, self.NEW_CONTENT, self.INSERT_LINE)
         self.assertFileContentEqual(self.temporary_file.name, self.INSERT_LINE_EXPECTED_CONTENT)
 
+    def test_insert_end_of_file(self):
+        modify_file_line(self.temporary_file.name, self.NEW_CONTENT, self.INSERT_EOF_LINE)
+        self.assertFileContentEqual(self.temporary_file.name, self.INSERT_EOF_EXPECTED_CONTENT)
+
     def test_overwrite_file_line(self):
         modify_file_line(self.temporary_file.name, self.NEW_CONTENT, self.OVERWRITE_LINE, overwrite=True)
         self.assertFileContentEqual(self.temporary_file.name, self.OVERWRITE_LINE_EXPECTED_CONTENT)
 
+    def test_overwrite_end_of_file(self):
+        modify_file_line(self.temporary_file.name, self.NEW_CONTENT, self.OVERWRITE_EOF_LINE, overwrite=True)
+        self.assertFileContentEqual(self.temporary_file.name, self.OVERWRITE_EOF_EXPECTED_CONTENT)
+
     def test_delete_file_line(self):
         delete_file_line(self.temporary_file.name, self.DELETE_LINE)
         self.assertFileContentEqual(self.temporary_file.name, self.DELETE_LINE_EXPECTED_CONTENT)
-
-    def test_insert_at_end_of_file(self):
-        modify_file_line(self.temporary_file.name, self.NEW_CONTENT, self.INSERT_EOF_LINE)
-        self.assertFileContentEqual(self.temporary_file.name, self.INSERT_EOF_EXPECTED_CONTENT)
 
     def tearDown(self):
         os.remove(self.temporary_file.name)

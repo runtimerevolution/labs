@@ -51,8 +51,9 @@ def modify_file_line(file_path: str, content: Union[str | List[str]], line_numbe
 
                 temp_file.write(line)
 
-            if line_number > current_line_number:
-                temp_file.writelines(content)
+            if not overwrite and line_number > current_line_number:
+                # If we reach this condition line_number + 1 does not apply, so we add a `\n` before
+                temp_file.writelines(f"\n{content}")
 
     except Exception as e:
         logger.error(f"Error modifying file {file_path}: {e}")
