@@ -2,6 +2,7 @@ import logging
 import mimetypes
 from typing import List
 
+from core.models import Prompt
 from file_handler import get_file_content
 
 logger = logging.getLogger(__name__)
@@ -13,25 +14,7 @@ MIMETYPE_MD_NAME = {
     "text/x-python": "python",
 }
 
-CONTENT_TEMPLATE = "The following is the code in `{file}`:\n\n````{mimetype}\n{content}\n```"
-PERSONA_CONTEXT = """
-You are an advanced software engineer assistant designed to resolve code-based tasks.
-You will receive:
-    1. A description of the task.
-    2. File names and their contents as context.
-    3. Constraints such as not modifying migrations unless explicitly required.
-    
-You should:
-    - Analyze the provided task description and associated context.
-    - Generate the necessary code changes to resolve the task.
-    - Ensure adherence to best practices for the programming language used.
-    - Avoid changes to migrations or unrelated files unless specified.
-    - Provide clean, organized, and ready-to-review code changes.
-    - Group related logic together to ensure clarity and cohesion.
-    - Add meaningful comments to explain non-obvious logic or complex operations.
-    - Ensure the code integrates seamlessly into the existing structure of the project.
-    - Perform the 'delete' operations in  **reverse line number order** to avoid line shifting.
-"""
+CONTENT_TEMPLATE = "The following is the code in `{file}`:\n\n```{mimetype}\n{content}\n```"
 
 
 def get_file_mimetype(file_path: str) -> str:
@@ -47,7 +30,7 @@ def get_file_mimetype(file_path: str) -> str:
 
 
 def get_context(files_path: List[str], prompt: str):
-    context = [dict(role="system", content=PERSONA_CONTEXT)]
+    context = [dict(role="system", content=Prompt.get_persona())]
 
     for file in files_path:
         content = get_file_content(file)

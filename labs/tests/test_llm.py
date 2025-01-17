@@ -94,20 +94,8 @@ class TestLocalLLM:
         "content": CONTENT_TEMPLATE.format(file=test_file_paths[0], content=test_file_contents, mimetype="text/plain"),
     }
 
-    @patch("file_handler.get_file_content", return_value="test file contents")
-    @patch("embeddings.vectorizers.chunk_vectorizer.ChunkVectorizer.vectorize_to_database")
-    @patch("embeddings.embedder.Embedder.retrieve_files_path")
-    @skip("This is used locally with an Ollama instance running in docker")
-    def test_local_llm_connection(
-        self, mocked_retrieve_files_path, mocked_vectorize_to_database, mocked_get_file_content
-    ):
-        mocked_retrieve_files_path.return_value = ["/path/to/file1"]
-        repository_destination = "repo"
-        issue_summary = "Fix the bug in the authentication module"
-        success, response = call_llm_with_context(repository_destination, issue_summary)
-
-        assert success
-
+    @patch("core.models.Prompt.get_persona", return_value="persona prompt")
+    @patch("core.models.Prompt.get_instruction", return_value="instruction prompt")
     @patch("llm.context.get_file_content", return_value="test file contents")
     @patch("tasks.llm.run_response_checks")
     @patch("embeddings.vectorizers.vectorizer.Vectorizer.vectorize_to_database")
@@ -121,6 +109,8 @@ class TestLocalLLM:
         mocked_vectorize_to_database,
         mocked_run_response_checks,
         mocked_get_file_content,
+        mocked_get_instruction,
+        mocked_get_persona,
         create_test_ollama_llm_config,
         create_test_ollama_embedding_config,
         create_test_chunk_vectorizer_config,
@@ -132,6 +122,20 @@ class TestLocalLLM:
         call_llm_with_context(repository_path, issue_summary)
 
         mocked_completion_without_proxy.assert_called_once()
+
+    @patch("file_handler.get_file_content", return_value="test file contents")
+    @patch("embeddings.vectorizers.chunk_vectorizer.ChunkVectorizer.vectorize_to_database")
+    @patch("embeddings.embedder.Embedder.retrieve_files_path")
+    @skip("This is used locally with an Ollama instance running in docker")
+    def test_local_llm_connection(
+        self, mocked_retrieve_files_path, mocked_vectorize_to_database, mocked_get_file_content
+    ):
+        mocked_retrieve_files_path.return_value = ["/path/to/file1"]
+        repository_destination = "repo"
+        issue_summary = "Fix the bug in the authentication module"
+        success, response = call_llm_with_context(repository_destination, issue_summary)
+
+        assert success
 
 
 class TestLLMRequester:

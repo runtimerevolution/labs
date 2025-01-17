@@ -138,3 +138,52 @@ class WorkflowResult(models.Model):
     llm_response = models.TextField(null=True)
     modified_files = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Workflow result"
+        verbose_name_plural = "Workflow results"
+
+
+class Prompt(models.Model):
+    persona = models.TextField(
+        null=False,
+        blank=False,
+        help_text="""It should include additional information to help guide the model's behavior and 
+        understanding of its role.""",
+    )
+    instruction = models.TextField(
+        null=False,
+        blank=False,
+        help_text="""It should include guidelines on what is expected in the generated code, 
+        such as "avoid complexity" or "minimize the code".""",
+    )
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_persona() -> str:
+        queryset = Prompt.objects.filter(active=True)
+        if not queryset.exists():
+            raise ValueError("No persona configured")
+
+        return queryset.first().persona
+
+    @staticmethod
+    def get_instruction() -> str:
+        queryset = Prompt.objects.filter(active=True)
+        if not queryset.exists():
+            raise ValueError("No instruction configured")
+
+        return queryset.first().instruction
+
+    def save(self, *args, **kwargs):
+        Prompt.objects.filter(id=self.id, active=True).exclude(id=self.id).update(active=False)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.persona[:50]}..., {self.instruction[:50]}..."
+
+    class Meta:
+        verbose_name = "Prompt"
+        verbose_name_plural = "Prompts"

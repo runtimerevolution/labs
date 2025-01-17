@@ -3,7 +3,7 @@ import json
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Model, Variable, VectorizerModel, WorkflowResult
+from .models import Model, Prompt, Variable, VectorizerModel, WorkflowResult
 
 
 class JSONFormatterMixin:
@@ -107,3 +107,28 @@ class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
     pretty_context.short_description = "Context"
     pretty_llm_response.short_description = "LLM Response"
     pretty_modified_files.short_description = "Modified Files"
+
+
+@admin.register(Prompt)
+class PromptAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "persona_preview",
+        "instruction_preview",
+        "active",
+        "created_at",
+        "updated_at",
+    )
+    list_display_links = ("id",)
+    list_editable = ("active",)
+    search_fields = ("prompt",)
+
+    def persona_preview(self, obj):
+        return self.text_preview(obj.persona)
+
+    def instruction_preview(self, obj):
+        return self.text_preview(obj.instruction)
+
+    @staticmethod
+    def text_preview(text, preview_size=50):
+        return f"{text[:preview_size]}..." if len(text) > preview_size else text
