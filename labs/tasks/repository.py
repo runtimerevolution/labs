@@ -1,5 +1,6 @@
 import json
 import logging
+import subprocess
 from typing import List, cast
 
 from decorators import time_and_log_function
@@ -161,6 +162,38 @@ def create_pull_request_task(
         head=redis_client.get(RedisVariable.BRANCH_NAME, prefix, default=branch_name),
         base=redis_client.get(RedisVariable.ORIGINAL_BRANCH_NAME, prefix, default=original_branch),
     )
+
+    if prefix:
+        return prefix
+    return True
+
+
+@app.task
+def run_pre_commit(prefix=""):
+    logger.debug("Running pre-commit")
+    path = str(redis_client.get(RedisVariable.REPOSITORY_PATH, prefix=prefix))
+
+    number_of_runs = 2
+    for run in range(number_of_runs):
+        try:
+            subprocess.run(
+                ["pre-commit", "run", "--all-files"],
+                cwd=path,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            logger.debug("Pre-commit checks passed successfully!")
+            return
+
+        except subprocess.CalledProcessError as e:
+            logger.debug("Pre-commit output:")
+            logger.debug(e.stdout)
+
+            if run == number_of_runs - 1:
+                logger.error("Pre-commit checks failed after multiple attempts.")
+                logger.error(e.stdout)
+                break
 
     if prefix:
         return prefix
