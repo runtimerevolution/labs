@@ -74,15 +74,17 @@ class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
         "embed_model",
         "prompt_model",
         "pretty_embeddings",
-        "pretty_context",
         "pretty_llm_response",
         "pretty_modified_files",
+        "pretty_pre_commit_error",
+        "pretty_context",
     )
     exclude = (
         "embeddings",
         "context",
         "llm_response",
         "modified_files",
+        "pre_commit_error",
     )
 
     def has_add_permission(self, request):
@@ -103,7 +105,11 @@ class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
     def pretty_modified_files(self, obj):
         return self.format_json_field(obj.modified_files)
 
+    def pretty_pre_commit_error(self, obj):
+        return self.format_json_field(obj.pre_commit_error)
+
     pretty_embeddings.short_description = "Embeddings"
     pretty_context.short_description = "Context"
     pretty_llm_response.short_description = "LLM Response"
     pretty_modified_files.short_description = "Modified Files"
+    pretty_pre_commit_error.short_description = "Pre-Commit error message"

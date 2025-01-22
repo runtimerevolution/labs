@@ -193,6 +193,7 @@ def run_pre_commit(prefix=""):
             if run == number_of_runs - 1:
                 logger.error("Pre-commit checks failed after multiple attempts.")
                 logger.error(e.stdout)
+                redis_client.set(RedisVariable.PRE_COMMIT_ERROR, prefix=prefix, value=json.dumps(e.stdout))
                 break
 
     if prefix:

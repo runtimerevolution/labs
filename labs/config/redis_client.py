@@ -22,6 +22,7 @@ class RedisVariable(Enum):
     REPOSITORY_PATH = "repository_path"
     TOKEN = "token"
     USERNAME = "username"
+    PRE_COMMIT_ERROR = "pre_commit_error"
 
 
 class RedisStrictClient(StrictRedis):
