@@ -45,10 +45,10 @@ JSON_RESPONSE = json.dumps(
 )
 
 
-def get_prompt(issue_summary: str):
+def get_prompt(project_id: int, issue_summary: str):
     formatted_input = INPUT.format(issue_summary=issue_summary)
     formatted_output = OUTPUT.format(json_response=JSON_RESPONSE)
 
-    prompt = "\n".join([formatted_input, Prompt.get_instruction(), formatted_output])
+    prompt = "\n".join([formatted_input, Prompt.get_instruction(project_id), formatted_output])
 
     return prompt

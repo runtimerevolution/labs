@@ -29,8 +29,8 @@ def get_file_mimetype(file_path: str) -> str:
         return MIMETYPE_MD_NAME["text/plain"]
 
 
-def get_context(files_path: List[str], prompt: str):
-    context = [dict(role="system", content=Prompt.get_persona())]
+def get_context(project_id: int, files_path: List[str], prompt: str):
+    context = [dict(role="system", content=Prompt.get_persona(project_id))]
 
     for file in files_path:
         content = get_file_content(file)

@@ -1,5 +1,3 @@
-import os.path
-
 from celery import chain
 from config.celery import app
 from config.redis_client import RedisVariable, redis_client
@@ -20,10 +18,6 @@ from tasks import (
 
 @app.task(bind=True)
 def init_task(self, **kwargs):
-    path = RedisVariable.REPOSITORY_PATH.value
-    if path in kwargs and not os.path.exists(kwargs[path]):
-        raise FileNotFoundError(f"Directory {kwargs[path]} does not exist")
-
     prefix = self.request.id
     for k, v in kwargs.items():
         redis_client.set(k, v, prefix=prefix, ex=3600)
@@ -59,14 +53,15 @@ def run_on_repository_task(
         apply_code_changes_task.s(),
         commit_changes_task.s(),
         create_pull_request_task.s(),
+        save_workflow_result_task.s(),
     ).apply_async()
 
 
 @app.task
-def run_on_local_repository_task(repository_path, issue_body):
+def run_on_local_repository_task(project_id, issue_body):
     data = {
         RedisVariable.ISSUE_BODY.value: issue_body,
-        RedisVariable.REPOSITORY_PATH.value: repository_path,
+        RedisVariable.PROJECT.value: project_id,
     }
     chain(
         init_task.s(**data),

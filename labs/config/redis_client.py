@@ -16,10 +16,10 @@ class RedisVariable(Enum):
     ISSUE_TITLE = "issue_title"
     LLM_RESPONSE = "llm_response"
     ORIGINAL_BRANCH_NAME = "original_branch_name"
+    PROJECT = "project"
     PROMPT = "prompt"
     REPOSITORY_NAME = "repository_name"
     REPOSITORY_OWNER = "repository_owner"
-    REPOSITORY_PATH = "repository_path"
     TOKEN = "token"
     USERNAME = "username"
 

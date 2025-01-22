@@ -1,10 +1,10 @@
-import unittest
 from unittest.mock import patch
 
+from django.test import TestCase
 from file_handler import modify_file_line
 
 
-class TestModifyFile(unittest.TestCase):
+class TestModifyFile(TestCase):
     modify_file_args = {
         "file_path": "abc/test.txt",
         "content": ["content"],

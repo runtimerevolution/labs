@@ -20,7 +20,16 @@ class GithubRequests:
         self.repository_name = repository_name
         self.username = username
         self.github_api_url = f"{settings.GITHUB_API_BASE_URL}/repos/{repository_owner}/{repository_name}"
-        self.directory_dir = f"{settings.CLONE_DESTINATION_DIR}{repository_owner}/{repository_name}"
+        self._repository_url = f"{settings.GITHUB_BASE_URL}/{repository_owner}/{repository_name}.git"
+        self._directory = f"{settings.CLONE_DESTINATION_DIR}{repository_owner}/{repository_name}"
+
+    @property
+    def directory_path(self):
+        return self._directory
+
+    @property
+    def repository_url(self):
+        return self._repository_url
 
     def _get(self, url, headers={}, params={}):
         try:
@@ -140,7 +149,7 @@ class GithubRequests:
 
         tree_items = []
         for file_path in files:
-            file_name = file_path.replace(f"{self.directory_dir}/", "")
+            file_name = file_path.replace(f"{self._directory}/", "")
             if file_name.startswith("/"):
                 file_name = file_name[1:]
 
@@ -190,12 +199,11 @@ class GithubRequests:
 
     def clone(self):
         try:
-            url = f"https://github.com/{self.repository_owner}/{self.repository_name}.git"
             branch = "main"
-            probe = settings.CLONE_DESTINATION_DIR + f"{self.repository_owner}/{self.repository_name}/.git"
+            probe = f"{self._directory}/.git"
             if not os.path.exists(probe):
-                git.Repo.clone_from(url, self.directory_dir, branch=branch)
-            return self.directory_dir
+                git.Repo.clone_from(self._repository_url, self._directory, branch=branch)
+            return self._directory
         except Exception as e:
             logger.error(f"An unexpected error occurred: {e}")
             return None

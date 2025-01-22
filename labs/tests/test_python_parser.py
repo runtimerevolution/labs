@@ -1,7 +1,7 @@
 import ast
-import unittest
 from tempfile import NamedTemporaryFile
 
+from django.test import TestCase
 from parsers.python import PythonFileParser, get_lines_code, parse_python_file
 
 TEST_CODE = """
@@ -16,7 +16,7 @@ class DummyClass:
 """
 
 
-class TestPythonFileParser(unittest.TestCase):
+class TestPythonFileParser(TestCase):
     def setUp(self):
         self.test_code = TEST_CODE
         self.parser = PythonFileParser("file.py")

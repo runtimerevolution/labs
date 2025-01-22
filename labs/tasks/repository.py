@@ -1,9 +1,11 @@
 import json
 import logging
+import os.path
 from typing import List, cast
 
 from config.celery import app
 from config.redis_client import RedisVariable, redis_client
+from core.models import Project
 from decorators import time_and_log_function
 from file_handler import create_file, delete_file_line, modify_file_line
 from github.github import GithubRequests
@@ -97,12 +99,18 @@ def create_branch_task(
 @app.task
 def clone_repository_task(prefix="", repository_owner="", repository_name=""):
     repository = github_repository_data(prefix, repository_owner=repository_owner, repository_name=repository_name)
-
     github_request = GithubRequests(**repository)
-    repository_path = github_request.clone()
+
+    # Create the project associated with repository if it doesn't exist yet
+    project, _ = Project.objects.get_or_create(
+        path=github_request.directory_path,
+        defaults={"name": os.path.basename(github_request.directory_path), "url": github_request.repository_url},
+    )
+
+    github_request.clone()
 
     if prefix:
-        redis_client.set(RedisVariable.REPOSITORY_PATH, prefix=prefix, value=repository_path, ex=300)
+        redis_client.set(RedisVariable.PROJECT, prefix=prefix, value=project.id, ex=3600)
         return prefix
     return True
 

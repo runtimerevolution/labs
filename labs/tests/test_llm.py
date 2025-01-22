@@ -1,54 +1,43 @@
-from unittest import TestCase, skip
+from unittest import skip
 from unittest.mock import patch
 
-import pytest
-from core.models import Model, VectorizerModel
+from core.models import Model, ModelTypeEnum, Project, ProviderEnum, VectorizerModel
+from django.test import TestCase
 from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.vectorizer import Vectorizer
 from llm.checks import ValidationError, check_invalid_json
-from llm.context import CONTENT_TEMPLATE, get_context
+from llm.context import get_context
 from llm.ollama import OllamaRequester
 from llm.openai import OpenAIRequester
 from llm.prompt import get_prompt
 from tasks.llm import get_llm_response
 from tests.constants import (
+    FILE_CONTENT,
+    INSTRUCTION,
     OLLAMA_EMBEDDING_MODEL_NAME,
     OLLAMA_LLM_MODEL_NAME,
     OPENAI_EMBEDDING_MODEL_NAME,
     OPENAI_LLM_MODEL_NAME,
+    PERSONA,
 )
+from tests.utilities import create_test_config
 
 
-def call_llm_with_context(repository_path, issue_summary):
-    if not issue_summary:
-        raise ValueError("issue_summary cannot be empty.")
-
+def call_llm_with_context(project, issue_summary):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embedder = Embedder(embedder_class, *embeder_args)
 
-    vectorizer_class = VectorizerModel.get_active_vectorizer()
-    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repository_path)
+    vectorizer_class = VectorizerModel.get_active_vectorizer(project)
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, project)
 
-    # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    file_paths = embedder.retrieve_files_path(issue_summary, repository_path)
+    file_paths = embedder.retrieve_files_path(issue_summary, project)
 
-    prompt = get_prompt(issue_summary)
-    prepared_context = get_context(file_paths, prompt)
+    prompt = get_prompt(project.id, issue_summary)
+    prepared_context = get_context(project.id, file_paths, prompt)
 
     return get_llm_response(prepared_context)
-
-
-class TestCallLLMWithContext:
-    def test_empty_summary(self):
-        repository_path = "repository_path"
-        issue_summary = ""
-
-        with pytest.raises(Exception) as excinfo:
-            call_llm_with_context(repository_path, issue_summary)
-
-        assert "issue_summary cannot be empty" in str(excinfo.value)
 
 
 class TestCheckInvalidJsonResponse(TestCase):
@@ -86,22 +75,20 @@ class TestCheckInvalidJsonResponse(TestCase):
             check_invalid_json(llm_response)
 
 
-class TestLocalLLM:
-    test_file_paths = ["file_path"]
-    test_file_contents = "some_text"
-    test_context = {
-        "role": "system",
-        "content": CONTENT_TEMPLATE.format(file=test_file_paths[0], content=test_file_contents, mimetype="text/plain"),
-    }
+class TestLocalLLM(TestCase):
+    def setUp(self):
+        super().setUpClass()
+        create_test_config()
 
-    @patch("core.models.Prompt.get_persona", return_value="persona prompt")
-    @patch("core.models.Prompt.get_instruction", return_value="instruction prompt")
-    @patch("llm.context.get_file_content", return_value="test file contents")
+        self.project = Project.objects.create(name="test", path="/test/path")
+
+    @patch("core.models.Prompt.get_persona", return_value=PERSONA)
+    @patch("core.models.Prompt.get_instruction", return_value=INSTRUCTION)
+    @patch("llm.context.get_file_content", return_value=FILE_CONTENT)
     @patch("tasks.llm.run_response_checks")
     @patch("embeddings.vectorizers.vectorizer.Vectorizer.vectorize_to_database")
     @patch("llm.ollama.OllamaRequester.completion_without_proxy")
     @patch("embeddings.embedder.Embedder.retrieve_files_path")
-    @pytest.mark.django_db
     def test_local_llm_redirect(
         self,
         mocked_retrieve_files_path,
@@ -111,58 +98,115 @@ class TestLocalLLM:
         mocked_get_file_content,
         mocked_get_instruction,
         mocked_get_persona,
-        create_test_ollama_llm_config,
-        create_test_ollama_embedding_config,
-        create_test_chunk_vectorizer_config,
     ):
+        Model.objects.create(
+            model_type=ModelTypeEnum.LLM.name,
+            provider=ProviderEnum.OLLAMA.name,
+            model_name=OLLAMA_LLM_MODEL_NAME,
+            active=True,
+        )
+        Model.objects.create(
+            model_type=ModelTypeEnum.EMBEDDING.name,
+            provider=ProviderEnum.OLLAMA.name,
+            model_name=OLLAMA_EMBEDDING_MODEL_NAME,
+            active=True,
+        )
+
         mocked_retrieve_files_path.return_value = ["/path/to/file1"]
         mocked_run_response_checks.return_value = False, ""
-        repository_path = "repo"
+
         issue_summary = "Fix the bug in the authentication module"
-        call_llm_with_context(repository_path, issue_summary)
+        call_llm_with_context(self.project, issue_summary)
 
         mocked_completion_without_proxy.assert_called_once()
 
-    @patch("file_handler.get_file_content", return_value="test file contents")
+    @patch("llm.context.get_file_content", return_value=FILE_CONTENT)
     @patch("embeddings.vectorizers.chunk_vectorizer.ChunkVectorizer.vectorize_to_database")
     @patch("embeddings.embedder.Embedder.retrieve_files_path")
     @skip("This is used locally with an Ollama instance running in docker")
     def test_local_llm_connection(
         self, mocked_retrieve_files_path, mocked_vectorize_to_database, mocked_get_file_content
     ):
+        # Creates the required configuration objects
+        Model.objects.create(
+            model_type=ModelTypeEnum.LLM.name,
+            provider=ProviderEnum.OLLAMA.name,
+            model_name=OLLAMA_LLM_MODEL_NAME,
+            active=True,
+        )
+        Model.objects.create(
+            model_type=ModelTypeEnum.EMBEDDING.name,
+            provider=ProviderEnum.OLLAMA.name,
+            model_name=OLLAMA_EMBEDDING_MODEL_NAME,
+            active=True,
+        )
+
         mocked_retrieve_files_path.return_value = ["/path/to/file1"]
-        repository_destination = "repo"
         issue_summary = "Fix the bug in the authentication module"
-        success, response = call_llm_with_context(repository_destination, issue_summary)
+        success, response = call_llm_with_context(self.project, issue_summary)
 
-        assert success
+        self.assertTrue(success)
 
 
-class TestLLMRequester:
-    @pytest.mark.django_db
-    def test_openai_llm_requester(self, create_test_openai_llm_config):
-        requester, model_name = Model.get_active_llm_model()
+class TestLLMRequesterOllama(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        create_test_config()
 
-        assert issubclass(requester, OpenAIRequester)
-        assert model_name == OPENAI_LLM_MODEL_NAME
+        Model.objects.create(
+            model_type=ModelTypeEnum.LLM.name,
+            provider=ProviderEnum.OLLAMA.name,
+            model_name=OLLAMA_LLM_MODEL_NAME,
+            active=True,
+        )
+        Model.objects.create(
+            model_type=ModelTypeEnum.EMBEDDING.name,
+            provider=ProviderEnum.OLLAMA.name,
+            model_name=OLLAMA_EMBEDDING_MODEL_NAME,
+            active=True,
+        )
 
-    @pytest.mark.django_db
-    def test_openai_embedder(self, create_test_openai_embedding_config):
-        embedder, model_name = Model.get_active_embedding_model()
-
-        assert issubclass(embedder, OpenAIEmbedder)
-        assert model_name == OPENAI_EMBEDDING_MODEL_NAME
-
-    @pytest.mark.django_db
-    def test_ollama_llm_requester(self, create_test_ollama_llm_config):
+    def test_ollama_llm_requester(self):
         requester, model_name = Model.get_active_llm_model()
 
         assert issubclass(requester, OllamaRequester)
-        assert model_name == OLLAMA_LLM_MODEL_NAME
+        self.assertEqual(model_name, OLLAMA_LLM_MODEL_NAME)
 
-    @pytest.mark.django_db
-    def test_ollama_embedder(self, create_test_ollama_embedding_config):
+    def test_ollama_embedder(self):
         embedder, model_name = Model.get_active_embedding_model()
 
         assert issubclass(embedder, OllamaEmbedder)
-        assert model_name == OLLAMA_EMBEDDING_MODEL_NAME
+        self.assertEqual(model_name, OLLAMA_EMBEDDING_MODEL_NAME)
+
+
+class TestLLMRequestOpenAI(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        create_test_config()
+
+        Model.objects.create(
+            model_type=ModelTypeEnum.LLM.name,
+            provider=ProviderEnum.OPENAI.name,
+            model_name=OPENAI_LLM_MODEL_NAME,
+            active=True,
+        )
+        Model.objects.create(
+            model_type=ModelTypeEnum.EMBEDDING.name,
+            provider=ProviderEnum.OPENAI.name,
+            model_name=OPENAI_EMBEDDING_MODEL_NAME,
+            active=True,
+        )
+
+    def test_openai_llm_requester(self):
+        requester, model_name = Model.get_active_llm_model()
+
+        assert issubclass(requester, OpenAIRequester)
+        self.assertEqual(model_name, OPENAI_LLM_MODEL_NAME)
+
+    def test_openai_embedder(self):
+        embedder, model_name = Model.get_active_embedding_model()
+
+        assert issubclass(embedder, OpenAIEmbedder)
+        self.assertEqual(model_name, OPENAI_EMBEDDING_MODEL_NAME)

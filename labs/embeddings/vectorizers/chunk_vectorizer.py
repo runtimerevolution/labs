@@ -61,9 +61,9 @@ class ChunkVectorizer:
         text_splitter = CharacterTextSplitter(chunk_size=2000, chunk_overlap=0)
         return text_splitter.split_documents(docs)
 
-    def vectorize_to_database(self, include_file_extensions, repository_path, *args, **kwargs):
+    def vectorize_to_database(self, include_file_extensions, project, *args, **kwargs):
         logger.debug("Loading and splitting all documents into chunks.")
-        docs = self.load_docs(repository_path, include_file_extensions)
+        docs = self.load_docs(project.path, include_file_extensions)
         texts = self.split_docs(docs)
         files_texts = [(text.metadata["source"], text.page_content) for text in texts]
         texts = [files_text[1] for files_text in files_texts]
@@ -73,4 +73,4 @@ class ChunkVectorizer:
         embeddings = self.embedder.embed(prompt=texts)
 
         logger.debug("Storing all embeddings.")
-        self.embedder.reembed_code(files_texts=files_texts, embeddings=embeddings, repository=repository_path)  # type: ignore
+        self.embedder.reembed_code(project=project, files_texts=files_texts, embeddings=embeddings)
