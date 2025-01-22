@@ -95,7 +95,7 @@ class Model(models.Model):
 
     @staticmethod
     def _get_active_provider_model(model_type: Literal["embedding", "llm", "vectorizer"]):
-        queryset = Model.objects.filter(model_type=model_type.upper(), active=True)
+        queryset = Model.objects.filter(model_type=model_type.upper())
         if not queryset.exists():
             raise ValueError(f"No {model_type} model configured")
 
