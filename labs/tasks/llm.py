@@ -2,7 +2,9 @@ import json
 import logging
 from typing import List, Optional
 
-from core.models import Model, VectorizerModel
+from config.celery import app
+from config.redis_client import RedisVariable, redis_client
+from core.models import Model, Project, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.vectorizer import Vectorizer
@@ -10,9 +12,6 @@ from llm.checks import run_response_checks
 from llm.context import get_context
 from llm.prompt import get_prompt
 from llm.requester import Requester
-
-from config.celery import app
-from config.redis_client import RedisVariable, redis_client
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +50,8 @@ def vectorize_repository_task(prefix="", repository_path=""):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embedder = Embedder(embedder_class, *embeder_args)
 
-    vectorizer_class = VectorizerModel.get_active_vectorizer()
+    project = Project.objects.filter(path=repository_path).first()
+    vectorizer_class = VectorizerModel.get_active_vectorizer(project)
     Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repository_path)
 
     if prefix:

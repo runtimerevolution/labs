@@ -21,6 +21,7 @@ services:
     volumes:
       - api_logs:/app/logs
       - ./labs/:/app/
+      - ${LOCAL_REPOSITORIES_PATH}:/repositories/
 
   worker:
     env_file: .env.local
@@ -34,7 +35,7 @@ services:
     volumes:
       - worker_logs:/app/logs
       - ./labs/:/app/
-      - ${LOCAL_REPOSITORIES_PATH}:/local-repos/
+      - ${LOCAL_REPOSITORIES_PATH}:/repositories/
 
   ollama:
     image: ollama/ollama:latest
