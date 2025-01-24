@@ -137,4 +137,5 @@ class WorkflowResult(models.Model):
     context = models.TextField(null=True)
     llm_response = models.TextField(null=True)
     modified_files = models.TextField(null=True)
+    pre_commit_error = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)

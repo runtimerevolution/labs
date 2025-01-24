@@ -42,6 +42,7 @@ WORKDIR $PYSETUP_PATH
 
 # Install production dependencies
 COPY poetry.lock pyproject.toml ./
+
 RUN poetry install --no-root --without dev
 
 
@@ -63,5 +64,4 @@ EXPOSE 8000
 
 CMD python manage.py migrate --noinput && \
 python manage.py loaddata fixtures/*.json && \
-DJANGO_SUPERUSER_PASSWORD=admin python manage.py createsuperuser --noinput --username=admin --email=admin@example.com && \
 python manage.py runserver 0.0.0.0:8000

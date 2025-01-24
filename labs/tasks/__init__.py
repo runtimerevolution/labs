@@ -12,6 +12,7 @@ from tasks.repository import (
     create_branch_task,
     create_pull_request_task,
     get_issue_task,
+    run_pre_commit,
 )
 from tasks.run import init_task, run_on_local_repository_task, run_on_repository_task
 
@@ -30,4 +31,5 @@ __all__ = [
     "run_on_repository_task",
     "run_on_local_repository_task",
     "save_workflow_result_task",
+    "run_pre_commit",
 ]
