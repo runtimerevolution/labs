@@ -26,12 +26,12 @@ format:
 ## Stops and removes all the services
 .PHONY: down
 down:
-	docker compose down
+	$(shell cat .env.local | grep LOCAL_REPOSITORIES_PATH ) docker compose down
 
 ## Start all the services
 .PHONY: up
 up: down
-	docker compose up --build -d
+	$(shell cat .env.local | grep LOCAL_REPOSITORIES_PATH ) docker compose up --build -d
 
 ## Start a python shell
 .PHONY: shell
