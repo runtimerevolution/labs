@@ -26,12 +26,12 @@ format:
 ## Stops and removes all the services
 .PHONY: down
 down:
-	env $(shell cat .env.local | xargs) docker compose down
+	docker compose down
 
 ## Start all the services
 .PHONY: up
 up: down
-	env $(shell cat .env.local | xargs) docker compose up --build -d
+	docker compose up --build -d
 
 ## Start a python shell
 .PHONY: shell
