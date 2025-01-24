@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .forms import ProjectForm
-from .mixins import DeletePermissionMixin, JSONFormatterMixin
+from .mixins import JSONFormatterMixin
 from .models import Model, Project, Prompt, Variable, VectorizerModel, WorkflowResult
 
 
@@ -48,7 +48,8 @@ class VariableAdmin(admin.ModelAdmin):
 
 
 @admin.register(VectorizerModel)
-class VectorizerModelAdmin(admin.ModelAdmin, DeletePermissionMixin):
+class VectorizerModelAdmin(admin.ModelAdmin):
+    actions = None
     list_display = (
         "id",
         "project",
@@ -62,9 +63,14 @@ class VectorizerModelAdmin(admin.ModelAdmin, DeletePermissionMixin):
     def has_add_permission(self, request):
         return False
 
+    def has_delete_permission(self, request, obj=None):
+        # The ´Vectorizer´ should only be deleted through the Project (CASCADE)
+        return False if obj else super().has_delete_permission(request, obj)
+
 
 @admin.register(Prompt)
-class PromptAdmin(admin.ModelAdmin, DeletePermissionMixin):
+class PromptAdmin(admin.ModelAdmin):
+    actions = None
     list_display = (
         "id",
         "project",
@@ -76,6 +82,10 @@ class PromptAdmin(admin.ModelAdmin, DeletePermissionMixin):
 
     def has_add_permission(self, request):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        # The ´Prompt´ should only be deleted through the Project (CASCADE)
+        return False if obj else super().has_delete_permission(request, obj)
 
     def persona_preview(self, obj):
         return self.text_preview(obj.persona)
@@ -105,7 +115,8 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 @admin.register(WorkflowResult)
-class WorkflowResultAdmin(admin.ModelAdmin, DeletePermissionMixin, JSONFormatterMixin):
+class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
+    actions = None
     list_display = ("task_id", "created_at")
     list_display_links = ("task_id",)
     search_fields = ("task_id",)
@@ -131,6 +142,10 @@ class WorkflowResultAdmin(admin.ModelAdmin, DeletePermissionMixin, JSONFormatter
 
     def has_add_permission(self, request):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        # The ´WorkflowResult´ should only be deleted through the Project (CASCADE)
+        return False if obj else super().has_delete_permission(request, obj)
 
     def pretty_embeddings(self, obj):
         return self.format_json_field(obj.embeddings)
