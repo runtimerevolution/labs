@@ -35,9 +35,10 @@ Here's the steps to set up the project locally:
 
 1. `poetry shell`
 2. `poetry install`
-3. `make migrate`
-4. `make load_fixtures`
-5. `make createuser`
+3. `make up`
+4. `make migrate`
+5. `make load_fixtures`
+6. `make createuser`
 
 ### Using OpenAI
 

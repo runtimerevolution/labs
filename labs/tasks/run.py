@@ -1,6 +1,8 @@
 import os.path
 
 from celery import chain
+from config.celery import app
+from config.redis_client import RedisVariable, redis_client
 from tasks import (
     apply_code_changes_task,
     clone_repository_task,
@@ -15,9 +17,6 @@ from tasks import (
     save_workflow_result_task,
     vectorize_repository_task,
 )
-
-from config.celery import app
-from config.redis_client import RedisVariable, redis_client
 
 
 @app.task(bind=True)
