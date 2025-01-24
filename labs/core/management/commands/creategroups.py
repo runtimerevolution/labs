@@ -1,6 +1,6 @@
+from core.groups import GROUPS
 from django.contrib.auth.models import Group, Permission
 from django.core.management import BaseCommand
-from users.groups import GROUPS
 
 
 class Command(BaseCommand):

@@ -91,7 +91,7 @@ class Model(models.Model):
 
     @staticmethod
     def _get_active_provider_model(model_type: Literal["embedding", "llm", "vectorizer"]):
-        queryset = Model.objects.filter(model_type=model_type.upper())
+        queryset = Model.objects.filter(model_type=model_type.upper(), active=True)
         if not queryset.exists():
             raise ValueError(f"No {model_type} model configured")
 
@@ -145,7 +145,7 @@ def _get_default_vectorizer_value():
 
 
 class VectorizerModel(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=_get_default_vectorizer_value)
 
     @staticmethod
@@ -166,7 +166,7 @@ class VectorizerModel(models.Model):
 
 
 class WorkflowResult(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     task_id = models.CharField(max_length=255)
     embed_model = models.CharField(max_length=255, null=True)
     prompt_model = models.CharField(max_length=255, null=True)
@@ -194,7 +194,7 @@ def _get_default_instruction_value():
 
 
 class Prompt(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     persona = models.TextField(
         null=False,
         blank=False,
