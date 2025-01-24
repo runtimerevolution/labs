@@ -2,13 +2,12 @@ import json
 import logging
 from typing import List, cast
 
+from config.celery import app
+from config.redis_client import RedisVariable, redis_client
 from decorators import time_and_log_function
 from file_handler import create_file, delete_file_line, modify_file_line
 from github.github import GithubRequests
 from parsers.response import parse_llm_output
-
-from config.celery import app
-from config.redis_client import RedisVariable, redis_client
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +25,11 @@ def github_repository_data(prefix, token="", repository_owner="", repository_nam
 def apply_code_changes(llm_response):
     response = parse_llm_output(llm_response)
 
+    # We will sort the operations by file and by line number
+    sorted_steps = sorted(response.steps, key=lambda s: (s.path, s.line), reverse=True)
+
     files: List[str | None] = []
-    for step in response.steps:
+    for step in sorted_steps:
         match step.type:
             case "create":
                 create_file(step.path, step.content)
