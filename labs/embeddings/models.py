@@ -3,7 +3,7 @@ from pgvector.django import VectorField
 
 
 class Embedding(models.Model):
-    project = models.ForeignKey("core.Project", on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey("core.Project", on_delete=models.CASCADE)
     repository = models.CharField(max_length=255)
     file_path = models.CharField(max_length=255)
     text = models.TextField()
