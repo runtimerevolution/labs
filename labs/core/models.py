@@ -54,8 +54,6 @@ class Variable(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
     name = models.CharField(max_length=255)
     value = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def load_provider_keys(provider: str):
@@ -82,8 +80,6 @@ class Model(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
     model_name = models.CharField(max_length=255)
     active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def get_active_embedding_model() -> Tuple[Embedder, str]:
@@ -121,6 +117,8 @@ class Project(models.Model):
     description = models.TextField(null=True, blank=True)
     path = models.CharField(max_length=255, unique=True)
     url = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
         if not os.path.exists(self.path):
@@ -147,10 +145,8 @@ def _get_default_vectorizer_value():
 
 
 class VectorizerModel(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=_get_default_vectorizer_value)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def get_active_vectorizer(project) -> Vectorizer:
@@ -170,7 +166,7 @@ class VectorizerModel(models.Model):
 
 
 class WorkflowResult(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     task_id = models.CharField(max_length=255)
     embed_model = models.CharField(max_length=255, null=True)
     prompt_model = models.CharField(max_length=255, null=True)
@@ -198,7 +194,7 @@ def _get_default_instruction_value():
 
 
 class Prompt(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     persona = models.TextField(
         null=False,
         blank=False,
@@ -213,8 +209,6 @@ class Prompt(models.Model):
         help_text="""It should include guidelines on what is expected in the generated code, 
         such as "avoid complexity" or "minimize the code".""",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def get_persona(project_id: int) -> str:

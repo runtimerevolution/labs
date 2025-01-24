@@ -13,8 +13,6 @@ class ModelAdmin(admin.ModelAdmin):
         "provider",
         "model_name",
         "active",
-        "created_at",
-        "updated_at",
     )
     list_display_links = ("id",)
     list_editable = ("model_type", "provider", "model_name", "active")
@@ -35,8 +33,6 @@ class VariableAdmin(admin.ModelAdmin):
         "provider",
         "name",
         "value",
-        "created_at",
-        "updated_at",
     )
     list_display_links = ("id",)
     list_editable = ("provider", "value")
@@ -57,8 +53,6 @@ class VectorizerModelAdmin(admin.ModelAdmin, DeletePermissionMixin):
         "id",
         "project",
         "vectorizer_type",
-        "created_at",
-        "updated_at",
     )
     list_display_links = ("id",)
     list_editable = ("vectorizer_type",)
@@ -76,8 +70,6 @@ class PromptAdmin(admin.ModelAdmin, DeletePermissionMixin):
         "project",
         "persona_preview",
         "instruction_preview",
-        "created_at",
-        "updated_at",
     )
     list_display_links = ("id",)
     search_fields = ("prompt",)
@@ -99,7 +91,14 @@ class PromptAdmin(admin.ModelAdmin, DeletePermissionMixin):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     form = ProjectForm
-    list_display = ("id", "name", "path", "url")
+    list_display = (
+        "id",
+        "name",
+        "path",
+        "url",
+        "created_at",
+        "updated_at",
+    )
     list_display_links = ("id",)
     search_fields = ("name", "path", "url")
     readonly_fields = ("url",)
