@@ -12,7 +12,8 @@ class Command(BaseCommand):
             group, created = Group.objects.get_or_create(name=group_name)
             self.stdout.write(f"Group {group.name} {'created' if created else 'already exists'}")
 
-            group_permissions = GROUPS.get_group_permission_codenames(group.name)
-            group.permissions.set(Permission.objects.filter(codename__in=group_permissions))
-            group.save()
-            self.stdout.write(f"Added permissions to group {group.name}: {', '.join(group_permissions)}")
+            if created:
+                group_permissions = GROUPS.get_group_permission_codenames(group.name)
+                group.permissions.set(Permission.objects.filter(codename__in=group_permissions))
+                group.save()
+                self.stdout.write(f"Added permissions to group {group.name}: {', '.join(group_permissions)}")
