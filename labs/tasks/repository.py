@@ -1,5 +1,6 @@
 import json
 import logging
+import subprocess
 from typing import List, cast
 
 from config.celery import app
@@ -25,8 +26,11 @@ def github_repository_data(prefix, token="", repository_owner="", repository_nam
 def apply_code_changes(llm_response):
     response = parse_llm_output(llm_response)
 
+    # We will sort the operations by file and by line number
+    sorted_steps = sorted(response.steps, key=lambda s: (s.path, s.line), reverse=True)
+
     files: List[str | None] = []
-    for step in response.steps:
+    for step in sorted_steps:
         match step.type:
             case "create":
                 create_file(step.path, step.content)
@@ -160,6 +164,39 @@ def create_pull_request_task(
         head=redis_client.get(RedisVariable.BRANCH_NAME, prefix, default=branch_name),
         base=redis_client.get(RedisVariable.ORIGINAL_BRANCH_NAME, prefix, default=original_branch),
     )
+
+    if prefix:
+        return prefix
+    return True
+
+
+@app.task
+def run_pre_commit(prefix=""):
+    logger.debug("Running pre-commit")
+    path = str(redis_client.get(RedisVariable.REPOSITORY_PATH, prefix=prefix))
+
+    number_of_runs = 2
+    for run in range(number_of_runs):
+        try:
+            subprocess.run(
+                ["pre-commit", "run", "--all-files"],
+                cwd=path,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            logger.debug("Pre-commit checks passed successfully!")
+            return
+
+        except subprocess.CalledProcessError as e:
+            logger.debug("Pre-commit output:")
+            logger.debug(e.stdout)
+
+            if run == number_of_runs - 1:
+                logger.error("Pre-commit checks failed after multiple attempts.")
+                logger.error(e.stdout)
+                redis_client.set(RedisVariable.PRE_COMMIT_ERROR, prefix=prefix, value=json.dumps(e.stdout))
+                break
 
     if prefix:
         return prefix
