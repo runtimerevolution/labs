@@ -39,9 +39,9 @@ JSON_RESPONSE = json.dumps(
     {
         "steps": [
             {
-                "type": "Operation type: 'create', 'update', 'overwrite', or 'delete'",
+                "type": "Operation type: 'create', 'insert', 'overwrite', or 'delete'",
                 "path": "Absolute file path",
-                "content": "Content to write (required for 'create', 'update', or 'overwrite')",
+                "content": "Content to write (required for 'create', 'insert', or 'overwrite')",
                 "line": "Initial line number where the content should be written (or erased if 'delete')",
             }
         ]

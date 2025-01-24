@@ -16,6 +16,7 @@ class RedisVariable(Enum):
     ISSUE_TITLE = "issue_title"
     LLM_RESPONSE = "llm_response"
     ORIGINAL_BRANCH_NAME = "original_branch_name"
+    PRE_COMMIT_ERROR = "pre_commit_error"
     PROMPT = "prompt"
     REPOSITORY_NAME = "repository_name"
     REPOSITORY_OWNER = "repository_owner"

@@ -1,6 +1,8 @@
 import logging
 import os
+from pathlib import Path
 from types import SimpleNamespace
+from typing import Union
 
 import pathspec
 from langchain_community.document_loaders import TextLoader
@@ -14,24 +16,13 @@ class PythonVectorizer:
     def __init__(self, embedder):
         self.embedder = embedder
 
-    def prepare_doc_content(self, metadata, code_snippet):
-        metadata = SimpleNamespace(**metadata)
+    def load_file_chunks(self, file_path: Union[str, Path]):
+        try:
+            loader = TextLoader(file_path, encoding="utf-8")
+            return loader.load_and_split()
 
-        result = (
-            f"Source: {metadata.source}\n"
-            f"Name: {metadata.name}\n"
-            f"Start line: {metadata.start_line}\n"
-            f"End line: {metadata.end_line}\n"
-        )
-
-        if hasattr(metadata, "parameters"):
-            result += f"Parameters: {', '.join(metadata.parameters)}\n"
-
-        if hasattr(metadata, "returns"):
-            result += f"Returns: {metadata.returns}\n"
-
-        result += f"\n\n{code_snippet}"
-        return result
+        except Exception:
+            logger.exception(f"Error loading file {file_path}")
 
     def load_docs(self, root_dir, file_extensions=None):
         docs = []
@@ -58,20 +49,20 @@ class PythonVectorizer:
                 if file_extensions and os.path.splitext(file_path)[1] not in file_extensions:
                     continue
 
-                # only python files
                 if os.path.splitext(file_path)[1] != ".py":
-                    try:
-                        loader = TextLoader(file_path, encoding="utf-8")
-                        docs.extend(loader.load_and_split())
-
-                    except Exception:
-                        logger.exception("Failed to load repository documents into memory.")
-
+                    docs.extend(self.load_file_chunks(file_path))
                     continue
 
-                python_file_structure = parse_python_file(file_path)
+                # Python files with syntax errors will be loaded in chunks
+                try:
+                    python_file_structure = parse_python_file(file_path)
 
-                # functions
+                except SyntaxError as e:
+                    logger.error(f"Syntax error at {file_path}. File will be loaded without Python parsing: {e}")
+                    docs.extend(self.load_file_chunks(file_path))
+                    continue
+
+                # Functions
                 for func in python_file_structure.get("functions", []):
                     func_ns = SimpleNamespace(**func)
 
@@ -85,10 +76,9 @@ class PythonVectorizer:
                         returns=func_ns.returns,
                     )
 
-                    doc_content = self.prepare_doc_content(metadata, function_snippet)
-                    docs.append(Document(doc_content, metadata=metadata))
+                    docs.append(Document(function_snippet, metadata=metadata))
 
-                # classes
+                # Classes
                 for cls in python_file_structure.get("classes", []):
                     cls_ns = SimpleNamespace(**cls)
 
@@ -100,8 +90,7 @@ class PythonVectorizer:
                         end_line=cls_ns.end_line,
                     )
 
-                    doc_content = self.prepare_doc_content(metadata, class_snippet)
-                    docs.append(Document(doc_content, metadata=metadata))
+                    docs.append(Document(class_snippet, metadata=metadata))
 
                     for method in cls.get("methods"):
                         method_ns = SimpleNamespace(**method)
@@ -116,8 +105,7 @@ class PythonVectorizer:
                             returns=method_ns.returns,
                         )
 
-                        doc_content = self.prepare_doc_content(metadata, method_snippet)
-                        docs.append(Document(doc_content, metadata=metadata))
+                        docs.append(Document(method_snippet, metadata=metadata))
 
         return docs
 
@@ -125,8 +113,16 @@ class PythonVectorizer:
         docs = self.load_docs(repository_path, include_file_extensions)
 
         logger.debug(f"Loading {len(docs)} documents...")
-        files_texts = [(doc.metadata["source"], doc.page_content) for doc in docs]
-        texts = [file_and_text[1] for file_and_text in files_texts]
+        texts = []
+        files_texts = []
+        for doc in docs:
+            # Add the file path to the content to allow retrieving the file by its path
+            # if it is mentioned in the prompt.
+            file_path = doc.metadata["source"]
+            content = f"{file_path}\n\n{doc.page_content}"
+
+            files_texts.append((file_path, content))
+            texts.append(content)
 
         embeddings = self.embedder.embed(prompt=texts)
 
