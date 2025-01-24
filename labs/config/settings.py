@@ -181,6 +181,9 @@ REDIS_HOST = os.environ.get("REDIS_HOST")
 REDIS_PORT = os.environ.get("REDIS_PORT")
 
 # Custom settings
+REPOSITORIES_PATH = os.environ.get("REPOSITORIES_PATH", "/repositories/")
+
+GITHUB_BASE_URL = "https://github.com"
 GITHUB_API_BASE_URL = "https://api.github.com"
 
 LOCAL_LLM_HOST = os.environ.get("LOCAL_LLM_HOST", "http://ollama:11434")
