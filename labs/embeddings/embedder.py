@@ -34,7 +34,7 @@ class Embedder:
     def retrieve_files_path(
         self,
         query: str,
-        project: Project,
+        project_id: int,
         similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_THRESHOLD,
         max_results: int = settings.EMBEDDINGS_MAX_RESULTS,
     ) -> List[str]:
@@ -44,7 +44,7 @@ class Embedder:
             raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
         files_path = (
-            Embedding.objects.filter(project=project)
+            Embedding.objects.filter(project__id=project_id)
             .values("file_path")  # the combination of values and annotate, is the Django way of making a group by
             .annotate(distance=Min(CosineDistance("embedding", embedded_query[0])))
             .order_by("distance")

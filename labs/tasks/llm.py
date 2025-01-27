@@ -68,14 +68,12 @@ def find_embeddings_task(
     similarity_threshold=settings.EMBEDDINGS_SIMILARITY_THRESHOLD,
     max_results=settings.EMBEDDINGS_MAX_RESULTS,
 ):
-    project = Project.get_cached_project_by_id(
-        redis_client.get(RedisVariable.PROJECT, prefix=prefix, default=project_id)
-    )
+    project_id = redis_client.get(RedisVariable.PROJECT, prefix=prefix, default=project_id)
 
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     files_path = Embedder(embedder_class, *embeder_args).retrieve_files_path(
         redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body),
-        project,
+        project_id,
         similarity_threshold,
         max_results,
     )

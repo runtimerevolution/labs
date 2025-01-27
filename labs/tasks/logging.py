@@ -1,13 +1,13 @@
 from config.celery import app
 from config.redis_client import RedisVariable, redis_client
-from core.models import Model, Project, WorkflowResult
+from core.models import Model, WorkflowResult
 
 
 @app.task
 def save_workflow_result_task(prefix):
     _, embedding_model_name = Model.get_active_embedding_model()
     _, llm_model_name = Model.get_active_llm_model()
-    project = Project.get_cached_project_by_id(redis_client.get(RedisVariable.PROJECT, prefix=prefix))
+    project_id = redis_client.get(RedisVariable.PROJECT, prefix=prefix)
     embeddings = redis_client.get(RedisVariable.EMBEDDINGS, prefix)
     context = redis_client.get(RedisVariable.CONTEXT, prefix)
     llm_response = redis_client.get(RedisVariable.LLM_RESPONSE, prefix)
@@ -15,7 +15,7 @@ def save_workflow_result_task(prefix):
     pre_commit_error = redis_client.get(RedisVariable.PRE_COMMIT_ERROR, prefix)
 
     WorkflowResult.objects.create(
-        project=project,
+        project_id=project_id,
         task_id=prefix,
         embed_model=embedding_model_name,
         prompt_model=llm_model_name,
