@@ -65,7 +65,13 @@ class VectorizerModelAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         # The ´Vectorizer´ should only be deleted through the Project (CASCADE)
-        return False if obj else super().has_delete_permission(request, obj)
+        return True if not obj else super().has_delete_permission(request, obj)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        # Remove the admin delete button because ´Vectorizer´ should only be deleted through the Project (CASCADE)
+        extra_context = extra_context or {}
+        extra_context["show_delete"] = False
+        return super().change_view(request, object_id, form_url, extra_context)
 
 
 @admin.register(Prompt)
@@ -85,7 +91,13 @@ class PromptAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         # The ´Prompt´ should only be deleted through the Project (CASCADE)
-        return False if obj else super().has_delete_permission(request, obj)
+        return True if not obj else super().has_delete_permission(request, obj)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        # Remove the admin delete button because ´Prompt´ should only be deleted through the Project (CASCADE)
+        extra_context = extra_context or {}
+        extra_context["show_delete"] = False
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def persona_preview(self, obj):
         return self.text_preview(obj.persona)
@@ -145,7 +157,13 @@ class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
 
     def has_delete_permission(self, request, obj=None):
         # The ´WorkflowResult´ should only be deleted through the Project (CASCADE)
-        return False if obj else super().has_delete_permission(request, obj)
+        return True if not obj else super().has_delete_permission(request, obj)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        # Remove the admin delete button because ´WorkflowResult´ should only be deleted through the Project (CASCADE)
+        extra_context = extra_context or {}
+        extra_context["show_delete"] = False
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def pretty_embeddings(self, obj):
         return self.format_json_field(obj.embeddings)
