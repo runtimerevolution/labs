@@ -82,5 +82,5 @@ creategroups:
 createuser:
 	DJANGO_SUPERUSER_PASSWORD=admin poetry run python labs/manage.py createsuperuser --noinput --username=admin --email=admin@example.com
 
-load_fixtures:
+loadfixtures:
 	python labs/manage.py loaddata $(wildcard labs/fixtures/*.json)

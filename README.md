@@ -37,7 +37,7 @@ Here's the steps to set up the project locally:
 2. `poetry install`
 3. `make up`
 4. `make migrate`
-5. `make load_fixtures`
+5. `make loadfixtures`
 6. `make creategroups`
 7. `make createuser`
 8. Go to [http://localhost:8000/admin](ttp://localhost:8000/admin) in internet browser and login (admin/admin)
