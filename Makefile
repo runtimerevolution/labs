@@ -76,6 +76,9 @@ migrations:
 migrate:
 	poetry run python labs/manage.py migrate
 
+creategroups:
+	poetry run python labs/manage.py creategroups
+
 createuser:
 	DJANGO_SUPERUSER_PASSWORD=admin poetry run python labs/manage.py createsuperuser --noinput --username=admin --email=admin@example.com
 
