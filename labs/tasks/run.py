@@ -56,7 +56,7 @@ def run_on_repository_task(
         commit_changes_task.s(),
         create_pull_request_task.s(),
         save_workflow_result_task.s(),
-    ).apply_async()
+    ).apply_async(link_error=save_workflow_result_task.s())
 
 
 @app.task
