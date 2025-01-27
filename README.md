@@ -50,6 +50,12 @@ Here's the steps to set up the project locally:
 ### Using OpenAI
 
 1. `make up`
+2. `make migrate`
+3. `make loadfixtures`
+4. `make creategroups`
+5. `make createuser`
+6. Go to [http://localhost:8000/admin](ttp://localhost:8000/admin) in internet browser and login (admin/admin)
+7. Select "Variables" option in the menu on the left and fill in the "OPENAI_API_KEY" key value with your [OpenAI API Key](https://openai.com/index/openai-api/) and click "Save"
 
 ### Using Llama 3.2 with nomic:
 
