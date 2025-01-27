@@ -1,14 +1,10 @@
 import json
 
+from core.models import Prompt
+
 INPUT = """
 Task description:
     {issue_summary}
-"""
-
-INSTRUCTION = """
-Based on the task description and the provided system context:
-    - Write the code changes required to resolve the task.
-    - Ensure that changes are made only within the allowed scope.
 """
 
 OUTPUT = """
@@ -49,10 +45,10 @@ JSON_RESPONSE = json.dumps(
 )
 
 
-def get_prompt(issue_summary: str):
+def get_prompt(project_id: int, issue_summary: str):
     formatted_input = INPUT.format(issue_summary=issue_summary)
     formatted_output = OUTPUT.format(json_response=JSON_RESPONSE)
 
-    prompt = "\n".join([formatted_input, INSTRUCTION, formatted_output])
+    prompt = "\n".join([formatted_input, Prompt.get_instruction(project_id), formatted_output])
 
     return prompt

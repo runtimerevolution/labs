@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from core.models import Model, ModelTypeEnum, Project, ProviderEnum, Variable, VectorizerEnum, VectorizerModel
+from core.models import Model, ModelTypeEnum, Project, ProviderEnum, Variable
 from embeddings.models import Embedding
 from tests.constants import (
     MULTIPLE_EMBEDDINGS,
@@ -14,24 +14,34 @@ from tests.constants import (
 
 
 @pytest.fixture
-@pytest.mark.django_db
-def create_test_embedding():
-    embedding = Embedding(**SINGLE_EMBEDDING)
-    embedding.save()
-
-    return [embedding]
+@pytest.mark.django_db()
+def create_test_project():
+    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER", value="CHUNK_VECTORIZER")
+    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA", value="persona")
+    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION", value="instruction")
+    return Project.objects.create(name="test", path="repository_path")
 
 
 @pytest.fixture
 @pytest.mark.django_db
-def create_test_embeddings():
-    embeddings: List[Embedding] = []
+def create_single_embedding(create_test_project):
+    project = create_test_project
+    embedding = Embedding.objects.create(project=project, **SINGLE_EMBEDDING)
 
-    for embedding in MULTIPLE_EMBEDDINGS:
-        embeddings.append(Embedding(**embedding))
+    return project, [embedding]
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def create_multiple_embeddings(create_test_project):
+    project = create_test_project
+
+    embeddings: List[Embedding] = []
+    for embedding_params in MULTIPLE_EMBEDDINGS:
+        embeddings.append(Embedding(project=project, **embedding_params))
 
     Embedding.objects.bulk_create(embeddings)
-    return embeddings
+    return project, embeddings
 
 
 @pytest.fixture
@@ -76,18 +86,3 @@ def create_test_openai_llm_config():
         model_name=OPENAI_LLM_MODEL_NAME,
         active=True,
     )
-
-
-@pytest.fixture
-@pytest.mark.django_db
-def create_test_chunk_vectorizer_config():
-    return VectorizerModel.objects.create(vectorizer_type=VectorizerEnum.CHUNK_VECTORIZER.name)
-
-
-@pytest.fixture
-@pytest.mark.django_db
-def create_test_project():
-    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER", value="CHUNK_VECTORIZER")
-    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA", value="persona")
-    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION", value="instruction")
-    return Project.objects.create(name="test", path="repository_path")

@@ -1,5 +1,6 @@
 import os
 from enum import Enum
+from functools import lru_cache
 from typing import Literal, Tuple
 
 from django.core.exceptions import ValidationError
@@ -120,11 +121,19 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @staticmethod
+    @lru_cache
+    def get_cached_project_by_id(project_id):
+        return Project.objects.get(id=project_id)
+
     def clean(self):
         if not os.path.exists(self.path):
             raise ValidationError({"path": f'Directory "{self.path}" does not exist.'})
 
     def save(self, *args, **kwargs):
+        # Invalidate LRU cache because objects has been changed
+        Project.get_cached_project_by_id.cache_clear()
+
         created = not self.id
         super().save(*args, **kwargs)
 
@@ -145,7 +154,7 @@ def _get_default_vectorizer_value():
 
 
 class VectorizerModel(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=_get_default_vectorizer_value)
 
     @staticmethod
@@ -166,7 +175,7 @@ class VectorizerModel(models.Model):
 
 
 class WorkflowResult(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     task_id = models.CharField(max_length=255)
     embed_model = models.CharField(max_length=255, null=True)
     prompt_model = models.CharField(max_length=255, null=True)
@@ -194,7 +203,7 @@ def _get_default_instruction_value():
 
 
 class Prompt(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     persona = models.TextField(
         null=False,
         blank=False,

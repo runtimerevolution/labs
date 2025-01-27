@@ -11,12 +11,12 @@ class GithubRepositorySchema(GithubSchema):
 
 
 class LocalRepositoryShema(BaseModel):
-    repository_path: str
+    project_id: int
     prompt: str
 
 
 class VectorizeRepositorySchema(BaseModel):
-    repository_path: str
+    project_id: int
 
 
 class FindEmbeddingsSchema(LocalRepositoryShema):
@@ -25,6 +25,7 @@ class FindEmbeddingsSchema(LocalRepositoryShema):
 
 
 class PreparePromptContextSchema(BaseModel):
+    project_id: int
     prompt: str
     embeddings: List[List[str]]
 
