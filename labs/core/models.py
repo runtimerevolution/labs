@@ -56,6 +56,18 @@ class Variable(models.Model):
     value = models.TextField()
 
     @staticmethod
+    def get_default_vectorizer_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER").value
+
+    @staticmethod
+    def get_default_persona_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA").value
+
+    @staticmethod
+    def get_default_instruction_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION").value
+
+    @staticmethod
     def load_provider_keys(provider: str):
         variables = Variable.objects.filter(provider=provider)
         for variable in variables:
@@ -140,13 +152,9 @@ class Project(models.Model):
         verbose_name_plural = "Projects"
 
 
-def _get_default_vectorizer_value():
-    return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER").value
-
-
 class VectorizerModel(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
-    vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=_get_default_vectorizer_value)
+    vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=Variable.get_default_vectorizer_value)
 
     @staticmethod
     def get_active_vectorizer(project) -> Vectorizer:
@@ -185,27 +193,19 @@ class WorkflowResult(models.Model):
         verbose_name_plural = "Workflow results"
 
 
-def _get_default_persona_value():
-    return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA").value
-
-
-def _get_default_instruction_value():
-    return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION").value
-
-
 class Prompt(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     persona = models.TextField(
         null=False,
         blank=False,
-        default=_get_default_persona_value,
+        default=Variable.get_default_persona_value,
         help_text="""It should include additional information to help guide the model's behavior and 
         understanding of its role.""",
     )
     instruction = models.TextField(
         null=False,
         blank=False,
-        default=_get_default_instruction_value,
+        default=Variable.get_default_instruction_value,
         help_text="""It should include guidelines on what is expected in the generated code, 
         such as "avoid complexity" or "minimize the code".""",
     )
