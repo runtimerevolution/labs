@@ -43,7 +43,7 @@ Here's the steps to set up the project locally:
 8. Go to [http://localhost:8000/admin](ttp://localhost:8000/admin) in internet browser and login (admin/admin)
 9. Select "Variables" option in the menu on the left and fill in the "OPENAI_API_KEY" key value with your [OpenAI API Key](https://openai.com/index/openai-api/) and click "Save"
 10. Click the "Add" button of the "Project" option in the menu on the left and fill in the "Name" and select the "Project directory" and click "Save" in red boxes in image bellow:
-   ![docs/assets/new_project_fields.png](new_project_fields.png)
+   ![new_project_fields](docs/assets/new_project_fields.png)
 
 
 
@@ -61,7 +61,7 @@ Here's the steps to set up the project locally:
 6. Go to [http://localhost:8000/admin](ttp://localhost:8000/admin) in internet browser and login (admin/admin)
 7. Select "Models" option in the menu on the left
 8. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
-   ![docs/assets/local_models_admin_fields.png](local_models_admin_fields.png)
+   ![local_models_admin_fields](docs/assets/local_models_admin_fields.png)
 
 
 ### Using Starcoder2 with nomic:
@@ -74,7 +74,7 @@ Here's the steps to set up the project locally:
 6. Go to [http://localhost:8000/admin](ttp://localhost:8000/admin) in internet browser and login (admin/admin)
 7. Select "Models" option in the menu on the left
 8. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
-   ![docs/assets/local_models_admin_fields.png](local_models_admin_fields.png)
+   ![local_models_admin_fields](docs/assets/local_models_admin_fields.png)
 
 
 ### Using Qwen2.5 with nomic:
@@ -87,4 +87,4 @@ Here's the steps to set up the project locally:
 6. Go to [http://localhost:8000/admin](ttp://localhost:8000/admin) in internet browser and login (admin/admin)
 7. Select "Models" option in the menu on the left
 8. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
-   ![docs/assets/local_models_admin_fields.png](local_models_admin_fields.png)
+   ![local_models_admin_fields](docs/assets/local_models_admin_fields.png)
