@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.urls import reverse
 
 from .forms import ProjectForm
 from .mixins import JSONFormatterMixin
@@ -65,7 +66,10 @@ class VectorizerModelAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         # The ´Vectorizer´ should only be deleted through the Project (CASCADE)
-        return True if not obj else super().has_delete_permission(request, obj)
+        # User can type the delete url in the browser, what should not be allowed
+        if obj and request.path == reverse("admin:core_vectorizermodel_delete", args=[obj.id]):
+            return False
+        return bool(obj)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         # Remove the admin delete button because ´Vectorizer´ should only be deleted through the Project (CASCADE)
@@ -91,7 +95,10 @@ class PromptAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         # The ´Prompt´ should only be deleted through the Project (CASCADE)
-        return True if not obj else super().has_delete_permission(request, obj)
+        # User can type the delete url in the browser, what should not be allowed
+        if obj and request.path == reverse("admin:core_prompt_delete", args=[obj.id]):
+            return False
+        return bool(obj)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         # Remove the admin delete button because ´Prompt´ should only be deleted through the Project (CASCADE)
@@ -157,7 +164,10 @@ class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
 
     def has_delete_permission(self, request, obj=None):
         # The ´WorkflowResult´ should only be deleted through the Project (CASCADE)
-        return True if not obj else super().has_delete_permission(request, obj)
+        # User can type the delete url in the browser, what should not be allowed
+        if obj and request.path == reverse("admin:core_workflowresult_delete", args=[obj.id]):
+            return False
+        return bool(obj)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         # Remove the admin delete button because ´WorkflowResult´ should only be deleted through the Project (CASCADE)
