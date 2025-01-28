@@ -6,9 +6,7 @@
     "model_type": "EMBEDDING",
     "provider": "OLLAMA",
     "model_name": "nomic-embed-text:latest",
-    "active": false,
-    "created_at": "2024-11-18T15:45:24.700Z",
-    "updated_at": "2024-11-18T17:36:08.019Z"
+    "active": false
   }
 },
 {
@@ -18,9 +16,7 @@
     "model_type": "LLM",
     "provider": "OPENAI",
     "model_name": "gpt-4o",
-    "active": true,
-    "created_at": "2024-11-18T17:13:14.538Z",
-    "updated_at": "2024-11-18T17:56:56.639Z"
+    "active": true
   }
 },
 {
@@ -30,9 +26,7 @@
     "model_type": "EMBEDDING",
     "provider": "OPENAI",
     "model_name": "text-embedding-ada-002",
-    "active": true,
-    "created_at": "2024-11-18T17:36:01.547Z",
-    "updated_at": "2024-11-18T17:57:20.268Z"
+    "active": true
   }
 },
 {
@@ -42,9 +36,7 @@
     "model_type": "LLM",
     "provider": "OLLAMA",
     "model_name": "llama3.2:latest",
-    "active": false,
-    "created_at": "2024-11-18T17:36:45.310Z",
-    "updated_at": "2024-11-18T17:56:51.371Z"
+    "active": false
   }
 }
 ]

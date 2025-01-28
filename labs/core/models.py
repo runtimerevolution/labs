@@ -2,6 +2,7 @@ import os
 from enum import Enum
 from typing import Literal, Tuple
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
@@ -31,6 +32,7 @@ class ModelTypeEnum(Enum):
 
 
 class ProviderEnum(Enum):
+    NO_PROVIDER = "No provider"
     OPENAI = "OpenAI"
     OLLAMA = "Ollama"
 
@@ -52,14 +54,34 @@ class Variable(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
     name = models.CharField(max_length=255)
     value = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_default_vectorizer_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER").value
+
+    @staticmethod
+    def get_default_persona_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA").value
+
+    @staticmethod
+    def get_default_instruction_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION").value
 
     @staticmethod
     def load_provider_keys(provider: str):
         variables = Variable.objects.filter(provider=provider)
         for variable in variables:
             os.environ.setdefault(variable.name, variable.value)
+
+    def clean(self):
+        self._default_vectorizer_value_validation()
+
+    def _default_vectorizer_value_validation(self):
+        allowed_vectorizer_values = VectorizerEnum.__members__.keys()
+        if self.name == "DEFAULT_VECTORIZER" and self.value not in allowed_vectorizer_values:
+            raise ValidationError(
+                f"The only possible values for DEFAULT_VECTORIZER are: {', '.join(allowed_vectorizer_values)}"
+            )
 
     def __str__(self):
         return self.name
@@ -70,8 +92,6 @@ class Model(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
     model_name = models.CharField(max_length=255)
     active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def get_active_embedding_model() -> Tuple[Embedder, str]:
@@ -91,7 +111,6 @@ class Model(models.Model):
 
         # Load associated provider variables
         Variable.load_provider_keys(model.provider)
-
         return provider_model_class[model.provider][model_type], model.model_name
 
     def save(self, *args, **kwargs):
@@ -105,24 +124,49 @@ class Model(models.Model):
         indexes = [models.Index(fields=["provider", "model_name"])]
 
 
-class VectorizerModel(models.Model):
-    vectorizer_type = models.CharField(choices=VectorizerEnum.choices())
-    active = models.BooleanField(default=True)
+class Project(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    path = models.CharField(max_length=255, unique=True)
+    url = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def clean(self):
+        if not os.path.exists(self.path):
+            raise ValidationError({"path": f'Directory "{self.path}" does not exist.'})
+
+    def save(self, *args, **kwargs):
+        created = not self.id
+        super().save(*args, **kwargs)
+
+        if created:
+            VectorizerModel.objects.create(project=self)
+            Prompt.objects.create(project=self)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Project"
+        verbose_name_plural = "Projects"
+
+
+class VectorizerModel(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=Variable.get_default_vectorizer_value)
+
     @staticmethod
-    def get_active_vectorizer() -> Vectorizer:
-        queryset = VectorizerModel.objects.filter(active=True)
+    def get_active_vectorizer(project) -> Vectorizer:
+        queryset = VectorizerModel.objects.filter(project=project)
         if not queryset.exists():
             raise ValueError("No vectorizer configured")
 
         vectorizer_model = queryset.first()
         return vectorizer_model_class[vectorizer_model.vectorizer_type]
 
-    def save(self, *args, **kwargs):
-        VectorizerModel.objects.filter(active=True).exclude(id=self.id).update(active=False)
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return self.vectorizer_type
 
     class Meta:
         verbose_name = "Vectorizer"
@@ -130,6 +174,7 @@ class VectorizerModel(models.Model):
 
 
 class WorkflowResult(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
     task_id = models.CharField(max_length=255)
     embed_model = models.CharField(max_length=255, null=True)
     prompt_model = models.CharField(max_length=255, null=True)
@@ -139,3 +184,51 @@ class WorkflowResult(models.Model):
     modified_files = models.TextField(null=True)
     pre_commit_error = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.task_id}"
+
+    class Meta:
+        verbose_name = "Workflow result"
+        verbose_name_plural = "Workflow results"
+
+
+class Prompt(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    persona = models.TextField(
+        null=False,
+        blank=False,
+        default=Variable.get_default_persona_value,
+        help_text="""It should include additional information to help guide the model's behavior and 
+        understanding of its role.""",
+    )
+    instruction = models.TextField(
+        null=False,
+        blank=False,
+        default=Variable.get_default_instruction_value,
+        help_text="""It should include guidelines on what is expected in the generated code, 
+        such as "avoid complexity" or "minimize the code".""",
+    )
+
+    @staticmethod
+    def get_persona(project_id: int) -> str:
+        queryset = Prompt.objects.filter(project=project_id)
+        if not queryset.exists():
+            raise ValueError("No persona configured")
+
+        return queryset.first().persona
+
+    @staticmethod
+    def get_instruction(project_id: int) -> str:
+        queryset = Prompt.objects.filter(project=project_id)
+        if not queryset.exists():
+            raise ValueError("No instruction configured")
+
+        return queryset.first().instruction
+
+    def __str__(self):
+        return f"{self.persona[:50]}..., {self.instruction[:50]}..."
+
+    class Meta:
+        verbose_name = "Prompt"
+        verbose_name_plural = "Prompts"

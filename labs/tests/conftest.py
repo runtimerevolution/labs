@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from core.models import Model, ModelTypeEnum, ProviderEnum, VectorizerEnum, VectorizerModel
+from core.models import Model, ModelTypeEnum, Project, ProviderEnum, Variable, VectorizerEnum, VectorizerModel
 from embeddings.models import Embedding
 from tests.constants import (
     MULTIPLE_EMBEDDINGS,
@@ -81,7 +81,13 @@ def create_test_openai_llm_config():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_chunk_vectorizer_config():
-    return VectorizerModel.objects.create(
-        vectorizer_type=VectorizerEnum.CHUNK_VECTORIZER.name,
-        active=True,
-    )
+    return VectorizerModel.objects.create(vectorizer_type=VectorizerEnum.CHUNK_VECTORIZER.name)
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def create_test_project():
+    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER", value="CHUNK_VECTORIZER")
+    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA", value="persona")
+    Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION", value="instruction")
+    return Project.objects.create(name="test", path="repository_path")
