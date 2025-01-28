@@ -107,7 +107,6 @@ class Migration(migrations.Migration):
             model_name="vectorizermodel",
             name="project",
             field=models.ForeignKey(
-                null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="core.project",
             ),
@@ -116,7 +115,6 @@ class Migration(migrations.Migration):
             model_name="workflowresult",
             name="project",
             field=models.ForeignKey(
-                null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="core.project",
             ),
@@ -150,7 +148,6 @@ class Migration(migrations.Migration):
                 (
                     "project",
                     models.ForeignKey(
-                        null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         to="core.project",
                     ),

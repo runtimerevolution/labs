@@ -11,11 +11,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RemoveField(
+            model_name="embedding",
+            name="repository",
+        ),
         migrations.AddField(
             model_name="embedding",
             name="project",
             field=models.ForeignKey(
-                null=True,
                 on_delete=django.db.models.deletion.CASCADE,
                 to="core.project",
             ),

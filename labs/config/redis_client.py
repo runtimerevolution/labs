@@ -17,10 +17,11 @@ class RedisVariable(Enum):
     LLM_RESPONSE = "llm_response"
     ORIGINAL_BRANCH_NAME = "original_branch_name"
     PRE_COMMIT_ERROR = "pre_commit_error"
+    PROJECT = "project"
+    PROJECT_PATH = "project_path"
     PROMPT = "prompt"
     REPOSITORY_NAME = "repository_name"
     REPOSITORY_OWNER = "repository_owner"
-    REPOSITORY_PATH = "repository_path"
     TOKEN = "token"
     USERNAME = "username"
 

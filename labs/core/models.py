@@ -153,12 +153,12 @@ class Project(models.Model):
 
 
 class VectorizerModel(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=Variable.get_default_vectorizer_value)
 
     @staticmethod
-    def get_active_vectorizer(project) -> Vectorizer:
-        queryset = VectorizerModel.objects.filter(project=project)
+    def get_active_vectorizer(project_id) -> Vectorizer:
+        queryset = VectorizerModel.objects.filter(project__id=project_id)
         if not queryset.exists():
             raise ValueError("No vectorizer configured")
 
@@ -174,7 +174,7 @@ class VectorizerModel(models.Model):
 
 
 class WorkflowResult(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     task_id = models.CharField(max_length=255)
     embed_model = models.CharField(max_length=255, null=True)
     prompt_model = models.CharField(max_length=255, null=True)
@@ -194,7 +194,7 @@ class WorkflowResult(models.Model):
 
 
 class Prompt(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     persona = models.TextField(
         null=False,
         blank=False,
