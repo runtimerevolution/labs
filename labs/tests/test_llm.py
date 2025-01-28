@@ -21,21 +21,25 @@ from tests.constants import (
 )
 
 
-def call_llm_with_context(repository_path, issue_summary, project):
+def call_llm_with_context(issue_summary, project):
     if not issue_summary:
         raise ValueError("issue_summary cannot be empty.")
 
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embedder = Embedder(embedder_class, *embeder_args)
 
-    vectorizer_class = VectorizerModel.get_active_vectorizer(project)
-    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, repository_path)
+    vectorizer_class = VectorizerModel.get_active_vectorizer(project.id)
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(
+        None,
+        project.id,
+        project_path=project.path,
+    )
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
-    file_paths = embedder.retrieve_files_path(issue_summary, repository_path)
+    file_paths = embedder.retrieve_files_path(issue_summary, project)
 
-    prompt = get_prompt(issue_summary)
-    prepared_context = get_context(file_paths, prompt)
+    prompt = get_prompt(project.id, issue_summary)
+    prepared_context = get_context(project.id, file_paths, prompt)
 
     return get_llm_response(prepared_context)
 
@@ -43,11 +47,10 @@ def call_llm_with_context(repository_path, issue_summary, project):
 class TestCallLLMWithContext:
     @pytest.mark.django_db
     def test_empty_summary(self, create_test_project):
-        repository_path = "repository_path"
         issue_summary = ""
 
         with pytest.raises(Exception) as excinfo:
-            call_llm_with_context(repository_path, issue_summary, project=create_test_project)
+            call_llm_with_context(issue_summary, project=create_test_project)
 
         assert "issue_summary cannot be empty" in str(excinfo.value)
 
@@ -104,9 +107,8 @@ class TestLocalLLM:
         self, mocked_retrieve_files_path, mocked_vectorize_to_database, mocked_get_file_content, create_test_project
     ):
         mocked_retrieve_files_path.return_value = ["/path/to/file1"]
-        repository_destination = "repo"
         issue_summary = "Fix the bug in the authentication module"
-        success, response = call_llm_with_context(repository_destination, issue_summary, create_test_project)
+        success, response = call_llm_with_context(issue_summary, create_test_project)
 
         assert success
 
@@ -125,14 +127,12 @@ class TestLocalLLM:
         mocked_get_file_content,
         create_test_ollama_llm_config,
         create_test_ollama_embedding_config,
-        create_test_chunk_vectorizer_config,
         create_test_project,
     ):
         mocked_retrieve_files_path.return_value = ["/path/to/file1"]
         mocked_run_response_checks.return_value = False, ""
-        repository_path = "repo"
         issue_summary = "Fix the bug in the authentication module"
-        call_llm_with_context(repository_path, issue_summary, create_test_project)
+        call_llm_with_context(issue_summary, create_test_project)
 
         mocked_completion_without_proxy.assert_called_once()
 

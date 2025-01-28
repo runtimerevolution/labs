@@ -10,17 +10,19 @@ client = TestAsyncClient(router)
 class TestCodemonkeyEndpoints:
     @pytest.mark.asyncio
     @patch("api.codemonkey_endpoints.run_on_local_repository_task")
-    async def test_run_on_local_repository_endpoint(self, mock_task):
+    @pytest.mark.django_db(transaction=True)
+    async def test_run_on_local_repository_endpoint(self, mock_task, create_test_project):
         mock_task.return_value = None
         response = await client.post(
             "/run_on_local_repository",
-            json={"repository_path": "path/to/repo", "prompt": "example issue text"},
+            json={"project_id": create_test_project.id, "prompt": "example issue text"},
         )
         assert response.status_code == 200
         mock_task.assert_called_once()
 
     @pytest.mark.asyncio
     @patch("api.codemonkey_endpoints.get_issue_task")
+    @pytest.mark.django_db(transaction=True)
     async def test_get_issue_endpoint(self, mock_task):
         mock_task.return_value = {}
         response = await client.post(
@@ -75,32 +77,35 @@ class TestCodemonkeyEndpoints:
 
     @pytest.mark.asyncio
     @patch("api.codemonkey_endpoints.vectorize_repository_task")
-    async def test_vectorize_repository_endpoint(self, mock_task):
+    @pytest.mark.django_db(transaction=True)
+    async def test_vectorize_repository_endpoint(self, mock_task, create_test_project):
         mock_task.return_value = {}
         response = await client.post(
             "/vectorize_repository",
-            json={"repository_path": "destination/path"},
+            json={"project_id": create_test_project.id},
         )
         assert response.status_code == 200
         mock_task.assert_called_once()
 
     @pytest.mark.asyncio
     @patch("api.codemonkey_endpoints.find_embeddings_task")
-    async def test_find_embeddings_endpoint(self, mock_task):
+    @pytest.mark.django_db(transaction=True)
+    async def test_find_embeddings_endpoint(self, mock_task, create_test_project):
         mock_task.return_value = {}
         response = await client.post(
-            "/find_embeddings", json={"repository_path": "destination/path", "prompt": "issue body"}
+            "/find_embeddings", json={"project_id": create_test_project.id, "prompt": "issue body"}
         )
         assert response.status_code == 200
         mock_task.assert_called_once()
 
     @pytest.mark.asyncio
     @patch("api.codemonkey_endpoints.prepare_prompt_and_context_task")
-    async def test_prepare_prompt_and_context_endpoint(self, mock_task):
+    @pytest.mark.django_db(transaction=True)
+    async def test_prepare_prompt_and_context_endpoint(self, mock_task, create_test_project):
         mock_task.return_value = {}
         response = await client.post(
             "/prepare_prompt_and_context",
-            json={"prompt": "body", "embeddings": []},
+            json={"project_id": create_test_project.id, "prompt": "body", "embeddings": []},
         )
         assert response.status_code == 200
         mock_task.assert_called_once()

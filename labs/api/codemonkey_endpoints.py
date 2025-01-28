@@ -11,6 +11,7 @@ from api.schemas.codemonkey import (
 )
 from api.schemas.github import BranchIssueSchema, CommitSchema, IssueSchema, PullRequestSchema
 from asgiref.sync import sync_to_async
+from core.models import Project
 from decorators import async_time_and_log_function
 from django.http import HttpRequest
 from ninja import Router
@@ -55,9 +56,17 @@ async def run_on_repository_endpoint(request: HttpRequest, run_on_repository: Gi
 @async_time_and_log_function
 async def run_on_local_repository_endpoint(request: HttpRequest, run_on_local_repository: LocalRepositoryShema):
     try:
+        # We do this to ensure project exists before continue the process
+        project = await Project.objects.aget(id=run_on_local_repository.project_id)
         run_on_local_repository_task(
-            repository_path=run_on_local_repository.repository_path, issue_body=run_on_local_repository.prompt
+            project_id=project.id,
+            project_path=project.path,
+            issue_body=run_on_local_repository.prompt,
         )
+    except Project.DoesNotExist:
+        logger.warning('A request has been made to "run_on_local_repository" with a project_id that does not exist')
+        raise HttpError(status_code=404, message="Project does not exist")
+
     except Exception as ex:
         logger.exception("Internal server error")
         raise HttpError(status_code=500, message="Internal server error: " + str(ex))
@@ -66,17 +75,21 @@ async def run_on_local_repository_endpoint(request: HttpRequest, run_on_local_re
 @router.post("/vectorize_repository")
 @async_time_and_log_function
 async def vectorize_repository_endpoint(request: HttpRequest, vectorize_repository: VectorizeRepositorySchema):
-    return await sync_to_async(vectorize_repository_task, thread_sensitive=True)(
-        repository_path=vectorize_repository.repository_path
-    )
+    try:
+        return await sync_to_async(vectorize_repository_task, thread_sensitive=True)(
+            project_id=vectorize_repository.project_id
+        )
+    except Project.DoesNotExist:
+        logger.warning('A request has been made to "vectorize_repository" with a project_id that does not exist')
+        raise HttpError(status_code=404, message="Project does not exist")
 
 
 @router.post("/find_embeddings")
 @async_time_and_log_function
 async def find_embeddings_endpoint(request: HttpRequest, find_embeddings: FindEmbeddingsSchema):
     return await sync_to_async(find_embeddings_task, thread_sensitive=True)(
+        project_id=find_embeddings.project_id,
         issue_body=find_embeddings.prompt,
-        repository_path=find_embeddings.repository_path,
         similarity_threshold=find_embeddings.similarity_threshold,
         max_results=find_embeddings.max_results,
     )
@@ -86,7 +99,9 @@ async def find_embeddings_endpoint(request: HttpRequest, find_embeddings: FindEm
 @async_time_and_log_function
 async def prepare_prompt_and_context_endpoint(request: HttpRequest, prepare_prompt_context: PreparePromptContextSchema):
     return await sync_to_async(prepare_prompt_and_context_task, thread_sensitive=True)(
-        issue_body=prepare_prompt_context.prompt, embeddings=prepare_prompt_context.embeddings
+        issue_body=prepare_prompt_context.prompt,
+        project_id=prepare_prompt_context.project_id,
+        embeddings=prepare_prompt_context.embeddings,
     )
 
 

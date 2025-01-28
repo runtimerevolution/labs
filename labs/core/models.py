@@ -54,8 +54,18 @@ class Variable(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
     name = models.CharField(max_length=255)
     value = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    @staticmethod
+    def get_default_vectorizer_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER").value
+
+    @staticmethod
+    def get_default_persona_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA").value
+
+    @staticmethod
+    def get_default_instruction_value():
+        return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION").value
 
     @staticmethod
     def load_provider_keys(provider: str):
@@ -82,8 +92,6 @@ class Model(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
     model_name = models.CharField(max_length=255)
     active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def get_active_embedding_model() -> Tuple[Embedder, str]:
@@ -95,7 +103,7 @@ class Model(models.Model):
 
     @staticmethod
     def _get_active_provider_model(model_type: Literal["embedding", "llm", "vectorizer"]):
-        queryset = Model.objects.filter(model_type=model_type.upper())
+        queryset = Model.objects.filter(model_type=model_type.upper(), active=True)
         if not queryset.exists():
             raise ValueError(f"No {model_type} model configured")
 
@@ -121,6 +129,8 @@ class Project(models.Model):
     description = models.TextField(null=True, blank=True)
     path = models.CharField(max_length=255, unique=True)
     url = models.CharField(max_length=255, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
         if not os.path.exists(self.path):
@@ -142,19 +152,13 @@ class Project(models.Model):
         verbose_name_plural = "Projects"
 
 
-def _get_default_vectorizer_value():
-    return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER").value
-
-
 class VectorizerModel(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
-    vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=_get_default_vectorizer_value)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=Variable.get_default_vectorizer_value)
 
     @staticmethod
-    def get_active_vectorizer(project) -> Vectorizer:
-        queryset = VectorizerModel.objects.filter(project=project)
+    def get_active_vectorizer(project_id) -> Vectorizer:
+        queryset = VectorizerModel.objects.filter(project__id=project_id)
         if not queryset.exists():
             raise ValueError("No vectorizer configured")
 
@@ -170,7 +174,7 @@ class VectorizerModel(models.Model):
 
 
 class WorkflowResult(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     task_id = models.CharField(max_length=255)
     embed_model = models.CharField(max_length=255, null=True)
     prompt_model = models.CharField(max_length=255, null=True)
@@ -189,32 +193,22 @@ class WorkflowResult(models.Model):
         verbose_name_plural = "Workflow results"
 
 
-def _get_default_persona_value():
-    return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA").value
-
-
-def _get_default_instruction_value():
-    return Variable.objects.get(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION").value
-
-
 class Prompt(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     persona = models.TextField(
         null=False,
         blank=False,
-        default=_get_default_persona_value,
+        default=Variable.get_default_persona_value,
         help_text="""It should include additional information to help guide the model's behavior and 
         understanding of its role.""",
     )
     instruction = models.TextField(
         null=False,
         blank=False,
-        default=_get_default_instruction_value,
+        default=Variable.get_default_instruction_value,
         help_text="""It should include guidelines on what is expected in the generated code, 
         such as "avoid complexity" or "minimize the code".""",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     @staticmethod
     def get_persona(project_id: int) -> str:

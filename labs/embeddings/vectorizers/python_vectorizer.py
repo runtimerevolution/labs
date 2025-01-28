@@ -109,8 +109,8 @@ class PythonVectorizer:
 
         return docs
 
-    def vectorize_to_database(self, include_file_extensions, repository_path, *args, **kwargs):
-        docs = self.load_docs(repository_path, include_file_extensions)
+    def vectorize_to_database(self, include_file_extensions, project_id, project_path, *args, **kwargs):
+        docs = self.load_docs(project_path, include_file_extensions)
 
         logger.debug(f"Loading {len(docs)} documents...")
         texts = []
@@ -127,8 +127,4 @@ class PythonVectorizer:
         embeddings = self.embedder.embed(prompt=texts)
 
         logger.debug("Storing embeddings...")
-        self.embedder.reembed_code(
-            files_texts=files_texts,
-            embeddings=embeddings,
-            repository=repository_path,
-        )
+        self.embedder.reembed_code(project_id=project_id, files_texts=files_texts, embeddings=embeddings)

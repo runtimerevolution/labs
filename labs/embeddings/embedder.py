@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django.conf import settings
 from django.db.models import Min
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Embeddings:
     model: str
-    embeddings: List[Dict[str, Any]]
+    embeddings: Union[List[Dict[str, Any]], List[List[int]]]
     model_config: Optional[Dict[str, Any]] = None
 
 
@@ -27,7 +27,7 @@ class Embedder:
     def retrieve_files_path(
         self,
         query: str,
-        repository: str,
+        project_id: int,
         similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_THRESHOLD,
         max_results: int = settings.EMBEDDINGS_MAX_RESULTS,
     ) -> List[str]:
@@ -37,7 +37,7 @@ class Embedder:
             raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
 
         files_path = (
-            Embedding.objects.filter(repository=repository)
+            Embedding.objects.filter(project__id=project_id)
             .values("file_path")  # the combination of values and annotate, is the Django way of making a group by
             .annotate(distance=Min(CosineDistance("embedding", embedded_query[0])))
             .order_by("distance")
@@ -49,18 +49,18 @@ class Embedder:
 
     def reembed_code(
         self,
-        repository: str,
-        files_texts: Union[str, List[str]],
+        project_id: int,
+        files_texts: Union[str, List[str], List[Tuple[str, str]]],
         embeddings: Any = None,
     ) -> None:
-        Embedding.objects.filter(repository=repository).delete()
+        Embedding.objects.filter(project__id=project_id).delete()
 
         if not embeddings:
             embeddings = self.embed(prompt=files_texts)
 
         for file_text, file_text_embedding in zip(files_texts, embeddings.embeddings):
             Embedding.objects.create(
-                repository=repository,
+                project_id=project_id,
                 embedding=file_text_embedding,
                 file_path=file_text[0],
                 text=file_text[1],

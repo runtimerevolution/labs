@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django.urls import reverse
 
 from .forms import ProjectForm
-from .mixins import DeletePermissionMixin, JSONFormatterMixin
+from .mixins import JSONFormatterMixin
 from .models import Model, Project, Prompt, Variable, VectorizerModel, WorkflowResult
 
 
@@ -13,8 +14,6 @@ class ModelAdmin(admin.ModelAdmin):
         "provider",
         "model_name",
         "active",
-        "created_at",
-        "updated_at",
     )
     list_display_links = ("id",)
     list_editable = ("model_type", "provider", "model_name", "active")
@@ -35,8 +34,6 @@ class VariableAdmin(admin.ModelAdmin):
         "provider",
         "name",
         "value",
-        "created_at",
-        "updated_at",
     )
     list_display_links = ("id",)
     list_editable = ("provider", "value")
@@ -52,13 +49,12 @@ class VariableAdmin(admin.ModelAdmin):
 
 
 @admin.register(VectorizerModel)
-class VectorizerModelAdmin(admin.ModelAdmin, DeletePermissionMixin):
+class VectorizerModelAdmin(admin.ModelAdmin):
+    actions = None
     list_display = (
         "id",
         "project",
         "vectorizer_type",
-        "created_at",
-        "updated_at",
     )
     list_display_links = ("id",)
     list_editable = ("vectorizer_type",)
@@ -68,22 +64,47 @@ class VectorizerModelAdmin(admin.ModelAdmin, DeletePermissionMixin):
     def has_add_permission(self, request):
         return False
 
+    def has_delete_permission(self, request, obj=None):
+        # The ´Vectorizer´ should only be deleted through the Project (CASCADE)
+        # User can type the delete url in the browser, what should not be allowed
+        if obj and request.path == reverse("admin:core_vectorizermodel_delete", args=[obj.id]):
+            return False
+        return bool(obj)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        # Remove the admin delete button because ´Vectorizer´ should only be deleted through the Project (CASCADE)
+        extra_context = extra_context or {}
+        extra_context["show_delete"] = False
+        return super().change_view(request, object_id, form_url, extra_context)
+
 
 @admin.register(Prompt)
-class PromptAdmin(admin.ModelAdmin, DeletePermissionMixin):
+class PromptAdmin(admin.ModelAdmin):
+    actions = None
     list_display = (
         "id",
         "project",
         "persona_preview",
         "instruction_preview",
-        "created_at",
-        "updated_at",
     )
     list_display_links = ("id",)
     search_fields = ("prompt",)
 
     def has_add_permission(self, request):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        # The ´Prompt´ should only be deleted through the Project (CASCADE)
+        # User can type the delete url in the browser, what should not be allowed
+        if obj and request.path == reverse("admin:core_prompt_delete", args=[obj.id]):
+            return False
+        return bool(obj)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        # Remove the admin delete button because ´Prompt´ should only be deleted through the Project (CASCADE)
+        extra_context = extra_context or {}
+        extra_context["show_delete"] = False
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def persona_preview(self, obj):
         return self.text_preview(obj.persona)
@@ -99,14 +120,22 @@ class PromptAdmin(admin.ModelAdmin, DeletePermissionMixin):
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     form = ProjectForm
-    list_display = ("id", "name", "path", "url")
+    list_display = (
+        "id",
+        "name",
+        "path",
+        "url",
+        "created_at",
+        "updated_at",
+    )
     list_display_links = ("id",)
     search_fields = ("name", "path", "url")
     readonly_fields = ("url",)
 
 
 @admin.register(WorkflowResult)
-class WorkflowResultAdmin(admin.ModelAdmin, DeletePermissionMixin, JSONFormatterMixin):
+class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
+    actions = None
     list_display = ("task_id", "created_at")
     list_display_links = ("task_id",)
     search_fields = ("task_id",)
@@ -117,10 +146,10 @@ class WorkflowResultAdmin(admin.ModelAdmin, DeletePermissionMixin, JSONFormatter
         "embed_model",
         "prompt_model",
         "pretty_embeddings",
+        "pretty_context",
         "pretty_llm_response",
         "pretty_modified_files",
         "pretty_pre_commit_error",
-        "pretty_context",
     )
     exclude = (
         "embeddings",
@@ -132,6 +161,19 @@ class WorkflowResultAdmin(admin.ModelAdmin, DeletePermissionMixin, JSONFormatter
 
     def has_add_permission(self, request):
         return False
+
+    def has_delete_permission(self, request, obj=None):
+        # The ´WorkflowResult´ should only be deleted through the Project (CASCADE)
+        # User can type the delete url in the browser, what should not be allowed
+        if obj and request.path == reverse("admin:core_workflowresult_delete", args=[obj.id]):
+            return False
+        return bool(obj)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        # Remove the admin delete button because ´WorkflowResult´ should only be deleted through the Project (CASCADE)
+        extra_context = extra_context or {}
+        extra_context["show_delete"] = False
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def pretty_embeddings(self, obj):
         return self.format_json_field(obj.embeddings)
