@@ -35,8 +35,6 @@ class VariableFactory(DjangoModelFactory):
     provider = PROVIDERS
     name = factory.Iterator(VARIABLES_NAMES)
     value = factory.Faker("text")
-    created_at = CREATED_AT
-    updated_at = UPDATED_AT
 
     @classmethod
     def predefined(cls):
@@ -56,8 +54,6 @@ class ModelFactory(DjangoModelFactory):
     provider = MODEL_TYPES
     model_name = factory.Faker("word")
     active = factory.Faker("boolean")
-    created_at = CREATED_AT
-    updated_at = UPDATED_AT
 
     @classmethod
     def predefined(cls):
@@ -77,6 +73,8 @@ class ProjectFactory(DjangoModelFactory):
     description = factory.Faker("text")
     path = factory.Faker("file_path")
     url = factory.Faker("url")
+    created_at = CREATED_AT
+    updated_at = UPDATED_AT
 
     @classmethod
     def _create(cls, model_class, create_variables: Iterable[Dict[str, str]] = None, *args, **kwargs):
@@ -98,8 +96,6 @@ class ProjectFactory(DjangoModelFactory):
 class VectorizerFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     vectorizer_type = VECTORIZERS
-    created_at = CREATED_AT
-    updated_at = UPDATED_AT
 
     class Meta:
         model = VectorizerModel
@@ -124,8 +120,6 @@ class PromptFactory(DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     persona = factory.Faker("text")
     instruction = factory.Faker("text")
-    created_at = CREATED_AT
-    updated_at = UPDATED_AT
 
     class Meta:
         model = Prompt
