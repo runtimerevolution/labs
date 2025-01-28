@@ -181,14 +181,14 @@ def create_pull_request_task(
 @app.task
 def run_pre_commit(prefix=""):
     logger.debug("Running pre-commit")
-    project = Project.get_cached_project_by_id(redis_client.get(RedisVariable.PROJECT, prefix=prefix))
+    project_path = redis_client.get(RedisVariable.PROJECT_PATH, prefix=prefix)
 
     number_of_runs = 2
     for run in range(number_of_runs):
         try:
             subprocess.run(
                 ["pre-commit", "run", "--all-files"],
-                cwd=project.path,
+                cwd=project_path,
                 check=True,
                 capture_output=True,
                 text=True,

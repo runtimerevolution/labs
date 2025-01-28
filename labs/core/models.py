@@ -1,6 +1,5 @@
 import os
 from enum import Enum
-from functools import lru_cache
 from typing import Literal, Tuple
 
 from django.core.exceptions import ValidationError
@@ -133,19 +132,11 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    @staticmethod
-    @lru_cache
-    def get_cached_project_by_id(project_id):
-        return Project.objects.get(id=project_id)
-
     def clean(self):
         if not os.path.exists(self.path):
             raise ValidationError({"path": f'Directory "{self.path}" does not exist.'})
 
     def save(self, *args, **kwargs):
-        # Invalidate LRU cache because objects has been changed
-        Project.get_cached_project_by_id.cache_clear()
-
         created = not self.id
         super().save(*args, **kwargs)
 
@@ -166,8 +157,8 @@ class VectorizerModel(models.Model):
     vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=Variable.get_default_vectorizer_value)
 
     @staticmethod
-    def get_active_vectorizer(project) -> Vectorizer:
-        queryset = VectorizerModel.objects.filter(project=project)
+    def get_active_vectorizer(project_id) -> Vectorizer:
+        queryset = VectorizerModel.objects.filter(project__id=project_id)
         if not queryset.exists():
             raise ValueError("No vectorizer configured")
 

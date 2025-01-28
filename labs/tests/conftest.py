@@ -19,7 +19,7 @@ def create_test_project():
     Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_VECTORIZER", value="CHUNK_VECTORIZER")
     Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_PERSONA", value="persona")
     Variable.objects.create(provider=ProviderEnum.NO_PROVIDER.name, name="DEFAULT_INSTRUCTION", value="instruction")
-    return Project.objects.create(name="test", path="repository_path")
+    return Project.objects.create(name="test", path="project_path")
 
 
 @pytest.fixture

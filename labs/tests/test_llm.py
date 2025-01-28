@@ -28,8 +28,12 @@ def call_llm_with_context(issue_summary, project):
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embedder = Embedder(embedder_class, *embeder_args)
 
-    vectorizer_class = VectorizerModel.get_active_vectorizer(project)
-    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, project)
+    vectorizer_class = VectorizerModel.get_active_vectorizer(project.id)
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(
+        None,
+        project.id,
+        project_path=project.path,
+    )
 
     # find_similar_embeddings narrows down codebase to files that matter for the issue at hand.
     file_paths = embedder.retrieve_files_path(issue_summary, project)

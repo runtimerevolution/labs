@@ -38,11 +38,10 @@ Here's the steps to set up the project locally:
 3. `make up`
 4. `make migrate`
 5. `make loadfixtures`
-6. `make creategroups`
-7. `make createuser`
-8. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
-9. Select "Variables" option in the menu on the left and fill in the "OPENAI_API_KEY" key value with your [OpenAI API Key](https://openai.com/index/openai-api/) and click "Save"
-10. Click the "Add" button of the "Project" option in the menu on the left and fill in the "Name" and select the "Project directory" and click "Save" in red boxes in image bellow:
+6. `make createuser`
+7. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
+8. Select "Variables" option in the menu on the left and fill in the "OPENAI_API_KEY" key value with your [OpenAI API Key](https://openai.com/index/openai-api/) and click "Save"
+9. Click the "Add" button of the "Project" option in the menu on the left and fill in the "Name" and select the "Project directory" and click "Save" in red boxes in image bellow:
    ![new_project_fields](docs/assets/new_project_fields.png)
 
 
@@ -52,45 +51,41 @@ Here's the steps to set up the project locally:
 1. `make up`
 2. `make migrate`
 3. `make loadfixtures`
-4. `make creategroups`
-5. `make createuser`
-6. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
-7. Select "Variables" option in the menu on the left and fill in the "OPENAI_API_KEY" key value with your [OpenAI API Key](https://openai.com/index/openai-api/) and click "Save"
+4. `make createuser`
+5. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
+6. Select "Variables" option in the menu on the left and fill in the "OPENAI_API_KEY" key value with your [OpenAI API Key](https://openai.com/index/openai-api/) and click "Save"
 
 ### Using Llama 3.2 with nomic:
 
 1. `make up`
-2. `make creategroups`
-3. `make createuser`
-4. `make ollama model=nomic-embed-text:latest`
-5. `make ollama model=llama3.2:latest`
-6. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
-7. Select "Models" option in the menu on the left
-8. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
+2. `make createuser`
+3. `make ollama model=nomic-embed-text:latest`
+4. `make ollama model=llama3.2:latest`
+5. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
+6. Select "Models" option in the menu on the left 
+7. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
    ![local_models_admin_fields](docs/assets/local_models_admin_fields.png)
 
 
 ### Using Starcoder2 with nomic:
 
 1. `make up`
-2. `make creategroups`
-3. `make createuser`
-4. `make ollama model=nomic-embed-text:latest`
-5. `make ollama model=starcoder2:15b-instruct`
-6. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
-7. Select "Models" option in the menu on the left
-8. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
+2. `make createuser`
+3. `make ollama model=nomic-embed-text:latest`
+4. `make ollama model=starcoder2:15b-instruct`
+5. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
+6. Select "Models" option in the menu on the left 
+7. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
    ![local_models_admin_fields](docs/assets/local_models_admin_fields.png)
 
 
 ### Using Qwen2.5 with nomic:
 
 1. `make up`
-2. `make creategroups`
-3. `make createuser`
-4. `make ollama model=nomic-embed-text:latest`
-5. `make ollama model=qwen2.5:7b-instruct`
-6. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
-7. Select "Models" option in the menu on the left
-8. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
+2. `make createuser`
+3. `make ollama model=nomic-embed-text:latest`
+4. `make ollama model=qwen2.5:7b-instruct`
+5. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
+6. Select "Models" option in the menu on the left 
+7. Fill in the models name and check the "active" checkbox in red boxes in the image bellow and click "Save" (pay attention to the LLM and Embeddings model name placement):
    ![local_models_admin_fields](docs/assets/local_models_admin_fields.png)

@@ -60,6 +60,7 @@ async def run_on_local_repository_endpoint(request: HttpRequest, run_on_local_re
         project = await Project.objects.aget(id=run_on_local_repository.project_id)
         run_on_local_repository_task(
             project_id=project.id,
+            project_path=project.path,
             issue_body=run_on_local_repository.prompt,
         )
     except Project.DoesNotExist:

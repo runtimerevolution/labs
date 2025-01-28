@@ -57,7 +57,7 @@ def test_reembed_code(create_test_project):
     )
 
     Embedder(OpenAIEmbedder, model=OPENAI_EMBEDDING_MODEL_NAME).reembed_code(
-        project=project,
+        project_id=project.id,
         files_texts=files_texts,
         embeddings=embeddings,
     )

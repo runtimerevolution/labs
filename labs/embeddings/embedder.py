@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from django.conf import settings
 from django.db.models import Min
@@ -10,11 +10,6 @@ from embeddings.models import Embedding
 from pgvector.django import CosineDistance
 
 logger = logging.getLogger(__name__)
-
-
-# Avoid importing circulars due to typing
-if TYPE_CHECKING:
-    from core.models import Project
 
 
 @dataclass
@@ -56,18 +51,18 @@ class Embedder:
 
     def reembed_code(
         self,
-        project: Project,
+        project_id: int,
         files_texts: Union[str, List[str], List[Tuple[str, str]]],
         embeddings: Any = None,
     ) -> None:
-        Embedding.objects.filter(project=project).delete()
+        Embedding.objects.filter(project__id=project_id).delete()
 
         if not embeddings:
             embeddings = self.embed(prompt=files_texts)
 
         for file_text, file_text_embedding in zip(files_texts, embeddings.embeddings):
             Embedding.objects.create(
-                project=project,
+                project_id=project_id,
                 embedding=file_text_embedding,
                 file_path=file_text[0],
                 text=file_text[1],

@@ -60,10 +60,11 @@ def run_on_repository_task(
 
 
 @app.task
-def run_on_local_repository_task(project_id, issue_body):
+def run_on_local_repository_task(project_id, project_path, issue_body):
     data = {
-        RedisVariable.ISSUE_BODY.value: issue_body,
         RedisVariable.PROJECT.value: project_id,
+        RedisVariable.PROJECT_PATH.value: project_path,
+        RedisVariable.ISSUE_BODY.value: issue_body,
     }
     chain(
         init_task.s(**data),

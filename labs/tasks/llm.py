@@ -45,15 +45,15 @@ def get_llm_response(prompt):
 
 @app.task
 def vectorize_repository_task(prefix="", project_id=0):
-    project = Project.get_cached_project_by_id(
-        redis_client.get(RedisVariable.PROJECT, prefix=prefix, default=project_id)
-    )
+    project_id = redis_client.get(RedisVariable.PROJECT, prefix=prefix, default=project_id)
+    if not (project_path := redis_client.get(RedisVariable.PROJECT_PATH, prefix=prefix)):
+        project_path = Project.objects.get(id=project_id).path
 
     embedder_class, *embeder_args = Model.get_active_embedding_model()
     embedder = Embedder(embedder_class, *embeder_args)
 
-    vectorizer_class = VectorizerModel.get_active_vectorizer(project)
-    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, project)
+    vectorizer_class = VectorizerModel.get_active_vectorizer(project_id)
+    Vectorizer(vectorizer_class, embedder).vectorize_to_database(None, project_id, project_path)
 
     if prefix:
         return prefix
