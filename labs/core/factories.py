@@ -14,17 +14,6 @@ from .models import (
 )
 
 VARIABLES_NAMES = ["OPENAI_API_KEY", "DEFAULT_VECTORIZER", "DEFAULT_PERSONA", "DEFAULT_INSTRUCTION"]
-PROVIDERS_VARIABLES = {
-    ProviderEnum.NO_PROVIDER.name: ["DEFAULT_VECTORIZER", "DEFAULT_PERSONA", "DEFAULT_INSTRUCTION"],
-    ProviderEnum.OPENAI.name: ["OPENAI_API_KEY"],
-}
-MODELS_TYPES_PROVIDERS = {
-    ModelTypeEnum.EMBEDDING.name: [ProviderEnum.OPENAI.name, ProviderEnum.OLLAMA.name],
-    ModelTypeEnum.LLM.name: [ProviderEnum.OPENAI.name, ProviderEnum.OLLAMA.name],
-}
-MODEL_TYPES = [ModelTypeEnum.EMBEDDING.name, ModelTypeEnum.EMBEDDING.name]
-PROVIDERS = [ProviderEnum.NO_PROVIDER.name, ProviderEnum.OPENAI.name, ProviderEnum.OLLAMA.name]
-VECTORIZERS = [VectorizerEnum.CHUNK_VECTORIZER.name, VectorizerEnum.PYTHON_VECTORIZER.name]
 
 
 class VariableFactory(DjangoModelFactory):
