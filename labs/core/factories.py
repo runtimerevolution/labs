@@ -1,5 +1,3 @@
-from typing import Dict, Iterable
-
 import factory
 from factory.django import DjangoModelFactory
 
@@ -42,15 +40,6 @@ class VariableFactory(DjangoModelFactory):
         if self.name == "DEFAULT_VECTORIZER" and self.value not in ["CHUNK_VECTORIZER", "PYTHON_VECTORIZER"]:
             raise ValueError("Invalid vectorizer value")
 
-    @classmethod
-    def predefined(cls):
-        variables_objects = []
-        for provider_name in PROVIDERS_VARIABLES:
-            for variable_name in PROVIDERS_VARIABLES[provider_name]:
-                variables_objects.append(VariableFactory.create(provider=provider_name, name=variable_name))
-
-        return variables_objects
-
 
 class ModelFactory(DjangoModelFactory):
     class Meta:
@@ -61,37 +50,15 @@ class ModelFactory(DjangoModelFactory):
     model_name = factory.Faker("word")
     active = factory.Faker("boolean")
 
-    @classmethod
-    def predefined(cls):
-        models_objects = []
-        for model_type_name in MODELS_TYPES_PROVIDERS:
-            for provider_name in MODELS_TYPES_PROVIDERS[model_type_name]:
-                models_objects.append(ModelFactory.create(model_type=model_type_name, provider=provider_name))
-
-        return models_objects
-
 
 class ProjectFactory(DjangoModelFactory):
+    class Meta:
+        model = Project
+
     name = factory.Faker("word")
     description = factory.Faker("text")
     path = factory.Faker("file_path")
     url = factory.Faker("url")
-
-    @classmethod
-    def _create(cls, model_class, create_variables: Iterable[Dict[str, str]] = None, *args, **kwargs):
-        if create_variables:
-            if isinstance(create_variables, Iterable):
-                for variable_data in create_variables:
-                    VariableFactory.create(**variable_data)
-            else:
-                raise ValueError("create_variables must be an iterable of dictionaries.")
-        else:
-            VariableFactory.predefined()
-
-        return super()._create(model_class, *args, **kwargs)
-
-    class Meta:
-        model = Project
 
 
 class VectorizerFactory(DjangoModelFactory):
