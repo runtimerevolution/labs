@@ -53,8 +53,11 @@ class VariableFactory(DjangoModelFactory):
 
 
 class ModelFactory(DjangoModelFactory):
-    model_type = PROVIDERS
-    provider = MODEL_TYPES
+    class Meta:
+        model = Model
+
+    model_type = factory.Iterator([mt.name for mt in ModelTypeEnum])
+    provider = factory.Iterator([provider.name for provider in ProviderEnum if provider != ProviderEnum.NO_PROVIDER])
     model_name = factory.Faker("word")
     active = factory.Faker("boolean")
 
@@ -66,9 +69,6 @@ class ModelFactory(DjangoModelFactory):
                 models_objects.append(ModelFactory.create(model_type=model_type_name, provider=provider_name))
 
         return models_objects
-
-    class Meta:
-        model = Model
 
 
 class ProjectFactory(DjangoModelFactory):
