@@ -75,6 +75,9 @@ class VectorizerFactory(DjangoModelFactory):
 
 
 class WorkflowResultFactory(DjangoModelFactory):
+    class Meta:
+        model = WorkflowResult
+
     project = factory.SubFactory(ProjectFactory)
     task_id = factory.Faker("uuid")
     embed_model = factory.Faker("word")
@@ -84,14 +87,18 @@ class WorkflowResultFactory(DjangoModelFactory):
     llm_response = factory.Faker("text")
     modified_files = factory.Faker("text")
 
-    class Meta:
-        model = WorkflowResult
-
 
 class PromptFactory(DjangoModelFactory):
+    class Meta:
+        model = Prompt
+
     project = factory.SubFactory(ProjectFactory)
     persona = factory.Faker("text")
     instruction = factory.Faker("text")
 
-    class Meta:
-        model = Prompt
+    @factory.post_generation
+    def set_persona_and_instruction(self, create, extracted, **kwargs):
+        if not self.persona:
+            self.persona = "Default persona value"
+        if not self.instruction:
+            self.instruction = "Default instruction value"
