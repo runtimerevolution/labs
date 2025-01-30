@@ -24,17 +24,23 @@ MODELS_TYPES_PROVIDERS = {
     ModelTypeEnum.EMBEDDING.name: [ProviderEnum.OPENAI.name, ProviderEnum.OLLAMA.name],
     ModelTypeEnum.LLM.name: [ProviderEnum.OPENAI.name, ProviderEnum.OLLAMA.name],
 }
-MODEL_TYPES = factory.Iterator([ModelTypeEnum.EMBEDDING.name, ModelTypeEnum.EMBEDDING.name])
-PROVIDERS = factory.Iterator([ProviderEnum.NO_PROVIDER.name, ProviderEnum.OPENAI.name, ProviderEnum.OLLAMA.name])
-VECTORIZERS = factory.Iterator([VectorizerEnum.CHUNK_VECTORIZER.name, VectorizerEnum.PYTHON_VECTORIZER.name])
-CREATED_AT = factory.Faker("date_time_this_decade")
-UPDATED_AT = factory.Faker("date_time_this_decade")
+MODEL_TYPES = [ModelTypeEnum.EMBEDDING.name, ModelTypeEnum.EMBEDDING.name]
+PROVIDERS = [ProviderEnum.NO_PROVIDER.name, ProviderEnum.OPENAI.name, ProviderEnum.OLLAMA.name]
+VECTORIZERS = [VectorizerEnum.CHUNK_VECTORIZER.name, VectorizerEnum.PYTHON_VECTORIZER.name]
 
 
 class VariableFactory(DjangoModelFactory):
-    provider = PROVIDERS
+    class Meta:
+        model = Variable
+
+    provider = factory.Iterator(PROVIDERS)
     name = factory.Iterator(VARIABLES_NAMES)
     value = factory.Faker("text")
+
+    @factory.post_generation
+    def default_vectorizer_value_validation(self, create, extracted, **kwargs):
+        if self.name == "DEFAULT_VECTORIZER" and self.value not in ["CHUNK_VECTORIZER", "PYTHON_VECTORIZER"]:
+            raise ValueError("Invalid vectorizer value")
 
     @classmethod
     def predefined(cls):
@@ -44,9 +50,6 @@ class VariableFactory(DjangoModelFactory):
                 variables_objects.append(VariableFactory.create(provider=provider_name, name=variable_name))
 
         return variables_objects
-
-    class Meta:
-        model = Variable
 
 
 class ModelFactory(DjangoModelFactory):
@@ -73,8 +76,6 @@ class ProjectFactory(DjangoModelFactory):
     description = factory.Faker("text")
     path = factory.Faker("file_path")
     url = factory.Faker("url")
-    created_at = CREATED_AT
-    updated_at = UPDATED_AT
 
     @classmethod
     def _create(cls, model_class, create_variables: Iterable[Dict[str, str]] = None, *args, **kwargs):
@@ -110,7 +111,6 @@ class WorkflowResultFactory(DjangoModelFactory):
     context = factory.Faker("text")
     llm_response = factory.Faker("text")
     modified_files = factory.Faker("text")
-    created_at = CREATED_AT
 
     class Meta:
         model = WorkflowResult
