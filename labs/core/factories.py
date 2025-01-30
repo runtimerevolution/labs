@@ -62,11 +62,16 @@ class ProjectFactory(DjangoModelFactory):
 
 
 class VectorizerFactory(DjangoModelFactory):
-    project = factory.SubFactory(ProjectFactory)
-    vectorizer_type = VECTORIZERS
-
     class Meta:
         model = VectorizerModel
+
+    project = factory.SubFactory(ProjectFactory)
+    vectorizer_type = factory.Iterator([vectorizer.name for vectorizer in VectorizerEnum])
+
+    @factory.post_generation
+    def set_vectorizer_type(self, create, extracted, **kwargs):
+        if not self.vectorizer_type:
+            self.vectorizer_type = "CHUNK_VECTORIZER"
 
 
 class WorkflowResultFactory(DjangoModelFactory):
