@@ -33,7 +33,7 @@ class VariableFactory(DjangoModelFactory):
     class Meta:
         model = Variable
 
-    provider = factory.Iterator(PROVIDERS)
+    provider = factory.Iterator([provider.name for provider in ProviderEnum if provider != ProviderEnum.NO_PROVIDER])
     name = factory.Iterator(VARIABLES_NAMES)
     value = factory.Faker("text")
 
