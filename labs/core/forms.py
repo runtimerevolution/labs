@@ -34,37 +34,29 @@ class ModelFormSet(BaseModelFormSet):
     def clean(self):
         super().clean()
 
-        embedding_count = 0
-        llm_count = 0
-        errors = []
-
         embedding_name = ModelTypeEnum.EMBEDDING.name
         llm_name = ModelTypeEnum.LLM.name
+        counts = {
+            embedding_name: 0,
+            llm_name: 0,
+        }
+        errors = []
 
         for form in self.forms:
             if not form.cleaned_data or form.cleaned_data.get("DELETE", False):
                 continue
 
             model_type = form.cleaned_data["model_type"]
-            active = form.cleaned_data["active"]
+            if model_type in counts and form.cleaned_data["active"]:
+                counts[model_type] += 1
 
-            if model_type == embedding_name and active:
-                embedding_count += 1
-            elif model_type == llm_name and active:
-                llm_count += 1
-
-        if embedding_count != 1:
-            errors.append(
-                ValidationError(
-                    f"You must have exactly 1 active {embedding_name}, found {embedding_count}."
+        for type_name, count in counts.items():
+            if count != 1:
+                errors.append(
+                    ValidationError(
+                        f"You must have exactly 1 active '{type_name}', found {count}."
+                    )
                 )
-            )
-        if llm_count != 1:
-            errors.append(
-                ValidationError(
-                    f"You must have exactly 1 active {llm_name}, found {llm_count}."
-                )
-            )
 
         if errors:
             raise ValidationError(errors)
