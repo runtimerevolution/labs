@@ -43,9 +43,6 @@ class ModelFormSet(BaseModelFormSet):
         errors = []
 
         for form in self.forms:
-            if not form.cleaned_data or form.cleaned_data.get("DELETE", False):
-                continue
-
             model_type = form.cleaned_data["model_type"]
             if model_type in counts and form.cleaned_data["active"]:
                 counts[model_type] += 1
