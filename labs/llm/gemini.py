@@ -28,16 +28,9 @@ class GeminiRequester:
                 **kwargs,
             )
 
-            try:
-                json_response = json.loads(gemini_response.text)
-                return self._model_name, {
-                    "choices": [{"message": {"content": json.dumps(json_response)}}]
-                }
-            except json.JSONDecodeError as e:
-                raise ValueError(
-                    f"Invalid Gemini JSON response: {e}. "
-                    f"Raw response: {getattr(gemini_response, 'text', 'No response text')}"
-                ) from e
+            return self._model_name, {
+                "choices": [{"message": {"content": gemini_response.text}}]
+            }
 
         except Exception as e:
             raise RuntimeError(f"Gemini API call failed: {e}") from e
