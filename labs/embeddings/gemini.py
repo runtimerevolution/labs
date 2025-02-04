@@ -2,23 +2,14 @@ import os
 import google.generativeai as genai
 from embeddings.embedder import Embeddings
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 class GeminiEmbedder:
     def __init__(self, model: str):
         self._model_name = model
         api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY environment variable not set.")
         genai.configure(api_key=api_key)
 
     def embed(self, prompt: str, *args, **kwargs) -> Embeddings:
         try:
-            logger.info("Starting embed with model '%s' and prompt length=%d",
-                        self._model_name, len(prompt))
-            
             result = genai.embed_content(
                 model=self._model_name,
                 content=prompt,

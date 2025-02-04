@@ -4,6 +4,7 @@ from typing import List, Dict, Tuple, Any
 
 import google.generativeai as genai
 
+
 class GeminiRequester:
     def __init__(self, model: str):
         self._model_name = model
