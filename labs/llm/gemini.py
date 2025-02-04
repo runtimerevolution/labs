@@ -9,10 +9,7 @@ class GeminiRequester:
         self._model_name = model
         api_key = os.environ.get("GEMINI_API_KEY")
         genai.configure(api_key=api_key)
-        self.generative_model = genai.GenerativeModel(
-            self._model_name, 
-            generation_config={"response_mime_type": "application/json"}
-        )
+        self.generative_model = genai.GenerativeModel(self._model_name)
 
     def completion_without_proxy(
         self,
@@ -21,21 +18,25 @@ class GeminiRequester:
         **kwargs,
     ) -> Tuple[str, Dict[str, Any]]:
 
+        generation_config = genai.GenerationConfig(response_mime_type="application/json")
+
         try:
-            response = self.generative_model.generate_content(
+            gemini_response = self.generative_model.generate_content(
                 contents=json.dumps(messages),
+                generation_config=generation_config,
                 *args,
                 **kwargs,
             )
 
             try:
-                json_response = json.loads(response.text)
+                json_response = json.loads(gemini_response.text)
                 return self._model_name, {
                     "choices": [{"message": {"content": json.dumps(json_response)}}]
                 }
             except json.JSONDecodeError as e:
                 raise ValueError(
-                    f"Invalid Gemini JSON response: {e}, Raw response: {getattr(response, 'text', 'No response text')}"
+                    f"Invalid Gemini JSON response: {e}. "
+                    f"Raw response: {getattr(gemini_response, 'text', 'No response text')}"
                 ) from e
 
         except Exception as e:
