@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Literal, Tuple
 
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import models
 from django.db.models import Q
 from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
