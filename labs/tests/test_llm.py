@@ -4,11 +4,13 @@ from unittest.mock import patch
 import pytest
 from core.models import Model, VectorizerModel
 from embeddings.embedder import Embedder
+from embeddings.gemini import GeminiEmbedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.vectorizer import Vectorizer
 from llm.checks import ValidationError, check_invalid_json
 from llm.context import CONTENT_TEMPLATE, get_context
+from llm.gemini import GeminiRequester
 from llm.ollama import OllamaRequester
 from llm.openai import OpenAIRequester
 from llm.prompt import get_prompt
@@ -18,6 +20,8 @@ from tests.constants import (
     OLLAMA_LLM_MODEL_NAME,
     OPENAI_EMBEDDING_MODEL_NAME,
     OPENAI_LLM_MODEL_NAME,
+    GEMINI_EMBEDDING_MODEL_NAME,
+    GEMINI_LLM_MODEL_NAME,
 )
 
 
@@ -165,3 +169,17 @@ class TestLLMRequester:
 
         assert issubclass(embedder, OllamaEmbedder)
         assert model_name == OLLAMA_EMBEDDING_MODEL_NAME
+
+    @pytest.mark.django_db
+    def test_gemini_llm_requester(self, create_test_gemini_llm_config):
+        requester, model_name = Model.get_active_llm_model()
+
+        assert issubclass(requester, GeminiRequester)
+        assert model_name == GEMINI_LLM_MODEL_NAME
+
+    @pytest.mark.django_db
+    def test_gemini_embedder(self, create_test_gemini_embedding_config):
+        embedder, model_name = Model.get_active_embedding_model()
+
+        assert issubclass(embedder, GeminiEmbedder)
+        assert model_name == GEMINI_EMBEDDING_MODEL_NAME

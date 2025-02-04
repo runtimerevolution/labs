@@ -9,6 +9,8 @@ from tests.constants import (
     OLLAMA_LLM_MODEL_NAME,
     OPENAI_EMBEDDING_MODEL_NAME,
     OPENAI_LLM_MODEL_NAME,
+    GEMINI_EMBEDDING_MODEL_NAME,
+    GEMINI_LLM_MODEL_NAME,
     SINGLE_EMBEDDING,
 )
 
@@ -84,5 +86,25 @@ def create_test_openai_llm_config():
         model_type=ModelTypeEnum.LLM.name,
         provider=ProviderEnum.OPENAI.name,
         model_name=OPENAI_LLM_MODEL_NAME,
+        active=True,
+    )
+
+@pytest.fixture
+@pytest.mark.django_db
+def create_test_gemini_embedding_config():
+    return Model.objects.create(
+        model_type=ModelTypeEnum.EMBEDDING.name,
+        provider=ProviderEnum.GEMINI.name,
+        model_name=GEMINI_EMBEDDING_MODEL_NAME,
+        active=True,
+    )
+
+@pytest.fixture
+@pytest.mark.django_db
+def create_test_gemini_llm_config():
+    return Model.objects.create(
+        model_type=ModelTypeEnum.LLM.name,
+        provider=ProviderEnum.GEMINI.name,
+        model_name=GEMINI_LLM_MODEL_NAME,
         active=True,
     )
