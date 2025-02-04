@@ -18,7 +18,7 @@
 	//],
 	// 4. Features to add to the Dev Container. More info: https://containers.dev/implementors/features.
 	"features": {
-		// ZSH without OMZ
+		// ZSH
 		"ghcr.io/devcontainers/features/common-utils:2": {
 			"installZsh": "true",
 			"configureZshAsDefaultShell": "true",
@@ -65,7 +65,7 @@
 		}
 	},
 	// 6. Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode"
+	"remoteUser": "vscode",
 	// the following commands are related to container lifecylce. More info: https://containers.dev/implementors/json_reference/#lifecycle-scripts
 	// 7. Use 'initializeCommand' to run commands ON THE HOST before container is created or started.
 	// "initializeCommand": "",
@@ -77,6 +77,7 @@
 	// "postCreateCommand": "pip3 install --user -r requirements.txt",
 	// 11. Use 'postStartCommand' to run a command each time the container starts successfully.
 	// "postStartCommand": "",
+	"postStartCommand": "poetry install"
 	// 12. Use 'postAttachCommand' to run a command each time a tool attaches to the container successfully. 
 	// "postAttachCommand": "",
 }
