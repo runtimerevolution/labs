@@ -12,8 +12,11 @@ class OllamaRequester:
         logger.info("OllamaRequester initialized with model '%s'", self._model_name)
 
     def completion_without_proxy(self, messages, *args, **kwargs):
-        logger.info("Calling Ollama with messages=%s", messages)
-        response = self._client.chat(model=self._model_name, messages=messages, format="json", *args, **kwargs)
-        logger.info("Ollama response: %s", response)
-
+        response = self._client.chat(
+            model=self._model_name,
+            messages=messages,
+            format="json",
+            *args,
+            **kwargs,
+        )
         return self._model_name, {"choices": [response]}

@@ -13,14 +13,10 @@ class OpenAIRequester:
         logger.info("OpenAIRequester initialized with model '%s'", self._model_name)
 
     def completion_without_proxy(self, messages, *args, **kwargs):
-        logger.info("Calling OpenAI with messages=%s", messages)
-        response = completion(
+        return self._model_name, completion(
             model=self._model_name,
             messages=messages,
             response_format={"type": "json_object"},
             *args,
             **kwargs,
         )
-        logger.info("OpenAI response: %s", response)
-
-        return self._model_name, response
