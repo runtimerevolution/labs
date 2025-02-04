@@ -1,20 +1,13 @@
 from django.contrib import admin
 from django.urls import reverse
 
-from .forms import ProjectForm
+from .forms import ProjectForm, ModelFormSet
 from .mixins import JSONFormatterMixin
 from .models import Model, Project, Prompt, Variable, VectorizerModel, WorkflowResult
 
-
 @admin.register(Model)
 class ModelAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "model_type",
-        "provider",
-        "model_name",
-        "active",
-    )
+    list_display = ("id", "model_type", "provider", "model_name", "active")
     list_display_links = ("id",)
     list_editable = ("model_type", "provider", "model_name", "active")
     list_filter = ("provider", "model_name")
@@ -25,6 +18,10 @@ class ModelAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_changelist_formset(self, request, **kwargs):
+        kwargs["formset"] = ModelFormSet
+        return super().get_changelist_formset(request, **kwargs)
 
 
 @admin.register(Variable)

@@ -4,6 +4,7 @@ from typing import Literal, Tuple
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from embeddings.embedder import Embedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
@@ -113,14 +114,22 @@ class Model(models.Model):
         Variable.load_provider_keys(model.provider)
         return provider_model_class[model.provider][model_type], model.model_name
 
-    def save(self, *args, **kwargs):
-        Model.objects.filter(model_type=self.model_type, active=True).exclude(id=self.id).update(active=False)
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"{self.model_type} {self.provider} {self.model_name}"
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["model_type"],
+                condition=Q(model_type=ModelTypeEnum.EMBEDDING, active=True),
+                name="unique_active_embedding"
+            ),
+            models.UniqueConstraint(
+                fields=["model_type"],
+                condition=Q(model_type=ModelTypeEnum.LLM, active=True),
+                name="unique_active_llm"
+            ),
+        ]
         indexes = [models.Index(fields=["provider", "model_name"])]
 
 
