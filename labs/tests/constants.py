@@ -9,6 +9,8 @@ OPENAI_LLM_MODEL_NAME = "gpt-4o"
 OPENAI_EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
 OLLAMA_LLM_MODEL_NAME = "llama3.2:latest"
 OLLAMA_EMBEDDING_MODEL_NAME = "nomic-embed-text:latest"
+GEMINI_LLM_MODEL_NAME = "gemini-1.5-flash"
+GEMINI_EMBEDDING_MODEL_NAME = "models/text-embedding-004"
 
 SINGLE_EMBEDDING = {
     "file_path": "file",

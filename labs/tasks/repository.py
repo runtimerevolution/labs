@@ -194,7 +194,7 @@ def run_pre_commit(prefix=""):
                 text=True,
             )
             logger.debug("Pre-commit checks passed successfully!")
-            return
+            return prefix or True
 
         except subprocess.CalledProcessError as e:
             logger.debug("Pre-commit output:")
@@ -206,6 +206,4 @@ def run_pre_commit(prefix=""):
                 redis_client.set(RedisVariable.PRE_COMMIT_ERROR, prefix=prefix, value=json.dumps(e.stdout))
                 break
 
-    if prefix:
-        return prefix
-    return True
+    return prefix or True

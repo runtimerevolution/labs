@@ -1,42 +1,62 @@
 [
-{
-  "model": "core.model",
-  "pk": 1,
-  "fields": {
-    "model_type": "EMBEDDING",
-    "provider": "OLLAMA",
-    "model_name": "nomic-embed-text:latest",
-    "active": false
+  {
+    "model": "core.model",
+    "pk": 1,
+    "fields": {
+      "model_type": "EMBEDDING",
+      "provider": "OLLAMA",
+      "model_name": "nomic-embed-text:latest",
+      "active": false
+    }
+  },
+  {
+    "model": "core.model",
+    "pk": 2,
+    "fields": {
+      "model_type": "LLM",
+      "provider": "OPENAI",
+      "model_name": "gpt-4o",
+      "active": true
+    }
+  },
+  {
+    "model": "core.model",
+    "pk": 3,
+    "fields": {
+      "model_type": "EMBEDDING",
+      "provider": "OPENAI",
+      "model_name": "text-embedding-ada-002",
+      "active": true
+    }
+  },
+  {
+    "model": "core.model",
+    "pk": 4,
+    "fields": {
+      "model_type": "LLM",
+      "provider": "OLLAMA",
+      "model_name": "llama3.2:latest",
+      "active": false
+    }
+  },
+  {
+    "model": "core.model",
+    "pk": 5,
+    "fields": {
+      "model_type": "LLM",
+      "provider": "GEMINI",
+      "model_name": "gemini-1.5-flash",
+      "active": false
+    }
+  },
+  {
+    "model": "core.model",
+    "pk": 6,
+    "fields": {
+      "model_type": "EMBEDDING",
+      "provider": "GEMINI",
+      "model_name": "models/text-embedding-004",
+      "active": false
+    }
   }
-},
-{
-  "model": "core.model",
-  "pk": 2,
-  "fields": {
-    "model_type": "LLM",
-    "provider": "OPENAI",
-    "model_name": "gpt-4o",
-    "active": true
-  }
-},
-{
-  "model": "core.model",
-  "pk": 3,
-  "fields": {
-    "model_type": "EMBEDDING",
-    "provider": "OPENAI",
-    "model_name": "text-embedding-ada-002",
-    "active": true
-  }
-},
-{
-  "model": "core.model",
-  "pk": 4,
-  "fields": {
-    "model_type": "LLM",
-    "provider": "OLLAMA",
-    "model_name": "llama3.2:latest",
-    "active": false
-  }
-}
 ]
