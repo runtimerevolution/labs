@@ -6,7 +6,6 @@ from ollama import Client
 class OllamaEmbedder:
     def __init__(self, model):
         self._model_name = model
-
         self._client = Client(settings.LOCAL_LLM_HOST)
 
     def embed(self, prompt, *args, **kwargs) -> Embeddings:
