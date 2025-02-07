@@ -15,13 +15,8 @@ clean:
 ## Lint and format using ruff
 .PHONY: lint
 lint:
-	ruff lint --fix --select I
+	ruff check --fix --select I
 	ruff format
-
-## Format source code with black
-.PHONY: format
-format:
-	black --config pyproject.toml labs
 
 ## Stops and removes all the services
 .PHONY: down

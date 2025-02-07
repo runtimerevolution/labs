@@ -9,6 +9,7 @@ authors = [
     "Sérgio Ildefonso <s.ildefonso@runtime-revolution.com>"
 ]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 pre-commit = "^3.8.0"

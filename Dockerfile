@@ -1,7 +1,7 @@
 # `python-base` sets up all our shared environment variables
 FROM python:3.12.5-slim AS python-base
 
-    # python
+# python
 ENV PYTHONUNBUFFERED=1 \
     # prevents python creating .pyc files
     PYTHONDONTWRITEBYTECODE=1 \
@@ -43,7 +43,7 @@ WORKDIR $PYSETUP_PATH
 # Install production dependencies
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install --no-root --without dev
+RUN poetry install --without dev
 
 
 # `production` image
@@ -63,5 +63,5 @@ COPY ./labs/ /app/
 EXPOSE 8000
 
 CMD python manage.py migrate --noinput && \
-python manage.py loaddata fixtures/*.json && \
-python manage.py runserver 0.0.0.0:8000
+    python manage.py loaddata fixtures/*.json && \
+    python manage.py runserver 0.0.0.0:8000
