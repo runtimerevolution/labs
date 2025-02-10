@@ -18,15 +18,15 @@ class GeminiEmbedder:
             )
 
             emb = result.get("embedding")
-            if isinstance(emb, list) and len(emb) > 0 and isinstance(emb[0], list):
-                flat_vector = emb[0]
+            if isinstance(emb, list) and all(isinstance(e, list) for e in emb):
+                flat_vectors = emb
             else:
-                flat_vector = emb
-            
+                flat_vectors = [emb]
+    
             return Embeddings(
                 model=self._model_name,
                 model_config=result.get("model_config", {}),
-                embeddings=[flat_vector]
+                embeddings=flat_vectors
             )
 
         except Exception as e:
