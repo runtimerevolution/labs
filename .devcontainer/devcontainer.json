@@ -9,13 +9,13 @@
 	// 1. Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": []
 	// 2. Use 'mounts' to make a list of local directories available inside the container. More info: https://code.visualstudio.com/remote/advancedcontainers/add-local-file-mount
-	// "mounts": [],
+	"mounts": [
+		"source=${localEnv:LOCAL_REPOSITORIES_PATH},target=${localEnv:LOCAL_REPOSITORIES_PATH},type=bind"
+	],
 	// 3. Use 'runArgs' to pass arguments to the container. 
-	// run the container with all GPUs
-	//"runArgs": [
-	//	"--gpus",
-	//	"all"
-	//],
+	// "runArgs": [
+    //     "--env-file", ".env.local"
+    // ], 
 	// 4. Features to add to the Dev Container. More info: https://containers.dev/implementors/features.
 	"features": {
 		// ZSH
@@ -74,10 +74,9 @@
 	// 9. Use 'updateContentCommand' to run commands if the root filetree have any changes, during container creation.
 	// "updateContentCommand": "",
 	// 10. Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "pip3 install --user -r requirements.txt",
+	"postCreateCommand": "source .env.local && echo $LOCAL_REPOSITORIES_PATH > /etc/environment && chmod +x .devcontainer/install.sh && ./.devcontainer/install.sh"
 	// 11. Use 'postStartCommand' to run a command each time the container starts successfully.
-	// "postStartCommand": "",
-	"postStartCommand": "poetry install"
+	// "postStartCommand": "chmod +x .devcontainer/login.sh && ./.devcontainer/login.sh && poetry install"
 	// 12. Use 'postAttachCommand' to run a command each time a tool attaches to the container successfully. 
 	// "postAttachCommand": "",
 }

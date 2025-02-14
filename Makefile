@@ -76,3 +76,5 @@ createuser:
 
 loadfixtures:
 	python labs/manage.py loaddata $(wildcard labs/fixtures/*.json)
+
+setup: migrate loadfixtures createuser
