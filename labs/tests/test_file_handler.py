@@ -12,12 +12,6 @@ class TestFileHandler(TestCase):
     Line 4
     """
     NEW_CONTENT = "    Line 3\n"
-    # Read variables
-    READ_FILE_EXPECTED_CONTENT = """     1 | 
-     2 |     Line 1
-     3 |     Line 2
-     4 |     Line 4
-     5 |     """
     # Insert variables
     INSERT_LINE = 3
     INSERT_LINE_EXPECTED_CONTENT = """
@@ -66,7 +60,7 @@ class TestFileHandler(TestCase):
 
     def test_get_file_content(self):
         content = get_file_content(self.temporary_file.name)
-        self.assertEqual(content, self.READ_FILE_EXPECTED_CONTENT)
+        self.assertEqual(content, self.TEMPORARY_CONTENT)
 
     def test_create_file(self):
         # Remove the existing file created in setUp

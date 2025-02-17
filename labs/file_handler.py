@@ -83,12 +83,8 @@ def delete_file_line(file_path: str, line_number: int) -> None:
 
 def get_file_content(file_path: str) -> str:
     try:
-        content = ""
         with open(file_path, "r") as file:
-            for line_number, line in enumerate(file, start=1):
-                content += f"{str(line_number).rjust(6)} | {line}"
-
-        return content
+            return file.read()
 
     except FileNotFoundError as e:
         raise FileNotFoundError(f"Error: The file '{file_path}' was not found.") from e
