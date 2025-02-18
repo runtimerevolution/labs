@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source .env.local
+source .env
 
 # Check if infisical credentials are present in the env
 if [ -z "$INFISICAL_CLIENT_ID" ] || [ -z "$INFISICAL_CLIENT_SECRET" ]; then

@@ -13,7 +13,7 @@
 
 Create a copy of the reference env file in the root of the project and update the values accordingly.
 
-`cp .env.sample .env.local`
+`cp .env.sample .env`
 
 ### Pre-commit
 
@@ -47,7 +47,7 @@ Here's the steps to set up the project locally:
 
 ## Run with dev container
 
-1. `source .env.local`
+1. `source .env`
 2. Reopen in container / Open folder in container
    - Ensure that you have `LOCAL_REPOSITORIES_PATH` set so that it can be mounted into the dev container
 3. `poetry shell`
