@@ -38,22 +38,18 @@ Here's the steps to set up the project locally:
 1. `poetry shell`
 2. `poetry install`
 3. `make up`
-4. `make migrations`
-5. `make setup`
-6. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
-7. Select "Variables" option in the menu on the left and fill in the "OPENAI_API_KEY" key value with your [OpenAI API Key](https://openai.com/index/openai-api/) and click "Save"
-8. Click the "Add" button of the "Project" option in the menu on the left and fill in the "Name" and select the "Project directory" and click "Save" in red boxes in image bellow:
+4. `make setup`
+5. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
+6. Select "Variables" option in the menu on the left and fill in the "OPENAI_API_KEY" key value with your [OpenAI API Key](https://openai.com/index/openai-api/) and click "Save"
+7. Click the "Add" button of the "Project" option in the menu on the left and fill in the "Name" and select the "Project directory" and click "Save" in red boxes in image bellow:
    ![new_project_fields](docs/assets/new_project_fields.png)
 
 ## Run with dev container
 
-1. `source .env`
-2. Reopen in container / Open folder in container
-   - Ensure that you have `LOCAL_REPOSITORIES_PATH` set so that it can be mounted into the dev container
-3. `poetry shell`
-4. `make up`
-5. `make migrations`
-6. `make setup`
+1. Reopen in container / Open folder in container
+2. `poetry shell`
+3. `make up`
+4. `make setup`
 
 ## Run with local models
 
