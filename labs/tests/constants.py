@@ -6,10 +6,10 @@ def embedding_values() -> list[int]:
 
 
 OPENAI_LLM_MODEL_NAME = "gpt-4o"
-OPENAI_EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
+OPENAI_EMBEDDING_MODEL_NAME = "text-embedding-3-small"
 OLLAMA_LLM_MODEL_NAME = "llama3.2:latest"
 OLLAMA_EMBEDDING_MODEL_NAME = "nomic-embed-text:latest"
-GEMINI_LLM_MODEL_NAME = "gemini-1.5-flash"
+GEMINI_LLM_MODEL_NAME = "gemini-2.0-flash"
 GEMINI_EMBEDDING_MODEL_NAME = "models/text-embedding-004"
 
 SINGLE_EMBEDDING = {
