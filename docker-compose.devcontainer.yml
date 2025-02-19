@@ -1,0 +1,12 @@
+services:
+  dev-container-service:
+    image: mcr.microsoft.com/devcontainers/python:3.12-bookworm
+    volumes:
+      - ${LOCAL_REPOSITORIES_PATH}:${LOCAL_REPOSITORIES_PATH}
+      - .:/workspace
+    environment:
+      - INFISICAL_DOMAIN=${INFISICAL_DOMAIN}
+      - INFISICAL_PROJECT_ID=${INFISICAL_PROJECT_ID}
+      - INFISICAL_CLIENT_ID=${INFISICAL_CLIENT_ID}
+      - INFISICAL_CLIENT_SECRET=${INFISICAL_CLIENT_SECRET}
+    command: sleep infinity

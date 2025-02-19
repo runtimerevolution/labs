@@ -3,13 +3,13 @@ services:
     container_name: labs-db
     image: pgvector/pgvector:pg16
     ports:
-     - 5432:5432
+      - 5432:5432
     restart: always
     environment:
       - POSTGRES_PASSWORD=postgres
 
   api:
-    env_file: .env.local
+    env_file: .env
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -24,7 +24,7 @@ services:
       - ${LOCAL_REPOSITORIES_PATH}:/repositories/
 
   worker:
-    env_file: .env.local
+    env_file: .env
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -60,7 +60,7 @@ services:
       - redis
 
   promtail:
-    env_file: .env.local
+    env_file: .env
     image: grafana/promtail:3.1.1
     volumes:
       - api_logs:/var/log/api
