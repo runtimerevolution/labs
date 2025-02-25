@@ -8,6 +8,7 @@ from embeddings.gemini import GeminiEmbedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
 from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.anthropic import AnthropicRequester
 from llm.checks import ValidationError, check_invalid_json
 from llm.context import CONTENT_TEMPLATE, get_context
 from llm.gemini import GeminiRequester
@@ -16,12 +17,13 @@ from llm.openai import OpenAIRequester
 from llm.prompt import get_prompt
 from tasks.llm import get_llm_response
 from tests.constants import (
+    ANTHROPIC_LLM_MODEL_NAME,
+    GEMINI_EMBEDDING_MODEL_NAME,
+    GEMINI_LLM_MODEL_NAME,
     OLLAMA_EMBEDDING_MODEL_NAME,
     OLLAMA_LLM_MODEL_NAME,
     OPENAI_EMBEDDING_MODEL_NAME,
     OPENAI_LLM_MODEL_NAME,
-    GEMINI_EMBEDDING_MODEL_NAME,
-    GEMINI_LLM_MODEL_NAME,
 )
 
 
@@ -183,3 +185,10 @@ class TestLLMRequester:
 
         assert issubclass(embedder, GeminiEmbedder)
         assert model_name == GEMINI_EMBEDDING_MODEL_NAME
+
+    @pytest.mark.django_db
+    def test_anthropic_llm_requester(self, create_test_anthropic_llm_config):
+        requester, model_name = Model.get_active_llm_model()
+
+        assert issubclass(requester, AnthropicRequester)
+        assert model_name == ANTHROPIC_LLM_MODEL_NAME

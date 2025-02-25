@@ -19,6 +19,14 @@
     "model": "core.variable",
     "pk": 3,
     "fields": {
+      "provider": "ANTHROPIC",
+      "name": "ANTHROPIC_API_KEY"
+    }
+  },
+  {
+    "model": "core.variable",
+    "pk": 4,
+    "fields": {
       "provider": "NO_PROVIDER",
       "name": "DEFAULT_VECTORIZER",
       "value": "CHUNK_VECTORIZER"
@@ -26,7 +34,7 @@
   },
   {
     "model": "core.variable",
-    "pk": 4,
+    "pk": 5,
     "fields": {
       "provider": "NO_PROVIDER",
       "name": "DEFAULT_PERSONA",
@@ -35,7 +43,7 @@
   },
   {
     "model": "core.variable",
-    "pk": 5,
+    "pk": 6,
     "fields": {
       "provider": "NO_PROVIDER",
       "name": "DEFAULT_INSTRUCTION",
