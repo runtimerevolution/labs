@@ -6,21 +6,23 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 from embeddings.embedder import Embedder
+from embeddings.gemini import GeminiEmbedder
 from embeddings.ollama import OllamaEmbedder
 from embeddings.openai import OpenAIEmbedder
-from embeddings.gemini import GeminiEmbedder
 from embeddings.vectorizers.chunk_vectorizer import ChunkVectorizer
 from embeddings.vectorizers.python_vectorizer import PythonVectorizer
 from embeddings.vectorizers.vectorizer import Vectorizer
+from llm.anthropic import AnthropicRequester
+from llm.gemini import GeminiRequester
 from llm.ollama import OllamaRequester
 from llm.openai import OpenAIRequester
-from llm.gemini import GeminiRequester
 from llm.requester import Requester
 
 provider_model_class = {
     "OPENAI": {"embedding": OpenAIEmbedder, "llm": OpenAIRequester},
     "OLLAMA": {"embedding": OllamaEmbedder, "llm": OllamaRequester},
     "GEMINI": {"embedding": GeminiEmbedder, "llm": GeminiRequester},
+    "ANTHROPIC": {"llm": AnthropicRequester},
 }
 
 vectorizer_model_class = {"CHUNK_VECTORIZER": ChunkVectorizer, "PYTHON_VECTORIZER": PythonVectorizer}
@@ -40,6 +42,7 @@ class ProviderEnum(Enum):
     OPENAI = "OpenAI"
     OLLAMA = "Ollama"
     GEMINI = "Gemini"
+    ANTHROPIC = "Anthropic"
 
     @classmethod
     def choices(cls):
@@ -129,12 +132,10 @@ class Model(models.Model):
             models.UniqueConstraint(
                 fields=["model_type"],
                 condition=Q(model_type=ModelTypeEnum.EMBEDDING, active=True),
-                name="unique_active_embedding"
+                name="unique_active_embedding",
             ),
             models.UniqueConstraint(
-                fields=["model_type"],
-                condition=Q(model_type=ModelTypeEnum.LLM, active=True),
-                name="unique_active_llm"
+                fields=["model_type"], condition=Q(model_type=ModelTypeEnum.LLM, active=True), name="unique_active_llm"
             ),
         ]
         indexes = [models.Index(fields=["provider", "model_name"])]

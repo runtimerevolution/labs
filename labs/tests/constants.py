@@ -11,6 +11,7 @@ OLLAMA_LLM_MODEL_NAME = "llama3.2:latest"
 OLLAMA_EMBEDDING_MODEL_NAME = "nomic-embed-text:latest"
 GEMINI_LLM_MODEL_NAME = "gemini-2.0-flash"
 GEMINI_EMBEDDING_MODEL_NAME = "models/text-embedding-004"
+ANTHROPIC_LLM_MODEL_NAME = "claude-3-5-sonnet-20241022"
 
 SINGLE_EMBEDDING = {
     "file_path": "file",
