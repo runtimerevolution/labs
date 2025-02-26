@@ -21,12 +21,12 @@ lint:
 ## Stops and removes all the services
 .PHONY: down
 down:
-	$(shell cat .env.local | grep LOCAL_REPOSITORIES_PATH ) docker compose down
+	$(shell cat .env | grep LOCAL_REPOSITORIES_PATH ) docker compose down
 
 ## Start all the services
 .PHONY: up
 up: down
-	$(shell cat .env.local | grep LOCAL_REPOSITORIES_PATH ) docker compose up --build -d
+	$(shell cat .env | grep LOCAL_REPOSITORIES_PATH ) docker compose up --build -d
 
 ## Start a python shell
 .PHONY: shell

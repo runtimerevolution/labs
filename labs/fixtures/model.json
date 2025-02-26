@@ -25,7 +25,7 @@
     "fields": {
       "model_type": "EMBEDDING",
       "provider": "OPENAI",
-      "model_name": "text-embedding-ada-002",
+      "model_name": "text-embedding-3-small",
       "active": true
     }
   },
@@ -45,7 +45,7 @@
     "fields": {
       "model_type": "LLM",
       "provider": "GEMINI",
-      "model_name": "gemini-1.5-flash",
+      "model_name": "gemini-2.0-flash",
       "active": false
     }
   },
@@ -56,6 +56,16 @@
       "model_type": "EMBEDDING",
       "provider": "GEMINI",
       "model_name": "models/text-embedding-004",
+      "active": false
+    }
+  },
+  {
+    "model": "core.model",
+    "pk": 7,
+    "fields": {
+      "model_type": "LLM",
+      "provider": "ANTHROPIC",
+      "model_name": "claude-3-5-sonnet-20241022",
       "active": false
     }
   }
