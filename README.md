@@ -100,7 +100,7 @@ Here's the steps to set up the project locally:
 1. `make up`
 2. `make createuser`
 3. `make ollama model=nomic-embed-text:latest`
-4. `make ollama model=deepseek-r1`
+4. `make ollama model=deepseek-r1` | `deepseek-coder` | `deepseek-coder-v2`, coder-v2 is the best if you have a good machine.
 5. Go to [http://localhost:8000/admin](http://localhost:8000/admin) in internet browser and login (admin/admin)
 6. Select "Models" option in the menu on the left
 7. Fill in the models name and check the "active" checkbox in red boxes in the image below and click "Save" (pay attention to the LLM and Embeddings model name placement):
