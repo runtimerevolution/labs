@@ -1,6 +1,6 @@
 import os
 
-from core.models import Project, ModelTypeEnum
+from core.models import Project
 from django.forms import (
     ModelForm, BaseModelFormSet, ValidationError, ChoiceField
 )
@@ -30,30 +30,33 @@ class ProjectForm(ModelForm):
         fields = ["name", "description", "path", "url"]
 
 
-class ModelFormSet(BaseModelFormSet):
+class EmbeddingModelFormSet(BaseModelFormSet):
     def clean(self):
         super().clean()
 
-        embedding_name = ModelTypeEnum.EMBEDDING.name
-        llm_name = ModelTypeEnum.LLM.name
-        counts = {
-            embedding_name: 0,
-            llm_name: 0,
-        }
-        errors = []
+        active_count = sum(
+            1
+            for form in self.forms
+            if form.cleaned_data and form.cleaned_data.get("active", False)
+        )
 
-        for form in self.forms:
-            model_type = form.cleaned_data["model_type"]
-            if model_type in counts and form.cleaned_data["active"]:
-                counts[model_type] += 1
+        if active_count != 1:
+            raise ValidationError(
+                f"You must have exactly 1 active Embedding Model, found {active_count}."
+            )
 
-        for type_name, count in counts.items():
-            if count != 1:
-                errors.append(
-                    ValidationError(
-                        f"You must have exactly 1 active '{type_name}', found {count}."
-                    )
-                )
 
-        if errors:
-            raise ValidationError(errors)
+class LLMModelFormSet(BaseModelFormSet):
+    def clean(self):
+        super().clean()
+
+        active_count = sum(
+            1
+            for form in self.forms
+            if form.cleaned_data and form.cleaned_data.get("active", False)
+        )
+
+        if active_count != 1:
+            raise ValidationError(
+                f"You must have exactly 1 active LLM Model, found {active_count}."
+            )

@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             constraint=models.UniqueConstraint(
                 condition=models.Q(
                     ("active", True),
-                    ("model_type", core.models.ModelTypeEnum["EMBEDDING"]),
+                    ("model_type", "Embedding"),
                 ),
                 fields=("model_type",),
                 name="unique_active_embedding",
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="model",
             constraint=models.UniqueConstraint(
-                condition=models.Q(("active", True), ("model_type", core.models.ModelTypeEnum["LLM"])),
+                condition=models.Q(("active", True), ("model_type", "LLM")),
                 fields=("model_type",),
                 name="unique_active_llm",
             ),

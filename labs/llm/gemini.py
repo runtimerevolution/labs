@@ -1,14 +1,13 @@
 import os
 import json
 from typing import List, Dict, Tuple, Any
-from core.models import Model
 
 import google.generativeai as genai
 
 
 class GeminiRequester:
-    def __init__(self, model: Model):
-        self._model_name = model.model_name
+    def __init__(self, model):
+        self._model_name = model.name
         api_key = os.environ.get("GEMINI_API_KEY")
         genai.configure(api_key=api_key)
         self.generative_model = genai.GenerativeModel(self._model_name)

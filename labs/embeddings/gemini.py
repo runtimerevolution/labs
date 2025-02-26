@@ -1,11 +1,10 @@
 import os
 import google.generativeai as genai
 from embeddings.embedder import Embeddings
-from core.models import Model
 
 class GeminiEmbedder:
-    def __init__(self, model: Model):
-        self._model_name = model.model_name
+    def __init__(self, model):
+        self._model_name = model.name
         api_key = os.environ.get("GEMINI_API_KEY")
         genai.configure(api_key=api_key)
 

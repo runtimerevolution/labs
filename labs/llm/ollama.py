@@ -1,12 +1,11 @@
 from django.conf import settings
-from core.models import Model
 from typing import Tuple, Dict, Any
 from ollama import Client
 
 
 class OllamaRequester:
-    def __init__(self, model: Model):
-        self._model_name = model.model_name
+    def __init__(self, model):
+        self._model_name = model.name
         self._model_max_output_tokens = model.max_output_tokens
         self._client = Client(settings.LOCAL_LLM_HOST)
 

@@ -27,16 +27,6 @@ provider_model_class = {
 
 vectorizer_model_class = {"CHUNK_VECTORIZER": ChunkVectorizer, "PYTHON_VECTORIZER": PythonVectorizer}
 
-
-class ModelTypeEnum(Enum):
-    EMBEDDING = "Embedding"
-    LLM = "LLM"
-
-    @classmethod
-    def choices(cls):
-        return [(prop.name, prop.value) for prop in cls]
-
-
 class ProviderEnum(Enum):
     NO_PROVIDER = "No provider"
     OPENAI = "OpenAI"
@@ -95,48 +85,69 @@ class Variable(models.Model):
         return self.name
 
 
-class Model(models.Model):
-    model_type = models.CharField(choices=ModelTypeEnum.choices())
+class EmbeddingModel(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
-    model_name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
     active = models.BooleanField(default=True)
-    max_output_tokens = models.IntegerField(default=2048)
 
-    @staticmethod
-    def get_active_embedding_model() -> Tuple[Embedder, str]:
-        return Model._get_active_provider_model("embedding")
+    @classmethod
+    def get_active_model(cls) -> Tuple[Embedder, "EmbeddingModel"]:
+        try:
+            model = cls.objects.get(active=True)
+        except cls.DoesNotExist:
+            raise ValueError("No active embedding model configured")
 
-    @staticmethod
-    def get_active_llm_model() -> Tuple[Requester, str]:
-        return Model._get_active_provider_model("llm")
-
-    @staticmethod
-    def _get_active_provider_model(model_type: Literal["embedding", "llm", "vectorizer"]):
-        queryset = Model.objects.filter(model_type=model_type.upper(), active=True)
-        if not queryset.exists():
-            raise ValueError(f"No {model_type} model configured")
-
-        model = queryset.first()
-
-        # Load associated provider variables
         Variable.load_provider_keys(model.provider)
-        return provider_model_class[model.provider][model_type], model
+        embedder_class = provider_model_class[model.provider]["embedding"]
+        return embedder_class, model
 
     def __str__(self):
-        return f"{self.model_type} {self.provider} {self.model_name}"
+        return f"EmbeddingModel {self.provider} {self.name}"
 
     class Meta:
+        verbose_name = "Embedding"
+        verbose_name_plural = "Embeddings"
         constraints = [
             models.UniqueConstraint(
-                fields=["model_type"],
-                condition=Q(model_type=ModelTypeEnum.EMBEDDING, active=True),
+                fields=["provider"],
+                condition=Q(active=True),
                 name="unique_active_embedding",
-            ),
-            models.UniqueConstraint(
-                fields=["model_type"], condition=Q(model_type=ModelTypeEnum.LLM, active=True), name="unique_active_llm"
-            ),
+            )
         ]
-        indexes = [models.Index(fields=["provider", "model_name"])]
+        indexes = [models.Index(fields=["provider", "name"])]
+
+
+class LLMModel(models.Model):
+    provider = models.CharField(choices=ProviderEnum.choices())
+    name = models.CharField(max_length=255)
+    active = models.BooleanField(default=True)
+    max_output_tokens = models.IntegerField(null=True, blank=True, default=None)
+
+    @classmethod
+    def get_active_model(cls) -> Tuple[Requester, "LLMModel"]:
+        try:
+            model = cls.objects.get(active=True)
+        except cls.DoesNotExist:
+            raise ValueError("No active llm model configured")
+
+        Variable.load_provider_keys(model.provider)
+        llm_class = provider_model_class[model.provider]["llm"]
+        return llm_class, model
+
+    def __str__(self):
+        return f"LLMModel {self.provider} {self.name}"  
+
+    class Meta:
+        verbose_name = "LLM"
+        verbose_name_plural = "LLMs"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["provider"],
+                condition=Q(active=True),
+                name="unique_active_llm",
+            )
+        ]
+        indexes = [models.Index(fields=["provider", "name"])]
 
 
 class Project(models.Model):
