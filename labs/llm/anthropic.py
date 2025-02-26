@@ -1,6 +1,7 @@
 import logging
 import os
 from typing import Any, Dict, List, Tuple, cast
+from core.models import Model
 
 from anthropic import Anthropic
 from anthropic.types import Message, TextBlock
@@ -9,8 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class AnthropicRequester:
-    def __init__(self, model: str):
-        self._model_name = model
+    def __init__(self, model: Model):
+        self._model_name = model.model_name
+        self._model_max_output_tokens = model.max_output_tokens
         api_key = os.environ.get("ANTHROPIC_API_KEY")
         self.client = Anthropic(api_key=api_key)
 
@@ -25,7 +27,10 @@ class AnthropicRequester:
 
         try:
             response = self.client.messages.create(
-                model=self._model_name, system=system_prompt, messages=user_messages, max_tokens=8192
+                model=self._model_name,
+                system=system_prompt,
+                messages=user_messages,
+                max_tokens=self._model_max_output_tokens,
             )
 
             response_steps = self.response_to_steps(response)

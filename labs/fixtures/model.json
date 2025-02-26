@@ -36,6 +36,7 @@
       "model_type": "LLM",
       "provider": "OLLAMA",
       "model_name": "llama3.2:latest",
+      "max_output_tokens": 2048,
       "active": false
     }
   },
@@ -66,6 +67,7 @@
       "model_type": "LLM",
       "provider": "ANTHROPIC",
       "model_name": "claude-3-5-sonnet-20241022",
+      "max_output_tokens": 8192,
       "active": false
     }
   }

@@ -1,11 +1,12 @@
 from django.conf import settings
 from embeddings.embedder import Embeddings
 from ollama import Client
+from core.models import Model
 
 
 class OllamaEmbedder:
-    def __init__(self, model):
-        self._model_name = model
+    def __init__(self, model: Model):
+        self._model_name = model.model_name
         self._client = Client(settings.LOCAL_LLM_HOST)
 
     def embed(self, prompt, *args, **kwargs) -> Embeddings:

@@ -100,6 +100,7 @@ class Model(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
     model_name = models.CharField(max_length=255)
     active = models.BooleanField(default=True)
+    max_output_tokens = models.IntegerField(default=2048)
 
     @staticmethod
     def get_active_embedding_model() -> Tuple[Embedder, str]:
@@ -119,7 +120,7 @@ class Model(models.Model):
 
         # Load associated provider variables
         Variable.load_provider_keys(model.provider)
-        return provider_model_class[model.provider][model_type], model.model_name
+        return provider_model_class[model.provider][model_type], model
 
     def __str__(self):
         return f"{self.model_type} {self.provider} {self.model_name}"
