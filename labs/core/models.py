@@ -93,8 +93,8 @@ class Variable(models.Model):
 
 class EmbeddingModel(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
-    name = models.CharField(max_length=255)
-    active = models.BooleanField(default=True)
+    name = models.CharField(max_length=255,help_text="Ensure this Embedding exists and is downloaded.")
+    active = models.BooleanField(default=True, help_text="Only one Embedding can be active.")
 
     @classmethod
     def get_active_model(cls) -> Tuple[Embedder, "EmbeddingModel"]:
@@ -130,9 +130,14 @@ class EmbeddingModel(models.Model):
 
 class LLMModel(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
-    name = models.CharField(max_length=255)
-    active = models.BooleanField(default=True)
-    max_output_tokens = models.IntegerField(null=True, blank=True, default=None)
+    name = models.CharField(max_length=255, help_text="Ensure this LLM exists and is downloaded.")
+    active = models.BooleanField(default=True, help_text="Only one LLM can be active.")
+    max_output_tokens = models.IntegerField(
+        null=True, 
+        blank=True, 
+        default=None,  
+        help_text="Leave blank for auto-detection, set only if required."
+    )
 
     @classmethod
     def get_active_model(cls) -> Tuple[Requester, "LLMModel"]:
