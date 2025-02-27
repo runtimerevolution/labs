@@ -54,7 +54,7 @@ class VectorizerEnum(Enum):
 class Variable(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
     name = models.CharField(max_length=255)
-    value = models.TextField()
+    value = models.TextField(blank=True, null=True)
 
     @staticmethod
     def get_default_vectorizer_value():
@@ -86,6 +86,9 @@ class Variable(models.Model):
 
     def __str__(self) -> str:
         return self.name
+    
+    class Meta:
+        unique_together = ("provider", "name")
 
 
 class EmbeddingModel(models.Model):
