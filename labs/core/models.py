@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import Literal, Tuple
+from typing import Tuple
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -25,7 +25,10 @@ provider_model_class = {
     "ANTHROPIC": {"llm": AnthropicRequester},
 }
 
-vectorizer_model_class = {"CHUNK_VECTORIZER": ChunkVectorizer, "PYTHON_VECTORIZER": PythonVectorizer}
+vectorizer_model_class = {
+    "CHUNK_VECTORIZER": ChunkVectorizer, 
+    "PYTHON_VECTORIZER": PythonVectorizer,
+}
 
 class ProviderEnum(Enum):
     NO_PROVIDER = "No provider"
@@ -81,7 +84,7 @@ class Variable(models.Model):
                 f"The only possible values for DEFAULT_VECTORIZER are: {', '.join(allowed_vectorizer_values)}"
             )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -98,11 +101,16 @@ class EmbeddingModel(models.Model):
             raise ValueError("No active embedding model configured")
 
         Variable.load_provider_keys(model.provider)
-        embedder_class = provider_model_class[model.provider]["embedding"]
+
+        try:
+            embedder_class = provider_model_class[model.provider]["embedding"]
+        except KeyError:
+            raise ValueError(f"Provider '{model.provider}' is missing or has no embedder class defined.")
+
         return embedder_class, model
 
-    def __str__(self):
-        return f"EmbeddingModel {self.provider} {self.name}"
+    def __str__(self) -> str:
+        return f"EmbeddingModel [{self.provider}] {self.name}"
 
     class Meta:
         verbose_name = "Embedding"
@@ -131,11 +139,16 @@ class LLMModel(models.Model):
             raise ValueError("No active llm model configured")
 
         Variable.load_provider_keys(model.provider)
-        llm_class = provider_model_class[model.provider]["llm"]
+
+        try:
+            llm_class = provider_model_class[model.provider]["llm"]
+        except KeyError:
+            raise ValueError(f"Provider '{model.provider}' is missing or has no LLM class defined.")
+
         return llm_class, model
 
-    def __str__(self):
-        return f"LLMModel {self.provider} {self.name}"  
+    def __str__(self) -> str:
+        return f"LLMModel [{self.provider}] {self.name}"
 
     class Meta:
         verbose_name = "LLM"
@@ -170,7 +183,7 @@ class Project(models.Model):
             VectorizerModel.objects.create(project=self)
             Prompt.objects.create(project=self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     class Meta:
@@ -183,16 +196,20 @@ class VectorizerModel(models.Model):
     vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=Variable.get_default_vectorizer_value)
 
     @staticmethod
-    def get_active_vectorizer(project_id) -> Vectorizer:
-        queryset = VectorizerModel.objects.filter(project__id=project_id)
-        if not queryset.exists():
-            raise ValueError("No vectorizer configured")
+    def get_active_vectorizer(project_id: int) -> Vectorizer:
+        vector_model = VectorizerModel.objects.filter(project__id=project_id).first()
+        if not vector_model:
+            raise ValueError("No vectorizer configured for this project.")
+        
+        try:
+            vec_class = vectorizer_model_class[vector_model.vectorizer_type]
+        except KeyError:
+            raise ValueError(f"Unrecognized vectorizer type '{vector_model.vectorizer_type}'")
 
-        vectorizer_model = queryset.first()
-        return vectorizer_model_class[vectorizer_model.vectorizer_type]
+        return vec_class
 
-    def __str__(self):
-        return self.vectorizer_type
+    def __str__(self) -> str:
+        return f"{self.vectorizer_type} for {self.project.name}"
 
     class Meta:
         verbose_name = "Vectorizer"
@@ -211,7 +228,7 @@ class WorkflowResult(models.Model):
     pre_commit_error = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.task_id}"
 
     class Meta:
@@ -252,7 +269,7 @@ class Prompt(models.Model):
 
         return queryset.first().instruction
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.persona[:50]}..., {self.instruction[:50]}..."
 
     class Meta:

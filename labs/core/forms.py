@@ -42,7 +42,7 @@ class EmbeddingModelFormSet(BaseModelFormSet):
 
         if active_count != 1:
             raise ValidationError(
-                f"You must have exactly 1 active Embedding Model, found {active_count}."
+                f"You must have exactly 1 active Embedding, found {active_count}."
             )
 
 
@@ -58,5 +58,5 @@ class LLMModelFormSet(BaseModelFormSet):
 
         if active_count != 1:
             raise ValidationError(
-                f"You must have exactly 1 active LLM Model, found {active_count}."
+                f"You must have exactly 1 active LLM, found {active_count}."
             )
