@@ -71,9 +71,6 @@ migrations:
 migrate:
 	poetry run python labs/manage.py migrate
 
-tests:
-	poetry run pytest ./labs
-
 createuser:
 	DJANGO_SUPERUSER_PASSWORD=admin poetry run python labs/manage.py createsuperuser --noinput --username=admin --email=admin@example.com
 
