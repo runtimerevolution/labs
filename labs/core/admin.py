@@ -12,7 +12,7 @@ from .models import (
 class EmbeddingModelAdmin(admin.ModelAdmin):
     list_display = ("id", "provider", "name", "active")
     list_display_links = ("id",)
-    list_editable = ("provider", "name", "active")
+    list_editable = ("name", "active")
     list_filter = ("provider", "name")
     search_fields = ("provider", "name")
 
@@ -31,7 +31,7 @@ class EmbeddingModelAdmin(admin.ModelAdmin):
 class LLMModelAdmin(admin.ModelAdmin):
     list_display = ("id", "provider", "name", "max_output_tokens", "active")
     list_display_links = ("id",)
-    list_editable = ("provider", "name", "max_output_tokens", "active")
+    list_editable = ("name", "max_output_tokens", "active")
     list_filter = ("provider", "name")
     search_fields = ("provider", "name", "max_output_tokens")
 
