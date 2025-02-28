@@ -30,33 +30,22 @@ class ProjectForm(ModelForm):
         fields = ["name", "description", "path", "url"]
 
 
-class EmbeddingModelFormSet(BaseModelFormSet):
+class SingleActiveFormSet(BaseModelFormSet):
+    model_name = "Model"
+
     def clean(self):
         super().clean()
-
         active_count = sum(
-            1
-            for form in self.forms
+            1 for form in self.forms
             if form.cleaned_data and form.cleaned_data.get("active", False)
         )
-
         if active_count != 1:
             raise ValidationError(
-                f"You must have exactly 1 active Embedding, found {active_count}."
+                f"You must have exactly 1 active {self.model_name}, found {active_count}."
             )
 
+class EmbeddingModelFormSet(SingleActiveFormSet):
+    model_name = "Embedding"
 
-class LLMModelFormSet(BaseModelFormSet):
-    def clean(self):
-        super().clean()
-
-        active_count = sum(
-            1
-            for form in self.forms
-            if form.cleaned_data and form.cleaned_data.get("active", False)
-        )
-
-        if active_count != 1:
-            raise ValidationError(
-                f"You must have exactly 1 active LLM, found {active_count}."
-            )
+class LLMModelFormSet(SingleActiveFormSet):
+    model_name = "LLM"
