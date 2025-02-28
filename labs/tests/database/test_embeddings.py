@@ -6,6 +6,7 @@ from core.models import Project
 from embeddings.embedder import Embedder, Embeddings
 from embeddings.models import Embedding
 from embeddings.openai import OpenAIEmbedder
+from core.factories import EmbeddingModelFactory
 from tests.constants import MULTIPLE_EMBEDDINGS, OPENAI_EMBEDDING_MODEL_NAME, SINGLE_EMBEDDING
 
 
@@ -56,7 +57,13 @@ def test_reembed_code(create_test_project):
         ],
     )
 
-    Embedder(OpenAIEmbedder, model=OPENAI_EMBEDDING_MODEL_NAME).reembed_code(
+    embedding_model = EmbeddingModelFactory(
+        provider="OPENAI",
+        name=OPENAI_EMBEDDING_MODEL_NAME,
+        active=True,  
+    )
+
+    Embedder(OpenAIEmbedder, model=embedding_model).reembed_code(
         project_id=project.id,
         files_texts=files_texts,
         embeddings=embeddings,

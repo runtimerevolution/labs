@@ -2,7 +2,7 @@ from unittest import TestCase, skip
 from unittest.mock import patch
 
 import pytest
-from core.models import Model, VectorizerModel
+from core.models import LLMModel, EmbeddingModel, VectorizerModel
 from embeddings.embedder import Embedder
 from embeddings.gemini import GeminiEmbedder
 from embeddings.ollama import OllamaEmbedder
@@ -31,7 +31,7 @@ def call_llm_with_context(issue_summary, project):
     if not issue_summary:
         raise ValueError("issue_summary cannot be empty.")
 
-    embedder_class, *embeder_args = Model.get_active_embedding_model()
+    embedder_class, *embeder_args = EmbeddingModel.get_active_model()
     embedder = Embedder(embedder_class, *embeder_args)
 
     vectorizer_class = VectorizerModel.get_active_vectorizer(project.id)
@@ -146,49 +146,49 @@ class TestLocalLLM:
 class TestLLMRequester:
     @pytest.mark.django_db
     def test_openai_llm_requester(self, create_test_openai_llm_config):
-        requester, model_name = Model.get_active_llm_model()
+        requester, model = LLMModel.get_active_model()
 
         assert issubclass(requester, OpenAIRequester)
-        assert model_name == OPENAI_LLM_MODEL_NAME
+        assert model.name == OPENAI_LLM_MODEL_NAME
 
     @pytest.mark.django_db
     def test_openai_embedder(self, create_test_openai_embedding_config):
-        embedder, model_name = Model.get_active_embedding_model()
+        embedder, model = EmbeddingModel.get_active_model()
 
         assert issubclass(embedder, OpenAIEmbedder)
-        assert model_name == OPENAI_EMBEDDING_MODEL_NAME
+        assert model.name == OPENAI_EMBEDDING_MODEL_NAME
 
     @pytest.mark.django_db
     def test_ollama_llm_requester(self, create_test_ollama_llm_config):
-        requester, model_name = Model.get_active_llm_model()
+        requester, model = LLMModel.get_active_model()
 
         assert issubclass(requester, OllamaRequester)
-        assert model_name == OLLAMA_LLM_MODEL_NAME
+        assert model.name == OLLAMA_LLM_MODEL_NAME
 
     @pytest.mark.django_db
     def test_ollama_embedder(self, create_test_ollama_embedding_config):
-        embedder, model_name = Model.get_active_embedding_model()
+        embedder, model = EmbeddingModel.get_active_model()
 
         assert issubclass(embedder, OllamaEmbedder)
-        assert model_name == OLLAMA_EMBEDDING_MODEL_NAME
+        assert model.name == OLLAMA_EMBEDDING_MODEL_NAME
 
     @pytest.mark.django_db
     def test_gemini_llm_requester(self, create_test_gemini_llm_config):
-        requester, model_name = Model.get_active_llm_model()
+        requester, model = LLMModel.get_active_model()
 
         assert issubclass(requester, GeminiRequester)
-        assert model_name == GEMINI_LLM_MODEL_NAME
+        assert model.name == GEMINI_LLM_MODEL_NAME
 
     @pytest.mark.django_db
     def test_gemini_embedder(self, create_test_gemini_embedding_config):
-        embedder, model_name = Model.get_active_embedding_model()
+        embedder, model = EmbeddingModel.get_active_model()
 
         assert issubclass(embedder, GeminiEmbedder)
-        assert model_name == GEMINI_EMBEDDING_MODEL_NAME
+        assert model.name == GEMINI_EMBEDDING_MODEL_NAME
 
     @pytest.mark.django_db
     def test_anthropic_llm_requester(self, create_test_anthropic_llm_config):
-        requester, model_name = Model.get_active_llm_model()
+        requester, model = LLMModel.get_active_model()
 
         assert issubclass(requester, AnthropicRequester)
-        assert model_name == ANTHROPIC_LLM_MODEL_NAME
+        assert model.name == ANTHROPIC_LLM_MODEL_NAME

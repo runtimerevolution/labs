@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from config.celery import app
 from config.redis_client import RedisVariable, redis_client
-from core.models import Model, Project, VectorizerModel
+from core.models import LLMModel, EmbeddingModel, Project, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.vectorizer import Vectorizer
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_llm_response(prompt):
-    llm_requester, *llm_requester_args = Model.get_active_llm_model()
+    llm_requester, *llm_requester_args = LLMModel.get_active_model()
     requester = Requester(llm_requester, *llm_requester_args)
 
     retries, max_retries = 0, 5
@@ -49,7 +49,7 @@ def vectorize_repository_task(prefix="", project_id=0):
     if not (project_path := redis_client.get(RedisVariable.PROJECT_PATH, prefix=prefix)):
         project_path = Project.objects.get(id=project_id).path
 
-    embedder_class, *embeder_args = Model.get_active_embedding_model()
+    embedder_class, *embeder_args = EmbeddingModel.get_active_model()
     embedder = Embedder(embedder_class, *embeder_args)
 
     vectorizer_class = VectorizerModel.get_active_vectorizer(project_id)
@@ -70,7 +70,7 @@ def find_embeddings_task(
 ):
     project_id = redis_client.get(RedisVariable.PROJECT, prefix=prefix, default=project_id)
 
-    embedder_class, *embeder_args = Model.get_active_embedding_model()
+    embedder_class, *embeder_args = EmbeddingModel.get_active_model()
     files_path = Embedder(embedder_class, *embeder_args).retrieve_files_path(
         redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body),
         project_id,

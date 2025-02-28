@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import Literal, Tuple
+from typing import Tuple
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -25,17 +25,10 @@ provider_model_class = {
     "ANTHROPIC": {"llm": AnthropicRequester},
 }
 
-vectorizer_model_class = {"CHUNK_VECTORIZER": ChunkVectorizer, "PYTHON_VECTORIZER": PythonVectorizer}
-
-
-class ModelTypeEnum(Enum):
-    EMBEDDING = "Embedding"
-    LLM = "LLM"
-
-    @classmethod
-    def choices(cls):
-        return [(prop.name, prop.value) for prop in cls]
-
+vectorizer_model_class = {
+    "CHUNK_VECTORIZER": ChunkVectorizer, 
+    "PYTHON_VECTORIZER": PythonVectorizer,
+}
 
 class ProviderEnum(Enum):
     NO_PROVIDER = "No provider"
@@ -91,54 +84,91 @@ class Variable(models.Model):
                 f"The only possible values for DEFAULT_VECTORIZER are: {', '.join(allowed_vectorizer_values)}"
             )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
     
     class Meta:
         unique_together = ("provider", "name")
 
 
-class Model(models.Model):
-    model_type = models.CharField(choices=ModelTypeEnum.choices())
+class EmbeddingModel(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
-    model_name = models.CharField(max_length=255)
-    active = models.BooleanField(default=True)
+    name = models.CharField(max_length=255,help_text="Ensure this Embedding exists and is downloaded.")
+    active = models.BooleanField(default=True, help_text="Only one Embedding can be active.")
 
-    @staticmethod
-    def get_active_embedding_model() -> Tuple[Embedder, str]:
-        return Model._get_active_provider_model("embedding")
+    @classmethod
+    def get_active_model(cls) -> Tuple[Embedder, "EmbeddingModel"]:
+        try:
+            model = cls.objects.get(active=True)
+        except cls.DoesNotExist:
+            raise ValueError("No active embedding model configured")
 
-    @staticmethod
-    def get_active_llm_model() -> Tuple[Requester, str]:
-        return Model._get_active_provider_model("llm")
-
-    @staticmethod
-    def _get_active_provider_model(model_type: Literal["embedding", "llm", "vectorizer"]):
-        queryset = Model.objects.filter(model_type=model_type.upper(), active=True)
-        if not queryset.exists():
-            raise ValueError(f"No {model_type} model configured")
-
-        model = queryset.first()
-
-        # Load associated provider variables
         Variable.load_provider_keys(model.provider)
-        return provider_model_class[model.provider][model_type], model.model_name
 
-    def __str__(self):
-        return f"{self.model_type} {self.provider} {self.model_name}"
+        try:
+            embedder_class = provider_model_class[model.provider]["embedding"]
+        except KeyError:
+            raise ValueError(f"Provider '{model.provider}' is missing or has no embedder class defined.")
+
+        return embedder_class, model
+
+    def __str__(self) -> str:
+        return f"EmbeddingModel [{self.provider}] {self.name}"
 
     class Meta:
+        verbose_name = "Embedding"
+        verbose_name_plural = "Embeddings"
         constraints = [
             models.UniqueConstraint(
-                fields=["model_type"],
-                condition=Q(model_type=ModelTypeEnum.EMBEDDING, active=True),
+                fields=["provider"],
+                condition=Q(active=True),
                 name="unique_active_embedding",
-            ),
-            models.UniqueConstraint(
-                fields=["model_type"], condition=Q(model_type=ModelTypeEnum.LLM, active=True), name="unique_active_llm"
-            ),
+            )
         ]
-        indexes = [models.Index(fields=["provider", "model_name"])]
+        indexes = [models.Index(fields=["provider", "name"])]
+
+
+class LLMModel(models.Model):
+    provider = models.CharField(choices=ProviderEnum.choices())
+    name = models.CharField(max_length=255, help_text="Ensure this LLM exists and is downloaded.")
+    active = models.BooleanField(default=True, help_text="Only one LLM can be active.")
+    max_output_tokens = models.IntegerField(
+        null=True, 
+        blank=True, 
+        default=None,  
+        help_text="Leave blank for auto-detection, set only if required."
+    )
+
+    @classmethod
+    def get_active_model(cls) -> Tuple[Requester, "LLMModel"]:
+        try:
+            model = cls.objects.get(active=True)
+        except cls.DoesNotExist:
+            raise ValueError("No active llm model configured")
+
+        Variable.load_provider_keys(model.provider)
+
+        try:
+            llm_class = provider_model_class[model.provider]["llm"]
+        except KeyError:
+            raise ValueError(f"Provider '{model.provider}' is missing or has no LLM class defined.")
+
+        return llm_class, model
+
+    def __str__(self) -> str:
+        return f"LLMModel [{self.provider}] {self.name}"
+
+    class Meta:
+        verbose_name = "LLM"
+        verbose_name_plural = "LLMs"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["provider"],
+                condition=Q(active=True),
+                name="unique_active_llm",
+            )
+        ]
+        indexes = [models.Index(fields=["provider", "name"])]
 
 
 class Project(models.Model):
@@ -161,7 +191,7 @@ class Project(models.Model):
             VectorizerModel.objects.create(project=self)
             Prompt.objects.create(project=self)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     class Meta:
@@ -174,16 +204,20 @@ class VectorizerModel(models.Model):
     vectorizer_type = models.CharField(choices=VectorizerEnum.choices(), default=Variable.get_default_vectorizer_value)
 
     @staticmethod
-    def get_active_vectorizer(project_id) -> Vectorizer:
-        queryset = VectorizerModel.objects.filter(project__id=project_id)
-        if not queryset.exists():
-            raise ValueError("No vectorizer configured")
+    def get_active_vectorizer(project_id: int) -> Vectorizer:
+        vector_model = VectorizerModel.objects.filter(project__id=project_id).first()
+        if not vector_model:
+            raise ValueError("No vectorizer configured for this project.")
+        
+        try:
+            vec_class = vectorizer_model_class[vector_model.vectorizer_type]
+        except KeyError:
+            raise ValueError(f"Unrecognized vectorizer type '{vector_model.vectorizer_type}'")
 
-        vectorizer_model = queryset.first()
-        return vectorizer_model_class[vectorizer_model.vectorizer_type]
+        return vec_class
 
-    def __str__(self):
-        return self.vectorizer_type
+    def __str__(self) -> str:
+        return f"{self.vectorizer_type} for {self.project.name}"
 
     class Meta:
         verbose_name = "Vectorizer"
@@ -202,7 +236,7 @@ class WorkflowResult(models.Model):
     pre_commit_error = models.TextField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.task_id}"
 
     class Meta:
@@ -243,7 +277,7 @@ class Prompt(models.Model):
 
         return queryset.first().instruction
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.persona[:50]}..., {self.instruction[:50]}..."
 
     class Meta:

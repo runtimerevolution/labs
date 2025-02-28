@@ -6,7 +6,7 @@ from litellm import embedding
 
 class OpenAIEmbedder:
     def __init__(self, model):
-        self._model_name = model
+        self._model_name = model.name
         openai.api_key = os.environ.get("OPENAI_API_KEY")
 
     def embed(self, prompt, *args, **kwargs) -> Embeddings:

@@ -1,7 +1,7 @@
 from typing import List
 
 import pytest
-from core.models import Model, ModelTypeEnum, Project, ProviderEnum, Variable
+from core.models import LLMModel, EmbeddingModel, Project, ProviderEnum, Variable
 from embeddings.models import Embedding
 from tests.constants import (
     ANTHROPIC_LLM_MODEL_NAME,
@@ -50,10 +50,9 @@ def create_multiple_embeddings(create_test_project):
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_ollama_embedding_config():
-    return Model.objects.create(
-        model_type=ModelTypeEnum.EMBEDDING.name,
+    return EmbeddingModel.objects.create(
         provider=ProviderEnum.OLLAMA.name,
-        model_name=OLLAMA_EMBEDDING_MODEL_NAME,
+        name=OLLAMA_EMBEDDING_MODEL_NAME,
         active=True,
     )
 
@@ -61,10 +60,9 @@ def create_test_ollama_embedding_config():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_ollama_llm_config():
-    return Model.objects.create(
-        model_type=ModelTypeEnum.LLM.name,
+    return LLMModel.objects.create(
         provider=ProviderEnum.OLLAMA.name,
-        model_name=OLLAMA_LLM_MODEL_NAME,
+        name=OLLAMA_LLM_MODEL_NAME,
         active=True,
     )
 
@@ -72,10 +70,9 @@ def create_test_ollama_llm_config():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_openai_embedding_config():
-    return Model.objects.create(
-        model_type=ModelTypeEnum.EMBEDDING.name,
+    return EmbeddingModel.objects.create(
         provider=ProviderEnum.OPENAI.name,
-        model_name=OPENAI_EMBEDDING_MODEL_NAME,
+        name=OPENAI_EMBEDDING_MODEL_NAME,
         active=True,
     )
 
@@ -83,10 +80,9 @@ def create_test_openai_embedding_config():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_openai_llm_config():
-    return Model.objects.create(
-        model_type=ModelTypeEnum.LLM.name,
+    return LLMModel.objects.create(
         provider=ProviderEnum.OPENAI.name,
-        model_name=OPENAI_LLM_MODEL_NAME,
+        name=OPENAI_LLM_MODEL_NAME,
         active=True,
     )
 
@@ -94,10 +90,9 @@ def create_test_openai_llm_config():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_gemini_embedding_config():
-    return Model.objects.create(
-        model_type=ModelTypeEnum.EMBEDDING.name,
+    return EmbeddingModel.objects.create(
         provider=ProviderEnum.GEMINI.name,
-        model_name=GEMINI_EMBEDDING_MODEL_NAME,
+        name=GEMINI_EMBEDDING_MODEL_NAME,
         active=True,
     )
 
@@ -105,10 +100,9 @@ def create_test_gemini_embedding_config():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_gemini_llm_config():
-    return Model.objects.create(
-        model_type=ModelTypeEnum.LLM.name,
+    return LLMModel.objects.create(
         provider=ProviderEnum.GEMINI.name,
-        model_name=GEMINI_LLM_MODEL_NAME,
+        name=GEMINI_LLM_MODEL_NAME,
         active=True,
     )
 
@@ -116,9 +110,8 @@ def create_test_gemini_llm_config():
 @pytest.fixture
 @pytest.mark.django_db
 def create_test_anthropic_llm_config():
-    return Model.objects.create(
-        model_type=ModelTypeEnum.LLM.name,
+    return LLMModel.objects.create(
         provider=ProviderEnum.ANTHROPIC.name,
-        model_name=ANTHROPIC_LLM_MODEL_NAME,
+        name=ANTHROPIC_LLM_MODEL_NAME,
         active=True,
     )
