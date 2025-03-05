@@ -346,3 +346,9 @@ The exploration of these eight advanced Retrieval Augmented Generation (RAG) tec
 - Unstructured RAG adapts RAG methodologies to handle raw, unsegmented data, including mixed content like text, tables, and images, ensuring that even disorganized sources contribute effectively to the final response.
 
 Collectively, these techniques demonstrate that the key to improving RAG systems lies in carefully tailoring the retrieval process to the specific nuances of the data and the query. By refining query representations, merging diverse retrieval signals, and incorporating contextual compression, these methods contribute to generating more accurate, relevant, and cost effective answers. This study not only highlights the breadth of approaches available but also provides a framework for selecting and combining techniques based on the unique challenges of different applications in the evolving field of retrieval augmented generation.
+
+# Additional Insights:
+
+- Transitioning from Naive to Hybrid RAG: Our current implementation follows the Naive RAG approach. Moving to Hybrid RAG is straightforward, by adding a sparse retrieval component and fusing its results, we can achieve a richer context.
+- Hybrid vs. RAG Fusion: Hybrid RAG typically uses a fixed or weighted fusion of the two, whereas RAG Fusion refines the process by generating sub queries and applying Reciprocal Rank Fusion to dynamically rank and merge results.
+- Hyde works by creating a draft answer based on the question, and then uses that draft to find documents that match its ideas. In contrast, RAG Fusion makes extra related questions from the original query and uses those to sort and rank the documents it retrieves.
