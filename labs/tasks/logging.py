@@ -1,12 +1,12 @@
 from config.celery import app
 from config.redis_client import RedisVariable, redis_client
-from core.models import Model, WorkflowResult
+from core.models import EmbeddingModel, LLMModel, WorkflowResult
 
 
 @app.task
 def save_workflow_result_task(prefix):
-    _, embedding_model_name = Model.get_active_embedding_model()
-    _, llm_model_name = Model.get_active_llm_model()
+    _, embedding_model_name = EmbeddingModel.get_active_model()
+    _, llm_model_name = LLMModel.get_active_model()
     project_id = redis_client.get(RedisVariable.PROJECT, prefix)
     embeddings = redis_client.get(RedisVariable.EMBEDDINGS, prefix)
     context = redis_client.get(RedisVariable.CONTEXT, prefix)

@@ -2,8 +2,8 @@ import factory
 from factory.django import DjangoModelFactory
 
 from .models import (
-    Model,
-    ModelTypeEnum,
+    LLMModel,
+    EmbeddingModel,
     Project,
     Prompt,
     ProviderEnum,
@@ -30,13 +30,22 @@ class VariableFactory(DjangoModelFactory):
             raise ValueError("Invalid vectorizer value")
 
 
-class ModelFactory(DjangoModelFactory):
+class LLMModelFactory(DjangoModelFactory):
     class Meta:
-        model = Model
+        model = LLMModel
 
-    model_type = factory.Iterator([mt.name for mt in ModelTypeEnum])
     provider = factory.Iterator([provider.name for provider in ProviderEnum if provider != ProviderEnum.NO_PROVIDER])
-    model_name = factory.Faker("word")
+    name = factory.Faker("word")
+    active = factory.Faker("boolean")
+    max_output_tokens = factory.Faker("integer")
+
+
+class EmbeddingModelFactory(DjangoModelFactory):
+    class Meta:
+        model = EmbeddingModel
+
+    provider = factory.Iterator([provider.name for provider in ProviderEnum if provider != ProviderEnum.NO_PROVIDER])
+    name = factory.Faker("word")
     active = factory.Faker("boolean")
 
 

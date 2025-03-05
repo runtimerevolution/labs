@@ -1,0 +1,29 @@
+[
+    {
+        "model": "core.embeddingmodel",
+        "pk": 1,
+        "fields": {
+            "provider": "OLLAMA",
+            "name": "nomic-embed-text:latest",
+            "active": false
+        }
+    },
+    {
+        "model": "core.embeddingmodel",
+        "pk": 2,
+        "fields": {
+            "provider": "OPENAI",
+            "name": "text-embedding-3-small",
+            "active": true
+        }
+    },
+    {
+        "model": "core.embeddingmodel",
+        "pk": 3,
+        "fields": {
+            "provider": "GEMINI",
+            "name": "models/text-embedding-004",
+            "active": false
+        }
+    }
+]
