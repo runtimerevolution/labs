@@ -1,17 +1,20 @@
 from django.contrib import admin
 from django.urls import reverse
 
-from .forms import ProjectForm, ModelFormSet
+from .forms import ProjectForm, EmbeddingModelFormSet, LLMModelFormSet
 from .mixins import JSONFormatterMixin
-from .models import Model, Project, Prompt, Variable, VectorizerModel, WorkflowResult
+from .models import (
+    EmbeddingModel, LLMModel, Project, Prompt, 
+    Variable, VectorizerModel, WorkflowResult
+)
 
-@admin.register(Model)
-class ModelAdmin(admin.ModelAdmin):
-    list_display = ("id", "model_type", "provider", "model_name", "active")
+@admin.register(EmbeddingModel)
+class EmbeddingModelAdmin(admin.ModelAdmin):
+    list_display = ("id", "provider", "name", "active")
     list_display_links = ("id",)
-    list_editable = ("model_type", "provider", "model_name", "active")
-    list_filter = ("provider", "model_name")
-    search_fields = ("provider", "model_name")
+    list_editable = ("name", "active")
+    list_filter = ("provider", "name")
+    search_fields = ("provider", "name")
 
     def has_add_permission(self, request):
         return False
@@ -20,7 +23,26 @@ class ModelAdmin(admin.ModelAdmin):
         return False
 
     def get_changelist_formset(self, request, **kwargs):
-        kwargs["formset"] = ModelFormSet
+        kwargs["formset"] = EmbeddingModelFormSet
+        return super().get_changelist_formset(request, **kwargs)
+
+
+@admin.register(LLMModel)
+class LLMModelAdmin(admin.ModelAdmin):
+    list_display = ("id", "provider", "name", "max_output_tokens", "active")
+    list_display_links = ("id",)
+    list_editable = ("name", "max_output_tokens", "active")
+    list_filter = ("provider", "name")
+    search_fields = ("provider", "name", "max_output_tokens")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_changelist_formset(self, request, **kwargs):
+        kwargs["formset"] = LLMModelFormSet
         return super().get_changelist_formset(request, **kwargs)
 
 

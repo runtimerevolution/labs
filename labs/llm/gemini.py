@@ -6,8 +6,8 @@ import google.generativeai as genai
 
 
 class GeminiRequester:
-    def __init__(self, model: str):
-        self._model_name = model
+    def __init__(self, model):
+        self._model_name = model.name
         api_key = os.environ.get("GEMINI_API_KEY")
         genai.configure(api_key=api_key)
         self.generative_model = genai.GenerativeModel(self._model_name)

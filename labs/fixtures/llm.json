@@ -1,0 +1,40 @@
+[
+    {
+        "model": "core.llmmodel",
+        "pk": 1,
+        "fields": {
+            "provider": "OPENAI",
+            "name": "gpt-4o",
+            "active": true
+        }
+    },
+    {
+        "model": "core.llmmodel",
+        "pk": 2,
+        "fields": {
+            "provider": "OLLAMA",
+            "name": "llama3.2:latest",
+            "max_output_tokens": 2048,
+            "active": false
+        }
+    },
+    {
+        "model": "core.llmmodel",
+        "pk": 3,
+        "fields": {
+            "provider": "GEMINI",
+            "name": "gemini-2.0-flash",
+            "active": false
+        }
+    },
+    {
+        "model": "core.llmmodel",
+        "pk": 4,
+        "fields": {
+            "provider": "ANTHROPIC",
+            "name": "claude-3-5-sonnet-20241022",
+            "max_output_tokens": 8192,
+            "active": false
+        }
+    }
+]
