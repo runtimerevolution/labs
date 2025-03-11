@@ -10,4 +10,4 @@ class OllamaEmbedder:
 
     def embed(self, prompt, *args, **kwargs) -> Embeddings:
         result = self._client.embed(self._model_name, prompt, *args, **kwargs)
-        return Embeddings(model=result["model"], embeddings=result["embeddings"])
+        return Embeddings(model=result["model"], embeddings=result["embeddings"], tokens=None)

@@ -1,6 +1,8 @@
 import os
+
 import google.generativeai as genai
 from embeddings.embedder import Embeddings
+
 
 class GeminiEmbedder:
     def __init__(self, model):
@@ -13,7 +15,7 @@ class GeminiEmbedder:
             result = genai.embed_content(
                 model=self._model_name,
                 content=prompt,
-                *args, 
+                *args,
                 **kwargs,
             )
 
@@ -22,11 +24,12 @@ class GeminiEmbedder:
                 flat_vectors = emb
             else:
                 flat_vectors = [emb]
-    
+
             return Embeddings(
                 model=self._model_name,
                 model_config=result.get("model_config", {}),
-                embeddings=flat_vectors
+                embeddings=flat_vectors,
+                tokens=None,
             )
 
         except Exception as e:
