@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class Embeddings:
     model: str
     tokens: Optional[int]
-    embeddings: Union[List[Dict[str, Any]], List[List[int]]]
+    embeddings: List[List[float]]
     model_config: Optional[Dict[str, Any]] = None
 
 
