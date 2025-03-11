@@ -24,6 +24,7 @@ def get_llm_response(prompt):
     is_invalid, reason = True, None
 
     llm_response = None
+    tokens = 0
     while is_invalid and retries < max_retries:
         try:
             llm_response = requester.completion_without_proxy(prompt)
@@ -40,7 +41,7 @@ def get_llm_response(prompt):
             llm_response = None
             logger.info(f"Redoing LLM response request doe to error (retries: {retries} of {max_retries}): {reason}")
 
-    return True, llm_response
+    return True, llm_response, tokens
 
 
 @app.task
@@ -125,13 +126,21 @@ def get_llm_response_task(prefix="", context=None):
         context = {}
 
     context = json.loads(redis_client.get(RedisVariable.CONTEXT, prefix=prefix, default=context))
+
     llm_response = get_llm_response(context)
 
     if prefix:
+        _, response, tokens = llm_response
         redis_client.set(
             RedisVariable.LLM_RESPONSE,
             prefix=prefix,
-            value=llm_response[1][1]["choices"][0]["message"]["content"],
+            value=response[1]["choices"][0]["message"]["content"],
         )
+        if tokens:
+            redis_client.set(
+                RedisVariable.LLM_TOKENS,
+                prefix=prefix,
+                value=tokens,
+            )
         return prefix
     return llm_response

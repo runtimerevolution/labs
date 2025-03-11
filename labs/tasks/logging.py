@@ -12,6 +12,7 @@ def save_workflow_result_task(prefix):
     embeddings_tokens = redis_client.get(RedisVariable.EMBEDDINGS_TOKENS, prefix)
     context = redis_client.get(RedisVariable.CONTEXT, prefix)
     llm_response = redis_client.get(RedisVariable.LLM_RESPONSE, prefix)
+    llm_tokens = redis_client.get(RedisVariable.LLM_TOKENS, prefix)
     modified_files = redis_client.get(RedisVariable.FILES_MODIFIED, prefix)
     pre_commit_error = redis_client.get(RedisVariable.PRE_COMMIT_ERROR, prefix)
 
@@ -24,6 +25,7 @@ def save_workflow_result_task(prefix):
         embeddings_tokens=embeddings_tokens,
         context=context,
         llm_response=llm_response,
+        llm_tokens=llm_tokens,
         modified_files=modified_files,
         pre_commit_error=pre_commit_error,
     )
