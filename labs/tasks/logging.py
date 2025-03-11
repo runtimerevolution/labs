@@ -9,6 +9,7 @@ def save_workflow_result_task(prefix):
     _, llm_model_name = LLMModel.get_active_model()
     project_id = redis_client.get(RedisVariable.PROJECT, prefix)
     embeddings = redis_client.get(RedisVariable.EMBEDDINGS, prefix)
+    embeddings_tokens = redis_client.get(RedisVariable.EMBEDDINGS_TOKENS, prefix)
     context = redis_client.get(RedisVariable.CONTEXT, prefix)
     llm_response = redis_client.get(RedisVariable.LLM_RESPONSE, prefix)
     modified_files = redis_client.get(RedisVariable.FILES_MODIFIED, prefix)
@@ -20,6 +21,7 @@ def save_workflow_result_task(prefix):
         embed_model=embedding_model_name,
         prompt_model=llm_model_name,
         embeddings=embeddings,
+        embeddings_tokens=embeddings_tokens,
         context=context,
         llm_response=llm_response,
         modified_files=modified_files,

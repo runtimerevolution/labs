@@ -10,6 +10,7 @@ class RedisVariable(Enum):
     BRANCH_NAME = "branch_name"
     CONTEXT = "context"
     EMBEDDINGS = "embeddings"
+    EMBEDDINGS_TOKENS = "embeddings_tokens"
     FILES_MODIFIED = "files_modified"
     ISSUE_BODY = "issue_body"
     ISSUE_NUMBER = "issue_number"

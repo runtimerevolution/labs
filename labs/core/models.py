@@ -26,9 +26,10 @@ provider_model_class = {
 }
 
 vectorizer_model_class = {
-    "CHUNK_VECTORIZER": ChunkVectorizer, 
+    "CHUNK_VECTORIZER": ChunkVectorizer,
     "PYTHON_VECTORIZER": PythonVectorizer,
 }
+
 
 class ProviderEnum(Enum):
     NO_PROVIDER = "No provider"
@@ -86,14 +87,14 @@ class Variable(models.Model):
 
     def __str__(self) -> str:
         return self.name
-    
+
     class Meta:
         unique_together = ("provider", "name")
 
 
 class EmbeddingModel(models.Model):
     provider = models.CharField(choices=ProviderEnum.choices())
-    name = models.CharField(max_length=255,help_text="Ensure this Embedding exists and is downloaded.")
+    name = models.CharField(max_length=255, help_text="Ensure this Embedding exists and is downloaded.")
     active = models.BooleanField(default=True, help_text="Only one Embedding can be active.")
 
     @classmethod
@@ -133,10 +134,7 @@ class LLMModel(models.Model):
     name = models.CharField(max_length=255, help_text="Ensure this LLM exists and is downloaded.")
     active = models.BooleanField(default=True, help_text="Only one LLM can be active.")
     max_output_tokens = models.IntegerField(
-        null=True, 
-        blank=True, 
-        default=None,  
-        help_text="Leave blank for auto-detection, set only if required."
+        null=True, blank=True, default=None, help_text="Leave blank for auto-detection, set only if required."
     )
 
     @classmethod
@@ -208,7 +206,7 @@ class VectorizerModel(models.Model):
         vector_model = VectorizerModel.objects.filter(project__id=project_id).first()
         if not vector_model:
             raise ValueError("No vectorizer configured for this project.")
-        
+
         try:
             vec_class = vectorizer_model_class[vector_model.vectorizer_type]
         except KeyError:
@@ -230,6 +228,10 @@ class WorkflowResult(models.Model):
     embed_model = models.CharField(max_length=255, null=True)
     prompt_model = models.CharField(max_length=255, null=True)
     embeddings = models.TextField(null=True)
+    embeddings_tokens = models.IntegerField(
+        null=True,
+        default=None,
+    )
     context = models.TextField(null=True)
     llm_response = models.TextField(null=True)
     modified_files = models.TextField(null=True)
