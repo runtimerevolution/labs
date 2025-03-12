@@ -166,6 +166,7 @@ class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
         "embeddings_tokens",
         "pretty_context",
         "pretty_llm_response",
+        "llm_tokens",
         "pretty_modified_files",
         "pretty_pre_commit_error",
     )

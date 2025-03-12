@@ -28,6 +28,9 @@ def get_llm_response(prompt):
     while is_invalid and retries < max_retries:
         try:
             llm_response = requester.completion_without_proxy(prompt)
+
+            tokens += llm_response[2]
+
             logger.debug(f"LLM response: {llm_response}")
 
             is_invalid, reason = run_response_checks(llm_response)
@@ -39,7 +42,7 @@ def get_llm_response(prompt):
         if is_invalid:
             retries += 1
             llm_response = None
-            logger.info(f"Redoing LLM response request doe to error (retries: {retries} of {max_retries}): {reason}")
+            logger.info(f"Redoing LLM response request due to error (retries: {retries} of {max_retries}): {reason}")
 
     return True, llm_response, tokens
 
