@@ -1,12 +1,9 @@
-import logging
 import os
 from typing import Any, Dict, Tuple
 
 import openai
 from litellm import completion
 from litellm.types.utils import ModelResponse
-
-logger = logging.getLogger(__name__)
 
 
 class OpenAIRequester:

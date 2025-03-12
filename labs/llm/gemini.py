@@ -1,9 +1,12 @@
 import json
+import logging
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, cast
 
 from google import genai
 from google.genai import types
+
+logger = logging.getLogger(__name__)
 
 
 class GeminiRequester:
@@ -17,7 +20,7 @@ class GeminiRequester:
         messages: List[Dict[str, str]],
         *args,
         **kwargs,
-    ) -> Tuple[str, Dict[str, Any]]:
+    ) -> Tuple[str, Dict[str, Any], int]:
         try:
             gemini_response = self._client.models.generate_content(
                 model=self._model_name,
@@ -27,6 +30,9 @@ class GeminiRequester:
                 **kwargs,
             )
 
-            return self._model_name, {"choices": [{"message": {"content": gemini_response.text}}]}
+            assert gemini_response.usage_metadata
+            tokens = cast(int, gemini_response.usage_metadata.total_token_count)
+
+            return self._model_name, {"choices": [{"message": {"content": gemini_response.text}}]}, tokens
         except Exception as e:
             raise RuntimeError(f"Gemini API call failed: {e}") from e
