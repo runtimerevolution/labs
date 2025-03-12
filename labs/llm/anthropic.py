@@ -20,7 +20,7 @@ class AnthropicRequester:
         messages: List[Dict[str, str]],
         *args,
         **kwargs,
-    ) -> Tuple[str, Dict[str, Any]]:
+    ) -> Tuple[str, Dict[str, Any], int]:
         system_prompt = "\n".join([message["content"] for message in messages if message["role"] == "system"])
         user_messages = [message for message in messages if message["role"] == "user"]
 
@@ -32,9 +32,11 @@ class AnthropicRequester:
                 max_tokens=self._model_max_output_tokens,
             )
 
+            tokens = response.usage.input_tokens + response.usage.output_tokens
+
             response_steps = self.response_to_steps(response)
 
-            return self._model_name, {"choices": [{"message": {"content": response_steps}}]}
+            return self._model_name, {"choices": [{"message": {"content": response_steps}}]}, tokens
         except Exception as e:
             raise RuntimeError(f"Anthropic API call failed: {e}") from e
 
