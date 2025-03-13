@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Embeddings:
     model: str
-    embeddings: Union[List[Dict[str, Any]], List[List[int]]]
+    tokens: Optional[int]
+    embeddings: List[List[float]]
     model_config: Optional[Dict[str, Any]] = None
 
 
@@ -26,20 +27,16 @@ class Embedder:
 
     def retrieve_files_path(
         self,
-        query: str,
+        embedded_prompt: Embeddings,
         project_id: int,
         similarity_threshold: float = settings.EMBEDDINGS_SIMILARITY_THRESHOLD,
         max_results: int = settings.EMBEDDINGS_MAX_RESULTS,
     ) -> List[str]:
-        query = query.replace("\n", "")
-        embedded_query = self.embed(prompt=query).embeddings
-        if not embedded_query:
-            raise ValueError(f"No embeddings found with the given {query=} with {similarity_threshold=}")
-
         files_path = (
             Embedding.objects.filter(project__id=project_id)
-            .values("file_path")  # the combination of values and annotate, is the Django way of making a group by
-            .annotate(distance=Min(CosineDistance("embedding", embedded_query[0])))
+            # the combination of values and annotate, is the Django way of making a group by
+            .values("file_path")
+            .annotate(distance=Min(CosineDistance("embedding", embedded_prompt.embeddings[0])))
             .order_by("distance")
             .values_list("file_path", flat=True)
         )[:max_results]

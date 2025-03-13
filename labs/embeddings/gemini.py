@@ -1,32 +1,37 @@
 import os
-import google.generativeai as genai
+
 from embeddings.embedder import Embeddings
+from google import genai
+
 
 class GeminiEmbedder:
     def __init__(self, model):
         self._model_name = model.name
         api_key = os.environ.get("GEMINI_API_KEY")
-        genai.configure(api_key=api_key)
+        self._client = genai.Client(api_key=api_key)
 
     def embed(self, prompt: str, *args, **kwargs) -> Embeddings:
         try:
-            result = genai.embed_content(
+            result = self._client.models.embed_content(
                 model=self._model_name,
-                content=prompt,
-                *args, 
+                contents=[prompt],
+                *args,
                 **kwargs,
             )
 
-            emb = result.get("embedding")
-            if isinstance(emb, list) and all(isinstance(e, list) for e in emb):
-                flat_vectors = emb
-            else:
-                flat_vectors = [emb]
-    
+            assert result.embeddings
+
+            embeddings = []
+
+            for content_embedding in result.embeddings:
+                if content_embedding.values:
+                    embeddings.append(content_embedding.values)
+
             return Embeddings(
                 model=self._model_name,
-                model_config=result.get("model_config", {}),
-                embeddings=flat_vectors
+                model_config=result.model_config,
+                embeddings=embeddings,
+                tokens=None,
             )
 
         except Exception as e:

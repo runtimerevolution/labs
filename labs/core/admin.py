@@ -1,12 +1,10 @@
 from django.contrib import admin
 from django.urls import reverse
 
-from .forms import ProjectForm, EmbeddingModelFormSet, LLMModelFormSet
+from .forms import EmbeddingModelFormSet, LLMModelFormSet, ProjectForm
 from .mixins import JSONFormatterMixin
-from .models import (
-    EmbeddingModel, LLMModel, Project, Prompt, 
-    Variable, VectorizerModel, WorkflowResult
-)
+from .models import EmbeddingModel, LLMModel, Project, Prompt, Variable, VectorizerModel, WorkflowResult
+
 
 @admin.register(EmbeddingModel)
 class EmbeddingModelAdmin(admin.ModelAdmin):
@@ -165,8 +163,10 @@ class WorkflowResultAdmin(admin.ModelAdmin, JSONFormatterMixin):
         "embed_model",
         "prompt_model",
         "pretty_embeddings",
+        "embeddings_tokens",
         "pretty_context",
         "pretty_llm_response",
+        "llm_tokens",
         "pretty_modified_files",
         "pretty_pre_commit_error",
     )

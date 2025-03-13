@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from config.celery import app
 from config.redis_client import RedisVariable, redis_client
-from core.models import LLMModel, EmbeddingModel, Project, VectorizerModel
+from core.models import EmbeddingModel, LLMModel, Project, VectorizerModel
 from django.conf import settings
 from embeddings.embedder import Embedder
 from embeddings.vectorizers.vectorizer import Vectorizer
@@ -24,9 +24,13 @@ def get_llm_response(prompt):
     is_invalid, reason = True, None
 
     llm_response = None
+    tokens = 0
     while is_invalid and retries < max_retries:
         try:
             llm_response = requester.completion_without_proxy(prompt)
+
+            tokens += llm_response[2]
+
             logger.debug(f"LLM response: {llm_response}")
 
             is_invalid, reason = run_response_checks(llm_response)
@@ -38,9 +42,9 @@ def get_llm_response(prompt):
         if is_invalid:
             retries += 1
             llm_response = None
-            logger.info(f"Redoing LLM response request doe to error (retries: {retries} of {max_retries}): {reason}")
+            logger.info(f"Redoing LLM response request due to error (retries: {retries} of {max_retries}): {reason}")
 
-    return True, llm_response
+    return True, llm_response, tokens
 
 
 @app.task
@@ -69,10 +73,20 @@ def find_embeddings_task(
     max_results=settings.EMBEDDINGS_MAX_RESULTS,
 ):
     project_id = redis_client.get(RedisVariable.PROJECT, prefix=prefix, default=project_id)
+    prompt = redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body)
 
     embedder_class, *embeder_args = EmbeddingModel.get_active_model()
-    files_path = Embedder(embedder_class, *embeder_args).retrieve_files_path(
-        redis_client.get(RedisVariable.ISSUE_BODY, prefix=prefix, default=issue_body),
+
+    embedder = Embedder(embedder_class, *embeder_args)
+
+    prompt = str(prompt).replace("\n", "")
+    embedded_prompt = embedder.embed(prompt=prompt)
+
+    if not embedded_prompt:
+        raise ValueError(f"No embeddings found with the given {prompt=} with {similarity_threshold=}")
+
+    files_path = embedder.retrieve_files_path(
+        embedded_prompt,
         project_id,
         similarity_threshold,
         max_results,
@@ -80,6 +94,10 @@ def find_embeddings_task(
 
     if prefix:
         redis_client.set(RedisVariable.EMBEDDINGS, prefix=prefix, value=json.dumps(files_path))
+
+        if embedded_prompt.tokens:
+            redis_client.set(RedisVariable.EMBEDDINGS_TOKENS, prefix=prefix, value=json.dumps(embedded_prompt.tokens))
+
         return prefix
     return files_path
 
@@ -111,13 +129,21 @@ def get_llm_response_task(prefix="", context=None):
         context = {}
 
     context = json.loads(redis_client.get(RedisVariable.CONTEXT, prefix=prefix, default=context))
+
     llm_response = get_llm_response(context)
 
     if prefix:
+        _, response, tokens = llm_response
         redis_client.set(
             RedisVariable.LLM_RESPONSE,
             prefix=prefix,
-            value=llm_response[1][1]["choices"][0]["message"]["content"],
+            value=response[1]["choices"][0]["message"]["content"],
         )
+        if tokens:
+            redis_client.set(
+                RedisVariable.LLM_TOKENS,
+                prefix=prefix,
+                value=tokens,
+            )
         return prefix
     return llm_response

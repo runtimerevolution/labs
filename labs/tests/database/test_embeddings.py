@@ -2,11 +2,11 @@ import random
 from typing import Union
 
 import pytest
+from core.factories import EmbeddingModelFactory
 from core.models import Project
 from embeddings.embedder import Embedder, Embeddings
 from embeddings.models import Embedding
 from embeddings.openai import OpenAIEmbedder
-from core.factories import EmbeddingModelFactory
 from tests.constants import MULTIPLE_EMBEDDINGS, OPENAI_EMBEDDING_MODEL_NAME, SINGLE_EMBEDDING
 
 
@@ -55,12 +55,13 @@ def test_reembed_code(create_test_project):
             random.sample(range(1, 5000), k=1536),
             random.sample(range(1, 5000), k=1536),
         ],
+        tokens=0,
     )
 
     embedding_model = EmbeddingModelFactory(
         provider="OPENAI",
         name=OPENAI_EMBEDDING_MODEL_NAME,
-        active=True,  
+        active=True,
     )
 
     Embedder(OpenAIEmbedder, model=embedding_model).reembed_code(
